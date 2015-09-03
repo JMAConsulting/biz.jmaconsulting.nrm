@@ -47,20 +47,25 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   function select() {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
+    $urlSubWhere = self::createSubURLCondition();
 
     $this->_columnHeaders["description"]['title'] = " ";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
     $this->_select = "SELECT 'Total unique new visitors for the day' as description, SUM(perday_visitor) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
-       FROM  {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW())) as x 
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW())) as a
        UNION 
        SELECT 'Total unique new visitors for all time' as description, SUM(perday_visitor) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
-       FROM  {$this->_drupalDatabase}.watchdog) as y 
+       FROM {$this->_drupalDatabase}.watchdog) as b
        UNION
        SELECT 'Total starts for individual forms and surveys for the day' as description, SUM(perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM  {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW()) {$urlWhere}) as z";
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW()) {$urlWhere}) as c
+       UNION
+       SELECT 'Total completed submissions for individual forms and surveys for the day' as description, SUM(perday_completed) as perday_visitor_count FROM
+       ( SELECT COUNT(nid) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW()) {$urlSubWhere}) as d";
   }
 
   function from() {
@@ -140,10 +145,26 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       $diff = array_flip(array_diff(array_flip($urls), $webformParams));
     }
     if (empty($diff)) {
-      return FALSE;
+      return " AND (1)";
     } 
     $statement = implode("' OR location LIKE '%", $diff);
     $sql = " AND location LIKE '%{$statement}'";
+    return $sql;
+  }
+  
+  function createSubURLCondition() {
+    // First get submitted params from webform
+    $webformOP = $this->_params['webforms_op'];
+    $webformParams = $this->_params['webforms_value'];
+    // Compute the intersection
+    if ($webformOP == 'in') {
+      $op = "IN";
+    }
+    else if ($webformOP == 'notin') {
+      $op = "NOT IN";
+    }
+    $statement = '(' . implode(",", $webformParams) . ')';
+    $sql = " AND nid {$op} {$statement}";
     return $sql;
   }
 
