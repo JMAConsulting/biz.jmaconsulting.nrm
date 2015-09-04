@@ -6,9 +6,17 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
   protected $_emailField = FALSE;
 
+  protected $_phoneField = FALSE;
+
   protected $_summary = NULL;
 
-  protected $_customGroupGroupBy = FALSE; function __construct() {
+  protected $_customGroupGroupBy = FALSE; 
+ 
+  function __construct() {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $this->_drupalDatabase = $dsnArray['database'];
+
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -42,12 +50,26 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array('phone' => array('default' => TRUE)),
+        'fields' => array(
+          'phone' => array('default' => TRUE)
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array('email' => array('default' => TRUE)),
+        'fields' => array(
+          'email' => array('default' => TRUE)
+        ),
+        'grouping' => 'contact-fields',
+      ),
+      'civicrm_log' => array(
+        'dao' => 'CRM_Core_DAO_Log',
+        'fields' => array(
+          'modified_date' => array(
+            'title' => ts('Last Updated'),
+            'default' => TRUE,
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
     );
@@ -73,16 +95,16 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
               if ($fieldName == 'street_address') {
-                $s = $field['dbAlias'];
+                $s = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
               if ($fieldName == 'city') {
-                $c = $field['dbAlias'];
+                $c = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, ', '))";
               }
               if ($fieldName == 'postal_code') {
-                $p = $field['dbAlias'];
+                $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
               if (isset($s) && isset($c) && isset($p)) {
-                $select[] = "CONCAT({$s}, '<br/>', {$c}, ', ' , {$p})";
+                $select[] = "CONCAT($s, '<br/>', $c, $p)";
                 $select[] = "'<br/>'";
               }
             }
@@ -96,6 +118,10 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
               $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               $select[] = "'<br/>'";
             }
+            elseif ($tableName == 'civicrm_log') {
+              $this->_logField = TRUE;
+              $logSelect = "MAX({$field['dbAlias']})";
+            }
             else {
               $select[] = "{$field['dbAlias']}";
               $select[] = "'<br/>'";
@@ -105,8 +131,12 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name";
+    $this->_select = "SELECT contact_civireport.id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+      1  as civicrm_contact_first_visit,
+      {$logSelect} as civicrm_contact_last_update";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
+    $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
+    $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
   }
 
   function from() {
@@ -139,6 +169,14 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
                         ON {$this->_aliases['civicrm_contact']}.id =
                            {$this->_aliases['civicrm_phone']}.contact_id AND
                            {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
+    }
+    //used when log field is selected
+    if ($this->_logField) {
+      $this->_from .= "
+              LEFT JOIN civicrm_log {$this->_aliases['civicrm_log']}
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           {$this->_aliases['civicrm_log']}.entity_id AND
+                           {$this->_aliases['civicrm_log']}.entity_table = 'civicrm_contact'\n";
     }
   }
 
