@@ -100,14 +100,13 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
               $select[] = "{$field['dbAlias']}";
               $select[] = "'<br/>'";
             }
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
           }
         }
       }
     }
 
     $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name";
+    $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
   }
 
   function from() {
