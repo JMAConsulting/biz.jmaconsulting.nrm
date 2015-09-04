@@ -8,42 +8,21 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array('Membership');
   protected $_customGroupGroupBy = FALSE; function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
+          'display_name' => array(
+            'title' => ts('Student Info'),
             'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
         ),
         'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
+          'display_name' => array(
+            'title' => ts('Student Name'),
             'operator' => 'like',
           ),
           'id' => array(
@@ -52,71 +31,23 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_membership' => array(
-        'dao' => 'CRM_Member_DAO_Membership',
-        'fields' => array(
-          'membership_type_id' => array(
-            'title' => 'Membership Type',
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'join_date' => array('title' => ts('Join Date'),
-            'default' => TRUE,
-          ),
-          'source' => array('title' => 'Source'),
-        ),
-        'filters' => array(
-          'join_date' => array(
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'owner_membership_id' => array(
-            'title' => ts('Membership Owner ID'),
-            'operatorType' => CRM_Report_Form::OP_INT,
-          ),
-          'tid' => array(
-            'name' => 'membership_type_id',
-            'title' => ts('Membership Types'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Member_PseudoConstant::membershipType(),
-          ),
-        ),
-        'grouping' => 'member-fields',
-      ),
-      'civicrm_membership_status' => array(
-        'dao' => 'CRM_Member_DAO_MembershipStatus',
-        'alias' => 'mem_status',
-        'fields' => array(
-          'name' => array(
-            'title' => ts('Status'),
-            'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sid' => array(
-            'name' => 'id',
-            'title' => ts('Status'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'),
-          ),
-        ),
-        'grouping' => 'member-fields',
-      ),
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-          'state_province_id' => array('title' => ts('State/Province')),
-          'country_id' => array('title' => ts('Country')),
+          'street_address' => array('default' => TRUE),
+          'city' => array('default' => TRUE),
+          'postal_code' => array('default' => TRUE),
         ),
+        'grouping' => 'contact-fields',
+      ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' => array('phone' => array('default' => TRUE)),
         'grouping' => 'contact-fields',
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array('email' => NULL),
+        'fields' => array('email' => array('default' => TRUE)),
         'grouping' => 'contact-fields',
       ),
     );
@@ -126,7 +57,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Membership Detail Report'));
+    $this->assign('reportTitle', ts('Individual Counsellor Report'));
     parent::preProcess();
   }
 
@@ -141,11 +72,34 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
           ) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
+              if ($fieldName == 'street_address') {
+                $s = $field['dbAlias'];
+              }
+              if ($fieldName == 'city') {
+                $c = $field['dbAlias'];
+              }
+              if ($fieldName == 'postal_code') {
+                $p = $field['dbAlias'];
+              }
+              if (isset($s) && isset($c) && isset($p)) {
+                $select[] = "CONCAT({$s}, '<br/>', {$c}, ', ' , {$p})";
+                $select[] = "'<br/>'";
+              }
+            }
+            elseif ($tableName == 'civicrm_phone') {
+              $this->_phoneField = TRUE;
+              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('Home: ', {$field['dbAlias']}))";
+              $select[] = "'<br/>'";
             }
             elseif ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
+              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
+              $select[] = "'<br/>'";
             }
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
+            else {
+              $select[] = "{$field['dbAlias']}";
+              $select[] = "'<br/>'";
+            }
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
           }
@@ -153,20 +107,14 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name";
   }
 
   function from() {
     $this->_from = NULL;
 
     $this->_from = "
-         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-               INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
-                          ON {$this->_aliases['civicrm_contact']}.id =
-                             {$this->_aliases['civicrm_membership']}.contact_id AND {$this->_aliases['civicrm_membership']}.is_test = 0
-               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
-                          ON {$this->_aliases['civicrm_membership_status']}.id =
-                             {$this->_aliases['civicrm_membership']}.status_id ";
+         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} ";
 
 
     //used when address field is selected
@@ -184,6 +132,14 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
                         ON {$this->_aliases['civicrm_contact']}.id =
                            {$this->_aliases['civicrm_email']}.contact_id AND
                            {$this->_aliases['civicrm_email']}.is_primary = 1\n";
+    }
+    //used when phone field is selected
+    if ($this->_phoneField) {
+      $this->_from .= "
+              LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           {$this->_aliases['civicrm_phone']}.contact_id AND
+                           {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
   }
 
@@ -232,11 +188,11 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
   }
 
   function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id";
   }
 
   function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.display_name, {$this->_aliases['civicrm_contact']}.id";
   }
 
   function postProcess() {
@@ -279,13 +235,6 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
         }
       }
 
-      if (array_key_exists('civicrm_membership_membership_type_id', $row)) {
-        if ($value = $row['civicrm_membership_membership_type_id']) {
-          $rows[$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
           $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
@@ -300,16 +249,16 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if (array_key_exists('civicrm_contact_sort_name', $row) &&
-        $rows[$rowNum]['civicrm_contact_sort_name'] &&
+      if (array_key_exists('civicrm_contact_display_name', $row) &&
+        $rows[$rowNum]['civicrm_contact_display_name'] &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view",
           'reset=1&cid=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl
         );
-        $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_display_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
 
