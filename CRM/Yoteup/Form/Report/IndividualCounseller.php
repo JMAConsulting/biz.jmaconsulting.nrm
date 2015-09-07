@@ -8,6 +8,8 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
   protected $_phoneField = FALSE;
 
+  protected $_logField = FALSE;
+
   protected $_summary = NULL;
 
   protected $_customGroupGroupBy = FALSE; 
@@ -98,10 +100,10 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
                 $s = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
               if ($fieldName == 'city') {
-                $c = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, ', '))";
+                $c = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
               if ($fieldName == 'postal_code') {
-                $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
+                $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
               }
               if (isset($s) && isset($c) && isset($p)) {
                 $select[] = "CONCAT($s, '<br/>', $c, $p)";
@@ -131,7 +133,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT contact_civireport.id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+    $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       1  as civicrm_contact_first_visit,
       {$logSelect} as civicrm_contact_last_update";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
@@ -238,6 +240,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    self::createTemp();
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -246,6 +249,15 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
+  }
+  
+  function createTemp() {
+    $sql = "CREATE TABLE civicrm_watchdog_temp AS SELECT {$this->_aliases['civicrm_contact']}.id, p.purl_145, MIN(DATE(FROM_UNIXTIME(timestamp)))
+      FROM civicrm_contact {$this->_aliases['civicrm_contact']}
+      INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
+      INNER JOIN {$this->_drupalDatabase}.watchdog w ON (SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)) = p.purl_145";
+    CRM_Core_Error::debug( '$sql', $sql );
+    exit;
   }
 
   function alterDisplay(&$rows) {
