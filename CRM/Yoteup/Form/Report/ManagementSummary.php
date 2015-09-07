@@ -80,7 +80,16 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Number of cumulative form/survey completions for all time' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlSubWhere}
-       GROUP BY nid, remote_addr) as g";
+       GROUP BY nid, remote_addr) as g
+       UNION
+       SELECT 'Percent engagement rate for site' as description,
+       CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlSubWhere}
+       GROUP BY nid, remote_addr) as h
+       INNER JOIN
+       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_start 
+       FROM {$this->_drupalDatabase}.watchdog) as i";
   }
 
   function from() {
