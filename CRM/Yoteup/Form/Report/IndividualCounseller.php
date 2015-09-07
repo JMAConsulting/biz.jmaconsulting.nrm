@@ -1,5 +1,7 @@
 <?php
 
+require_once 'yoteup_constants.php';
+
 class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
   protected $_addressField = FALSE;
@@ -54,6 +56,40 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
           'phone' => array('default' => TRUE)
+        ),
+        'grouping' => 'contact-fields',
+      ),
+      NRM_PRO => array(
+        'dao' => 'CRM_Core_DAO_CustomField',
+        'fields' => array(
+          HIGH_SCHOOL => array(
+            'title' => ts('High School'),
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          GRAD_YEAR => array(
+            'title' => ts('Grad Year'),
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          MAJOR => array(
+            'title' => ts('Major Interests'),
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+        ),
+        'filters' => array(
+          HIGH_SCHOOL => array(
+            'title' => ts('High School'),
+            'operator' => 'like',
+          ),
+          MAJOR => array(
+            'title' => ts('Major Interests'),
+            'operator' => 'like',
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -113,6 +149,11 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
             elseif ($tableName == 'civicrm_phone') {
               $this->_phoneField = TRUE;
               $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('Home: ', {$field['dbAlias']}))";
+              $select[] = "'<br/>'";
+            }
+            elseif ($tableName == NRM_PRO) {
+              $this->_customNRMField = TRUE;
+              $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}))";
               $select[] = "'<br/>'";
             }
             elseif ($tableName == 'civicrm_email') {
@@ -180,6 +221,13 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
                            {$this->_aliases['civicrm_log']}.entity_id AND
                            {$this->_aliases['civicrm_log']}.entity_table = 'civicrm_contact'\n";
     }
+    //used when log field is selected
+    if ($this->_customNRMField) {
+      $this->_from .= "
+              LEFT JOIN ". NRM_PRO . " value_nrmlayer_6_civireport
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           value_nrmlayer_6_civireport.entity_id\n";
+    }
   }
 
   function where() {
@@ -240,7 +288,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    self::createTemp();
+    //self::createTemp();
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
