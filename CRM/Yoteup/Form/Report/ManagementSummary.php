@@ -140,7 +140,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   }
   
   function getDefaultWebforms() {
-    $defaults = $urls = $this->urls = array();
+    $default = $urls = $this->urls = array();
     
     $sql = "SELECT w.nid, u.alias
       FROM {$this->_drupalDatabase}.webform w
