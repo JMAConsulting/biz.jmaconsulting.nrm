@@ -339,14 +339,12 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
-      SELECT cc.id, MAX(ws.sid), GROUP_CONCAT(wsd22.data, ' ', wsd23.data, ' ', wsd24.data) as brochures
+      SELECT cc.id, MAX(ws.sid), GROUP_CONCAT(wsd22.data SEPARATOR ', ') as brochures
       FROM civicrm_contact cc
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.cid = 22 AND wsd22.sid = wsd.sid
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd23 ON wsd23.cid = 23 AND wsd23.sid = wsd.sid
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd24 ON wsd24.cid = 24 AND wsd24.sid = wsd.sid
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.cid IN (22,23,24) AND wsd22.sid = wsd.sid
       LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
-      WHERE ws.nid = 72
+      WHERE ws.nid = 72 AND wsd.data IS NOT NULL
       GROUP BY cc.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
