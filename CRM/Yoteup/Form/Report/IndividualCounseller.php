@@ -20,6 +20,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $this->_drupalDatabase = $dsnArray['database'];
+    self::getWebforms();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -40,6 +41,13 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
           'id' => array(
             'no_display' => TRUE,
           ),
+          /* 'webforms' => array( */
+          /*   'title' => ts('Webforms'), */
+          /*   'type' => CRM_Utils_Type::T_STRING, */
+          /*   'operatorType' => CRM_Report_Form::OP_MULTISELECT, */
+          /*   'options' => $this->webForms, */
+          /*   'default' => self::getDefaultWebforms(), */
+          /* ), */
         ),
         'grouping' => 'contact-fields',
       ),
@@ -163,7 +171,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_log') {
               $this->_logField = TRUE;
-              $logSelect = "MAX({$field['dbAlias']})";
+              $logSelect = "MAX(DATE_FORMAT({$field['dbAlias']}, '%m/%d/%Y'))";
             }
             else {
               $select[] = "{$field['dbAlias']}";
@@ -175,11 +183,13 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     }
 
     $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
-      1  as civicrm_contact_first_visit,
-      {$logSelect} as civicrm_contact_last_update";
+      t.first_visit as civicrm_contact_first_visit,
+      {$logSelect} as civicrm_contact_last_update,
+      ct.brochures as civicrm_contact_brochure_request";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
+    $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Request');
   }
 
   function from() {
@@ -188,6 +198,19 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $this->_from = "
          FROM  civicrm_contact {$this->_aliases['civicrm_contact']} ";
 
+    // For first visit times
+    $this->_from .= "
+             LEFT JOIN civicrm_watchdog_temp_b t
+                       ON t.id = {$this->_aliases['civicrm_contact']}.id\n";
+    
+    $this->_from .= "
+             LEFT JOIN civicrm_watchdog_temp_c ct
+                       ON ct.id = {$this->_aliases['civicrm_contact']}.id\n";
+
+    // For survey responses
+    $this->_from .= "
+             LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data 
+                       ON t.id = {$this->_aliases['civicrm_contact']}.id\n";
 
     //used when address field is selected
     if ($this->_addressField) {
@@ -225,8 +248,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     if ($this->_customNRMField) {
       $this->_from .= "
               LEFT JOIN ". NRM_PRO . " value_nrmlayer_6_civireport
-                        ON {$this->_aliases['civicrm_contact']}.id =
-                           value_nrmlayer_6_civireport.entity_id\n";
+                        ON {$this->_aliases['civicrm_contact']}.id = value_nrmlayer_6_civireport.entity_id\n";
     }
   }
 
@@ -246,6 +268,9 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
+              if ($field['name'] == 'webforms') {
+                $field['dbAlias'] = "{$this->_drupalDatabase}.webform_submitted_data";
+              }
               $clause = $this->whereClause($field,
                 $op,
                 CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
@@ -288,7 +313,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    //self::createTemp();
+    self::createTemp();
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -300,12 +325,56 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
   }
   
   function createTemp() {
-    $sql = "CREATE TABLE civicrm_watchdog_temp AS SELECT {$this->_aliases['civicrm_contact']}.id, p.purl_145, MIN(DATE(FROM_UNIXTIME(timestamp)))
+    $sqlA = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
+      SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, MIN(DATE_FORMAT(DATE(FROM_UNIXTIME(timestamp)),'%m/%d/%Y')) as first_visit
+      FROM {$this->_drupalDatabase}.watchdog
+      GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
+    $dao = CRM_Core_DAO::executeQuery($sqlA);
+    
+    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
+      SELECT {$this->_aliases['civicrm_contact']}.id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN {$this->_drupalDatabase}.watchdog w ON (SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)) = p.purl_145";
-    CRM_Core_Error::debug( '$sql', $sql );
-    exit;
+      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_general_ci";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
+      SELECT cc.id, MAX(ws.sid), GROUP_CONCAT(wsd22.data, ' ', wsd23.data, ' ', wsd24.data) as brochures
+      FROM civicrm_contact cc
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.cid = 22 AND wsd22.sid = wsd.sid
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd23 ON wsd23.cid = 23 AND wsd23.sid = wsd.sid
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd24 ON wsd24.cid = 24 AND wsd24.sid = wsd.sid
+      LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
+      WHERE ws.nid = 72
+      GROUP BY cc.id";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+  }
+
+  function getWebforms() {
+    $this->webForms = array();
+
+    $sql = "SELECT w.nid, n.title
+      FROM {$this->_drupalDatabase}.webform w 
+      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $this->webForms[$dao->nid] = $dao->title;
+    }
+  }
+  
+  function getDefaultWebforms() {
+    $default = array();
+    
+    $sql = "SELECT w.nid
+      FROM {$this->_drupalDatabase}.webform w
+      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
+      WHERE w.nid IN (103, 128, 131, 132, 183, 75, 198)"; // Only surveys
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $default[] = $dao->nid;
+    }
+    return $default;
   }
 
   function alterDisplay(&$rows) {
@@ -330,20 +399,6 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
             $checkList[$colName][] = $colVal;
           }
         }
-      }
-
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_contact_display_name', $row) &&
