@@ -205,7 +205,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     
     $this->_from .= "
              LEFT JOIN civicrm_watchdog_temp_c ct
-                       ON ct.id = {$this->_aliases['civicrm_contact']}.id\n";
+                       ON ct.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
 
     // For survey responses
     $this->_from .= "
@@ -339,13 +339,13 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
-      SELECT cc.id, MAX(ws.sid), GROUP_CONCAT(wsd22.data SEPARATOR ', ') as brochures
+      SELECT id AS contact_id, GROUP_CONCAT(brochure ORDER BY brochure SEPARATOR ', ') as brochures FROM (SELECT cc.id, wsd22.data as brochure
       FROM civicrm_contact cc
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.cid IN (22,23,24) AND wsd22.sid = wsd.sid
+      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.sid = wsd.sid 
       LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
-      WHERE ws.nid = 72 AND wsd.data IS NOT NULL
-      GROUP BY cc.id";
+      WHERE ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
+      GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
 
