@@ -178,12 +178,14 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect} as civicrm_contact_last_update,
-      {$this->customField} as civicrm_contact_survey_response,
+      {$this->customSurveyField} as civicrm_contact_survey_response,
+      {$this->customNRMField} as civicrm_contact_info_request,
       ct.brochures as civicrm_contact_brochure_request";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
+    $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
     $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Request');
   }
 
@@ -202,7 +204,9 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
              LEFT JOIN civicrm_watchdog_temp_c ct
                        ON ct.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
 
-    $this->_from .= "{$this->tables}";
+    $this->_from .= "{$this->surveyTables}";
+
+    $this->_from .= "{$this->nrmTables}";
 
     //used when address field is selected
     if ($this->_addressField) {
@@ -307,6 +311,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     self::createTemp();
     self::createSurveyResponse();
+    self::createInfoRequest();
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -356,8 +361,26 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       $customFields[] = "IF({$field} IS NULL or {$field} = '', '', {$field})";
       $customFields[] = "'<br/>'";
     }
-    $this->customField = "CONCAT(" . implode(', ', $customFields) . ")";
-    $this->tables = implode(' ', $tables);
+    $this->customSurveyField = "CONCAT(" . implode(', ', $customFields) . ")";
+    $this->surveyTables = implode(' ', $tables);
+  }
+
+  function createInfoRequest() {
+    $sql = "SELECT g.id as group_id, g.table_name, c.column_name
+      FROM civicrm_custom_group g 
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      WHERE title LIKE '%NRM%'";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    
+    while ($dao->fetch()) {
+      $fieldAlias = 'group_' . $dao->group_id;
+      $field =  $fieldAlias . '.' . $dao->column_name;
+      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
+      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', {$field})";
+      $customFields[] = "'<br/>'";
+    }
+    $this->customNRMField = "CONCAT(" . implode(', ', $customFields) . ")";
+    $this->nrmTables = implode(' ', $tables);
   }
 
   function getWebforms() {
