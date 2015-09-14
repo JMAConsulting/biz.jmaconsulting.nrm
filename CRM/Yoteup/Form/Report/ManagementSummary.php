@@ -63,13 +63,13 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        ( SELECT COUNT(DISTINCT(location)) as perday_start
        FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW()) {$urlWhere}) as c
        UNION
-       SELECT 'Total completed submissions for individual forms/surveys for the day' as description, SUM(perday_completed) as perday_visitor_count FROM
+       SELECT 'Total completed submissions for individual forms/surveys for the day' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW()) {$urlSubWhere}
        GROUP BY nid, remote_addr) as d
        UNION
        SELECT 'Percent completion rate of individual forms/surveys for the day' as description,
-       CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
+       IF(SUM(perday_completed) IS NULL, '0%', CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%')) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW()) {$urlSubWhere}
        GROUP BY nid, remote_addr) as e
