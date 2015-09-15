@@ -11,8 +11,8 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'label' => 'ManagementSummary',
-      'description' => 'ManagementSummary (biz.jmaconsulting.yoteup)',
+      'label' => 'Management Summary',
+      'description' => 'Management Summary (biz.jmaconsulting.yoteup)',
       'class_name' => 'CRM_Yoteup_Form_Report_ManagementSummary',
       'report_url' => 'yoteup/managementsummary',
       'component' => '',
