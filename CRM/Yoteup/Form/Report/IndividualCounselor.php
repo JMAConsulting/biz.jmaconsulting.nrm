@@ -15,6 +15,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
   protected $_summary = NULL;
 
   protected $_customGroupGroupBy = FALSE;
+  
+  public static $_customFieldOptions = array();
  
   function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -373,7 +375,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
   }
 
   function createInfoRequest() {
-    $sql = "SELECT g.id as group_id, g.table_name, c.column_name
+    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
       WHERE title LIKE '%NRM%'";
@@ -383,7 +385,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
-      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '<br/>'))";
+      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '::::{$dao->field_id}<br/>'))";
     }
     $this->customNRMField = "CONCAT(" . implode(', ', $customFields) . ")";
     $this->nrmTables = implode(' ', $tables);
@@ -483,7 +485,10 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           WHERE form_key LIKE '%cg20%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
       }
-
+      if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
+        $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLables($row['civicrm_contact_info_request']);
+        $entryFound = TRUE;
+      }
       if (array_key_exists('civicrm_contact_brochure_request', $row)) {
         // First retrieve all the components used for brochures
         $sql = "SELECT nid, extra
@@ -496,5 +501,35 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         break;
       }
     }
+  }
+  
+  public static function getCustomFieldDataLables($data) {
+    if (empty($data)) {
+      return $data;
+    }
+    $tempArray =  array();
+    $data = explode('<br/>', $data);
+    foreach ($data as $value) {
+      if (empty($value)) {
+        continue;
+      }
+      $value = explode('::::', $value);
+      if (CRM_Utils_Array::value(1, $value)) {
+        if (empty(self::$_customFieldOptions[$value[1]])) {
+          $result = civicrm_api3('CustomField', 'getsingle', array(
+            'sequential' => 1,
+            'id' => $value[1],
+          ));
+          $options[$value[1]]= array();
+          CRM_Core_BAO_CustomField::buildOption($result, $options[$value[1]]);
+          self::$_customFieldOptions[$value[1]] = $options;
+        }
+        $tempArray[] = CRM_Core_BAO_CustomField::getDisplayValue($value[0], $value[1], self::$_customFieldOptions[$value[1]]);
+      }
+      else {
+        $tempArray[] = $value[0];
+      }
+    }
+    return implode('<br/>', $tempArray);
   }
 }
