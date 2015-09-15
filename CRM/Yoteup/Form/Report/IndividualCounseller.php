@@ -143,24 +143,20 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
                 $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
               }
               if (isset($s) && isset($c) && isset($p)) {
-                $select[] = "CONCAT($s, '<br/>', $c, $p)";
-                $select[] = "'<br/>'";
+                $select[] = "CONCAT($s, '<br/>', $c, $p, '<br/>')";
               }
             }
             elseif ($tableName == 'civicrm_phone') {
               $this->_phoneField = TRUE;
-              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('Home: ', {$field['dbAlias']}))";
-              $select[] = "'<br/>'";
+              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('Home: ', {$field['dbAlias']}, '<br/>'))";
             }
             elseif ($tableName == NRM_PRO) {
               $this->_customNRMField = TRUE;
-              $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}))";
-              $select[] = "'<br/>'";
+              $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}, '<br/>'))";
             }
             elseif ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
-              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
-              $select[] = "'<br/>'";
+              $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
             }
             elseif ($tableName == 'civicrm_log') {
               $this->_logField = TRUE;
