@@ -198,7 +198,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     // For first visit times
     $this->_from .= "
              LEFT JOIN civicrm_watchdog_temp_b t
-                       ON t.id = {$this->_aliases['civicrm_contact']}.id\n";
+                       ON t.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
     
     $this->_from .= "
              LEFT JOIN civicrm_watchdog_temp_c ct
@@ -323,21 +323,21 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
   }
   
   function createTemp() {
-    $sqlA = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
+    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
       SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, MIN(DATE_FORMAT(DATE(FROM_UNIXTIME(timestamp)),'%m/%d/%Y')) as first_visit
       FROM {$this->_drupalDatabase}.watchdog
       GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
-    $dao = CRM_Core_DAO::executeQuery($sqlA);
-    $sqlA = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl) USING HASH;"
-    $dao = CRM_Core_DAO::executeQuery($sqlA);
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $sql = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl(255)) USING HASH";
+    $dao = CRM_Core_DAO::executeQuery($sql);
     
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
-      SELECT {$this->_aliases['civicrm_contact']}.id, p.purl_145, first_visit
+      SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
       INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_general_ci";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145) USING HASH, ADD INDEX idx_c_id ({$this->_aliases['civicrm_contact']}.id) USING HASH;"
+    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
@@ -349,7 +349,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       WHERE ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
       GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH;"
+    $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
   }
@@ -451,6 +451,29 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_display_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
+      }
+      
+      if (array_key_exists('civicrm_contact_survey_response', $row)) {
+        // First retrieve all the components used for surveys
+        $sql = "SELECT nid, extra from {$this->_drupalDatabase}.webform_component where form_key LIKE '%cg20%'";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        while ($dao->fetch()) {
+          $items[$dao->nid] = unserialize($dao->extra);
+          $webform[] = array_filter(explode("\n", $items[$dao->nid]['items']));
+        }
+        foreach ($webform as $d) {
+          foreach ($d as $data) {
+            list($k, $v) = explode('|', $data);
+            $web[$k] = $v;
+          }
+        }
+        $op = array_filter(explode('<br/>', $row['civicrm_contact_survey_response']));
+        $count = 1;
+        foreach($op as $values) {
+          $newArray[] = $count . '. ' . $web[$values];
+          $count++;
+        }
+        $rows[$rowNum]['civicrm_contact_survey_response'] = implode('<br/>', $newArray);
       }
 
       if (!$entryFound) {
