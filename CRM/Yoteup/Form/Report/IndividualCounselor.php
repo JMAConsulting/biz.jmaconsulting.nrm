@@ -484,6 +484,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg20%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+        $entryFound = TRUE;
       }
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
         $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLables($row['civicrm_contact_info_request']);
@@ -495,6 +496,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg6%' AND nid = 72 AND type = 'select' AND cid IN (22,23,24)";
         $rows[$rowNum]['civicrm_contact_brochure_request'] = self::getLabels($sql, $separator = ', ', $row['civicrm_contact_brochure_request']);
+        $entryFound = TRUE;
       }
 
       if (!$entryFound) {
