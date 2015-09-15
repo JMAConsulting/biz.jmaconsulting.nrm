@@ -369,7 +369,9 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         'title' => ts('<b>Survey Information</b> - ' . $dao->label),
         'default' => TRUE,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
-      );
+      );     
+      $this->surveyColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
+      $this->surveyColumn[$dao->table_name]['group_title'] = ts('Survey Information');
     }
     $this->surveyTables = implode(' ', $tables);
   }
