@@ -11,8 +11,8 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'label' => 'IndividualCounseller',
-      'description' => 'IndividualCounseller (biz.jmaconsulting.yoteup)',
+      'label' => 'Individual Counseller',
+      'description' => 'Individual Counseller (biz.jmaconsulting.yoteup)',
       'class_name' => 'CRM_Yoteup_Form_Report_IndividualCounseller',
       'report_url' => 'yoteup/individualcounseller',
       'component' => '',
