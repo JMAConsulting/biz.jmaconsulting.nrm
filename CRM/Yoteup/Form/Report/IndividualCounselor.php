@@ -309,8 +309,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     self::createSurveyResponse();
     self::createInfoRequest();
     $sql = $this->buildQuery(TRUE);
-    CRM_Core_Error::debug( '$sql', $sql );
-    exit;
 
     $rows = array();
     $this->buildRows($sql, $rows);
