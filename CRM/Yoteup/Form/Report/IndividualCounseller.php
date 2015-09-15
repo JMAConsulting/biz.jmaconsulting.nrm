@@ -365,8 +365,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
-      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', {$field})";
-      $customFields[] = "'<br/>'";
+      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '<br/>'))";
     }
     $this->customSurveyField = "CONCAT(" . implode(', ', $customFields) . ")";
     $this->surveyTables = implode(' ', $tables);
@@ -383,8 +382,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
-      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', {$field})";
-      $customFields[] = "'<br/>'";
+      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '<br/>'))";
     }
     $this->customNRMField = "CONCAT(" . implode(', ', $customFields) . ")";
     $this->nrmTables = implode(' ', $tables);
