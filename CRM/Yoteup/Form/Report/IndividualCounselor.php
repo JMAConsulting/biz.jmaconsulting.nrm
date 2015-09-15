@@ -160,7 +160,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_log') {
               $this->_logField = TRUE;
-              $logSelect = "MAX(DATE_FORMAT({$field['dbAlias']}, '%m/%d/%Y'))";
+              $logSelect = "MAX(DATE_FORMAT({$field['dbAlias']}, '%m/%d/%Y')) as civicrm_contact_last_update,";
+              $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
             }
             else {
               $select[] = "{$field['dbAlias']}";
@@ -173,13 +174,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
     $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
-      {$logSelect} as civicrm_contact_last_update,
+      {$logSelect}
       {$this->customSurveyField} as civicrm_contact_survey_response,
       {$this->customNRMField} as civicrm_contact_info_request,
       ct.brochures as civicrm_contact_brochure_request";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
-    $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
     $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Request');
@@ -309,6 +309,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     self::createSurveyResponse();
     self::createInfoRequest();
     $sql = $this->buildQuery(TRUE);
+    CRM_Core_Error::debug( '$sql', $sql );
+    exit;
 
     $rows = array();
     $this->buildRows($sql, $rows);
