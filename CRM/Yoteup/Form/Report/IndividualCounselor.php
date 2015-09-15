@@ -366,7 +366,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
       $this->surveyColumn[$dao->table_name]['fields'][$dao->column_name] = array(
-        'title' => ts('<b>Survey Information</b> - ' . $dao->label),
+        'title' => $dao->label,
         'default' => TRUE,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
       );     
