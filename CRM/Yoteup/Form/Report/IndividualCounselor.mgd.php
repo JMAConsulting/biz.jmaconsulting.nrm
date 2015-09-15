@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_IndividualCounseller',
+    'name' => 'CRM_Yoteup_Form_Report_IndividualCounselor',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'Individual Counseller',
-      'description' => 'Individual Counseller (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_IndividualCounseller',
-      'report_url' => 'yoteup/individualcounseller',
+      'label' => 'Individual Counselor',
+      'description' => 'Individual Counselor (biz.jmaconsulting.yoteup)',
+      'class_name' => 'CRM_Yoteup_Form_Report_IndividualCounselor',
+      'report_url' => 'yoteup/individualcounselor',
       'component' => '',
     ),
   ),

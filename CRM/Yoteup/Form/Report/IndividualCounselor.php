@@ -2,7 +2,7 @@
 
 require_once 'yoteup_constants.php';
 
-class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
+class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
   protected $_addressField = FALSE;
 
@@ -118,7 +118,7 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Individual Counsellor Report'));
+    $this->assign('reportTitle', ts('Individual Counselor Report'));
     parent::preProcess();
   }
 
