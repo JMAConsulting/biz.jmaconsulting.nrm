@@ -21,6 +21,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $this->_drupalDatabase = $dsnArray['database'];
     self::getWebforms();
+    self::createSurveyResponse();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -112,6 +113,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         'grouping' => 'contact-fields',
       ),
     );
+    $this->_columns = array_merge($this->_columns, $this->surveyColumn);
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -161,7 +163,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             elseif ($tableName == 'civicrm_log') {
               $this->_logField = TRUE;
               $logSelect = "MAX(DATE_FORMAT({$field['dbAlias']}, '%m/%d/%Y')) as civicrm_contact_last_update,";
-              $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
+            }
+            elseif (array_key_exists($tableName, $this->surveyColumn)) {
+              $this->_surveyField = TRUE;
+              $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              $this->customSurveyField = "CONCAT(" . implode(', ', $surveyFields) . ")";
+              $surveyField = "{$this->customSurveyField} as civicrm_contact_survey_response,";
             }
             else {
               $select[] = "{$field['dbAlias']}";
@@ -175,11 +182,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
-      {$this->customSurveyField} as civicrm_contact_survey_response,
+      {$surveyField}
       {$this->customNRMField} as civicrm_contact_info_request,
       ct.brochures as civicrm_contact_brochure_request";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
+    $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
     $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Request');
@@ -260,9 +268,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
-              if ($field['name'] == 'webforms') {
-                $field['dbAlias'] = "{$this->_drupalDatabase}.webform_submitted_data";
-              }
               $clause = $this->whereClause($field,
                 $op,
                 CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
@@ -306,7 +311,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     self::createTemp();
-    self::createSurveyResponse();
     self::createInfoRequest();
     $sql = $this->buildQuery(TRUE);
 
@@ -347,23 +351,24 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
-
   }
   
   function createSurveyResponse() {
-    $sql = "SELECT g.id as group_id, g.table_name, c.column_name
+    $sql = "SELECT g.id as group_id, g.table_name, c.column_name, c.label
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
       WHERE title LIKE '%Survey%'";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
     while ($dao->fetch()) {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
-      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
-      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '<br/>'))";
+      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
+      $this->surveyColumn[$dao->table_name]['fields'][$dao->column_name] = array(
+        'title' => ts($dao->label),
+        'default' => TRUE,
+        'dbAlias' => $fieldAlias . '.' . $dao->column_name,
+      );
     }
-    $this->customSurveyField = "CONCAT(" . implode(', ', $customFields) . ")";
     $this->surveyTables = implode(' ', $tables);
   }
 
