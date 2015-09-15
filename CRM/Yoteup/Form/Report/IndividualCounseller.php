@@ -416,6 +416,30 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
     return $default;
   }
 
+  function getLabels($sql, $separator, $row) {
+    $items = $newArray = $web = array();
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $items[$dao->nid] = unserialize($dao->extra);
+      $webform[] = array_filter(explode("\n", $items[$dao->nid]['items']));
+    }
+    foreach ($webform as $d) {
+      foreach ($d as $data) {
+        list($k, $v) = explode('|', $data);
+        $web[$k] = $v;
+      }
+    }
+    $op = array_filter(explode($separator, $row));
+    $count = 1;
+    foreach($op as $values) {
+      if (isset($web[$values])) {
+        $newArray[] = $count . '. ' . $web[$values];
+        $count++;
+      }
+    }
+    return implode('<br/>', $newArray);
+  }
+
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -455,25 +479,18 @@ class CRM_Yoteup_Form_Report_IndividualCounseller extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra from {$this->_drupalDatabase}.webform_component where form_key LIKE '%cg20%'";
-        $dao = CRM_Core_DAO::executeQuery($sql);
-        while ($dao->fetch()) {
-          $items[$dao->nid] = unserialize($dao->extra);
-          $webform[] = array_filter(explode("\n", $items[$dao->nid]['items']));
-        }
-        foreach ($webform as $d) {
-          foreach ($d as $data) {
-            list($k, $v) = explode('|', $data);
-            $web[$k] = $v;
-          }
-        }
-        $op = array_filter(explode('<br/>', $row['civicrm_contact_survey_response']));
-        $count = 1;
-        foreach($op as $values) {
-          $newArray[] = $count . '. ' . $web[$values];
-          $count++;
-        }
-        $rows[$rowNum]['civicrm_contact_survey_response'] = implode('<br/>', $newArray);
+        $sql = "SELECT nid, extra
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE form_key LIKE '%cg20%' AND type = 'select'";
+        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+      }
+
+      if (array_key_exists('civicrm_contact_brochure_request', $row)) {
+        // First retrieve all the components used for brochures
+        $sql = "SELECT nid, extra
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE form_key LIKE '%cg6%' AND nid = 72 AND type = 'select' AND cid IN (22,23,24)";
+        $rows[$rowNum]['civicrm_contact_brochure_request'] = self::getLabels($sql, $separator = ', ', $row['civicrm_contact_brochure_request']);
       }
 
       if (!$entryFound) {
