@@ -36,10 +36,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'id' => array(
-            'required' => TRUE,
-            'no_display' => TRUE,
-            ),
         ),
         'filters' => array(
           'display_name' => array(
