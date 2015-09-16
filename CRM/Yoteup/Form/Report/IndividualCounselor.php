@@ -206,7 +206,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
-    $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Request');
+    $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Requests');
   }
 
   function from() {
