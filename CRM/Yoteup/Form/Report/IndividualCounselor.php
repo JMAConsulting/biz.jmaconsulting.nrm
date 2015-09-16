@@ -194,12 +194,13 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+    $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$surveyField}
       {$nrmField}
       ct.brochures as civicrm_contact_brochure_request";
+    $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
@@ -500,6 +501,21 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
         $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLables($row['civicrm_contact_info_request']);
+        $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\"%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
+        if ($purl) {
+          $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog
+          WHERE location REGEXP '[[:alnum:]]+.pdf'
+          AND location LIKE {$purl}";
+          $dao = CRM_Core_DAO::executeQuery($sql);
+          if ($dao->N) {
+            $string = "<hr><b>Downloads:</b><br/>";
+          }
+          while ($dao->fetch()) {
+            $string .= urldecode(basename($dao->location)) . "<br/>";
+          }
+          $rows[$rowNum]['civicrm_contact_info_request'] = $rows[$rowNum]['civicrm_contact_info_request'] . $string;
+          unset($this->_columnHeaders["civicrm_contact_contact_id"]);
+        }
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_contact_brochure_request', $row)) {
