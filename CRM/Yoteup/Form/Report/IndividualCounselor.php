@@ -34,8 +34,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'title' => ts('Student Info'),
             'required' => TRUE,
             'default' => TRUE,
-            'no_repeat' => TRUE,
           ),
+          'id' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'no_repeat' => TRUE,
+            ),
         ),
         'filters' => array(
           'display_name' => array(
@@ -200,7 +204,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       {$surveyField}
       {$nrmField}
       ct.brochures as civicrm_contact_brochure_request";
-    $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
+    // $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
