@@ -24,6 +24,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_drupalDatabase = $dsnArray['database'];
     self::getWebforms();
     self::createSurveyResponse();
+    self::createInfoRequest();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -116,6 +117,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       ),
     );
     $this->_columns = array_merge($this->_columns, $this->surveyColumn);
+    $this->_columns = array_merge($this->_columns, $this->infoColumn);
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -155,8 +157,19 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $select[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('Home: ', {$field['dbAlias']}, '<br/>'))";
             }
             elseif ($tableName == NRM_PRO) {
-              $this->_customNRMField = TRUE;
-              $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}, '<br/>'))";
+              if ($fieldName == HIGH_SCHOOL || $fieldName == MAJOR) {
+                $this->_customNRMField = TRUE;
+                $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              }
+              elseif ($fieldName == GRAD_YEAR) {
+                $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}, '<br/>'))";
+              }
+              elseif (array_key_exists($tableName, $this->infoColumn)) {
+                $this->_infoField = TRUE;
+                $infoFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+                $this->customNRMField = "CONCAT(" . implode(', ', $infoFields) . ")";
+                $nrmField = "{$this->customNRMField} as civicrm_contact_info_request,";
+              }
             }
             elseif ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
@@ -185,7 +198,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$surveyField}
-      {$this->customNRMField} as civicrm_contact_info_request,
+      {$nrmField}
       ct.brochures as civicrm_contact_brochure_request";
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
@@ -313,7 +326,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     self::createTemp();
-    self::createInfoRequest();
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -369,7 +381,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         'title' => $dao->label,
         'default' => TRUE,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
-      );     
+      );
       $this->surveyColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
       $this->surveyColumn[$dao->table_name]['group_title'] = ts('Survey Information');
     }
@@ -377,7 +389,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
   }
 
   function createInfoRequest() {
-    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name
+    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
       WHERE title LIKE '%NRM%'";
@@ -386,10 +398,16 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     while ($dao->fetch()) {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
-      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = {$this->_aliases['civicrm_contact']}.id ";
-      $customFields[] = "IF({$field} IS NULL or {$field} = '', '', CONCAT({$field}, '::::{$dao->field_id}<br/>'))";
+      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
+      $this->infoColumn[$dao->table_name]['fields'][$dao->column_name] = array(
+        'title' => $dao->label,
+        'default' => TRUE,
+        'dbAlias' => $fieldAlias . '.' . $dao->column_name,
+        'field_id' => $dao->field_id,
+      );
+      $this->infoColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
+      $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests & Downloads');
     }
-    $this->customNRMField = "CONCAT(" . implode(', ', $customFields) . ")";
     $this->nrmTables = implode(' ', $tables);
   }
 
@@ -467,16 +485,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         }
       }
 
-      if (array_key_exists('civicrm_contact_display_name', $row) &&
-        $rows[$rowNum]['civicrm_contact_display_name'] &&
-        array_key_exists('civicrm_contact_id', $row)
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_id'],
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_display_name_hover'] = ts("View Contact Summary for this Contact.");
+      if (array_key_exists('civicrm_contact_display_name', $row)) {
+        $rows[$rowNum]['civicrm_contact_display_name'] = self::getCustomFieldDataLables($row['civicrm_contact_display_name']);
         $entryFound = TRUE;
       }
       
