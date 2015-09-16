@@ -503,6 +503,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLables($row['civicrm_contact_info_request']);
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
+          $string = '';
           $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog
           WHERE location REGEXP '[[:alnum:]]+.pdf'
           AND location LIKE {$purl}";
