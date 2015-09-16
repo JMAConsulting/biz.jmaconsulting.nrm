@@ -34,11 +34,11 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'title' => ts('Student Info'),
             'required' => TRUE,
             'default' => TRUE,
+            'no_repeat' => TRUE,
           ),
           'id' => array(
             'required' => TRUE,
             'no_display' => TRUE,
-            'no_repeat' => TRUE,
             ),
         ),
         'filters' => array(
