@@ -200,7 +200,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       {$surveyField}
       {$nrmField}
       ct.brochures as civicrm_contact_brochure_request";
-    // $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
+    $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
@@ -515,7 +515,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             $string .= urldecode(basename($dao->location)) . "<br/>";
           }
           $rows[$rowNum]['civicrm_contact_info_request'] = $rows[$rowNum]['civicrm_contact_info_request'] . $string;
-          unset($this->_columnHeaders["civicrm_contact_contact_id"]);
         }
         $entryFound = TRUE;
       }
@@ -527,7 +526,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_brochure_request'] = self::getLabels($sql, $separator = ', ', $row['civicrm_contact_brochure_request']);
         $entryFound = TRUE;
       }
-
+      unset($this->_columnHeaders["civicrm_contact_contact_id"]);
       if (!$entryFound) {
         break;
       }
