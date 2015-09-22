@@ -17,10 +17,10 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       'watchdog' => array(
         'fields' => array(
           'location' => array(
-            'title' => ts('Location'),
+            'title' => ts('Daily Activity Statistics'),
             'required' => TRUE,
             'default' => TRUE,
-            'no_repeat' => TRUE,
+            'no_repeat' => FALSE,
           ),
         ),
         'filters' => array(
@@ -47,45 +47,57 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   function select() {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
+    $urlEWhere = self::createURLCondition(TRUE);
     $urlSubWhere = self::createSubURLCondition();
+    $urlVisitSubWhere = self::createVisitSubURLCondition();
 
-    $this->_columnHeaders["description"]['title'] = " ";
+    $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
-    $this->_select = "SELECT 'Total unique new visitors for the day' as description, SUM(perday_visitor) as perday_visitor_count FROM
+    $this->_select = "
+       SELECT CONCAT('Daily Activity Report: ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
+       UNION
+       SELECT 'Total unique visitors for the day' as description, SUM(perday_visitor) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW())) as a
-       UNION 
-       SELECT 'Total unique new visitors for all time' as description, SUM(perday_visitor) as perday_visitor_count FROM
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as a
+       UNION
+       SELECT 'Total unique new visitors for the day' as description, SUM(perday_visitor) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND (SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)) NOT IN (SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as u
+       UNION
+       SELECT 'Cumulative unique visitors' as description, SUM(perday_visitor) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog) as b
        UNION
-       SELECT 'Total starts for individual forms/surveys for the day' as description, SUM(perday_start) as perday_visitor_count FROM
+       SELECT 'Total applications started' as description, SUM(perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW()) {$urlWhere}) as c
+       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as c
        UNION
-       SELECT 'Total completed submissions for individual forms/surveys for the day' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       SELECT 'Total applications submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW()) {$urlSubWhere}
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlSubWhere}
        GROUP BY nid, remote_addr) as d
        UNION
-       SELECT 'Percent completion rate of individual forms/surveys for the day' as description,
-       IF(SUM(perday_completed) IS NULL, '0%', CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%')) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW()) {$urlSubWhere}
-       GROUP BY nid, remote_addr) as e
-       INNER JOIN
-       ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW()) {$urlWhere}) as f
-       UNION
-       SELECT 'Number of cumulative form/survey completions for all time' as description, SUM(perday_completed) as perday_visitor_count FROM
+       SELECT 'Cumulative applications submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlSubWhere}
+       GROUP BY nid, remote_addr) as g
+       UNION
+       SELECT 'Total visit registrations submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
+       GROUP BY nid, remote_addr) as p
+       UNION
+       SELECT 'Cumulative visit registrations submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
        GROUP BY nid, remote_addr) as g
        UNION
        SELECT 'Percent engagement rate for site' as description,
        CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_completed
-       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as h
+       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlEWhere}) as h
        INNER JOIN
        (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_start 
        FROM {$this->_drupalDatabase}.watchdog) as i";
@@ -154,8 +166,23 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     $this->urls = $urls;
     return $default;
   }
+
+  function createVisitSubURLCondition() {
+    $nid = array();
+    $sql = "SELECT w.nid
+      FROM {$this->_drupalDatabase}.webform w
+      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
+      WHERE n.title LIKE '%visit%' or n.title LIKE '%registration%'";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $nid[] = $dao->nid;
+    }
+    $statement = '(' . implode(",", $nid) . ')';
+    $sql = " AND nid IN {$statement}";
+    return $sql;
+  }
   
-  function createURLCondition() {
+  function createURLCondition($engage = FALSE) {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_op'];
     $webformParams = $this->_params['webforms_value'];
@@ -169,7 +196,10 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     }
     if (empty($diff)) {
       return " AND (1)";
-    } 
+    }
+    if ($engage) {
+      $diff[] = '%files/';
+    }
     $statement = implode("' OR location LIKE '%", $diff);
     $sql = " AND (location LIKE '%{$statement}')";
     return $sql;
