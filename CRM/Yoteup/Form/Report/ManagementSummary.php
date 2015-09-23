@@ -47,7 +47,6 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   function select() {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
-    $urlEWhere = self::createURLCondition(TRUE);
     $urlSubWhere = self::createSubURLCondition();
     $urlVisitSubWhere = self::createVisitSubURLCondition();
 
@@ -94,13 +93,21 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
        GROUP BY nid, remote_addr) as g
        UNION
-       SELECT 'Percent engagement rate for site' as description,
-       CONCAT_WS(ROUND((SUM(perday_completed)/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(location)) as perday_completed
-       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlEWhere}) as h
-       INNER JOIN
+       SELECT 'Engagement rate' as description,
+       CONCAT_WS(ROUND(((COALESCE(SUM(perday_completed),0)+COALESCE(SUM(DISTINCT(download)),0))/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
+       ( SELECT 1 as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submitted_data w
+       JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID'
+       AND w.nid = c.nid
+       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       AND data IS NOT NULL and data <> ''
+       GROUP BY data) as h
+       JOIN
        (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_start 
-       FROM {$this->_drupalDatabase}.watchdog) as i";
+       FROM {$this->_drupalDatabase}.watchdog) as i
+       JOIN        
+       (SELECT COUNT(DISTINCT(location)) as download
+       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as r";
   }
 
   function from() {
@@ -182,7 +189,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     return $sql;
   }
   
-  function createURLCondition($engage = FALSE) {
+  function createURLCondition() {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_op'];
     $webformParams = $this->_params['webforms_value'];
@@ -196,9 +203,6 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     }
     if (empty($diff)) {
       return " AND (1)";
-    }
-    if ($engage) {
-      $diff[] = '%files/';
     }
     $statement = implode("' OR location LIKE '%", $diff);
     $sql = " AND (location LIKE '%{$statement}')";
