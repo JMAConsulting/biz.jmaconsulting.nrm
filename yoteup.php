@@ -106,3 +106,12 @@ function yoteup_civicrm_caseTypes(&$caseTypes) {
 function yoteup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _yoteup_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
+
+function yoteup_civicrm_alterMailParams(&$params, $context) { 
+  if (CRM_Utils_Array::value('groupName', $params) == 'Report Email Sender') {
+    $email = CRM_Utils_Request::retrieve('email_to_send', 'String', CRM_Core_DAO::$_nullObject);
+    if ($email) {
+      $params['toEmail'] = $email;
+    }
+  }  
+}
