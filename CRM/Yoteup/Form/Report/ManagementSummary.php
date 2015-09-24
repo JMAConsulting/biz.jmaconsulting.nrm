@@ -1,5 +1,7 @@
 <?php
 
+require_once 'yoteup_constants.php';
+
 class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
 
   protected $_summary = NULL;
@@ -63,51 +65,96 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND (SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)) NOT IN (SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as u
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as b
        UNION
        SELECT 'Cumulative unique visitors' as description, SUM(perday_visitor) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog) as b
+       FROM {$this->_drupalDatabase}.watchdog) as c
        UNION
        SELECT 'Total applications started' as description, SUM(perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as c
+       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as d
        UNION
        SELECT 'Total applications submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlSubWhere}
-       GROUP BY nid, remote_addr) as d
+       GROUP BY nid, remote_addr) as e
        UNION
        SELECT 'Cumulative applications submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlSubWhere}
-       GROUP BY nid, remote_addr) as g
+       GROUP BY nid, remote_addr) as f
        UNION
        SELECT 'Total visit registrations submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
-       GROUP BY nid, remote_addr) as p
+       GROUP BY nid, remote_addr) as g
        UNION
        SELECT 'Cumulative visit registrations submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
-       GROUP BY nid, remote_addr) as g
+       GROUP BY nid, remote_addr) as h
        UNION
-       SELECT 'Engagement rate' as description,
-       CONCAT_WS(ROUND(((COALESCE(SUM(perday_completed),0)+COALESCE(SUM(DISTINCT(download)),0))/SUM(DISTINCT(perday_start)))*100, 2), '', '%') as perday_visitor_count FROM
-       ( SELECT 1 as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submitted_data w
-       JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID'
-       AND w.nid = c.nid
+       SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
+       (SELECT COUNT(*) as ecount FROM 
+       (SELECT location FROM 
+       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
        WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
-       AND data IS NOT NULL and data <> ''
-       GROUP BY data) as h
-       JOIN
-       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_start 
-       FROM {$this->_drupalDatabase}.watchdog) as i
-       JOIN        
-       (SELECT COUNT(DISTINCT(location)) as download
-       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as r";
+       AND data IS NOT NULL and data <> '' group by w.cid
+       AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
+       UNION
+       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
+       ) AS num
+       UNION
+       SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
+       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) AS visit FROM {$this->_drupalDatabase}.watchdog) AS denom
+       JOIN 
+       (SELECT COUNT(*) as ecount FROM 
+       (SELECT location FROM 
+       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       AND data IS NOT NULL and data <> '' group by w.cid
+       AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
+       UNION
+       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
+       ) AS num
+       UNION
+       SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount as perday_visitor_count FROM
+       (SELECT COUNT(*) as ecount FROM 
+       (SELECT location FROM 
+       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       AND data IS NOT NULL and data <> '' group by w.cid
+       UNION
+       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as e GROUP BY location) as ue
+       ) AS num
+       UNION
+       SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
+       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) AS visit FROM {$this->_drupalDatabase}.watchdog) AS denom
+       JOIN 
+       (SELECT COUNT(*) as ecount FROM 
+       (SELECT location FROM 
+       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id       
+       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       AND data IS NOT NULL and data <> '' group by w.cid
+       UNION
+       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as e GROUP BY location) as ue
+       ) AS num";
   }
 
   function from() {
