@@ -112,7 +112,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) AS visit
-        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) FROM {$this->_drupalDatabase}.watchdog) AS denom
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
