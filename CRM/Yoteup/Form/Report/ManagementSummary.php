@@ -26,8 +26,22 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'webforms' => array(
-            'title' => ts('Webforms'),
+          'webforms_visits' => array(
+            'title' => ts('Webforms Visits'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->webForms,
+            'default' => self::getDefaultWebforms(),
+          ),
+          'webforms_applications' => array(
+            'title' => ts('Webforms Applications'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->webForms,
+            'default' => self::getDefaultWebforms(),
+          ),
+          'webforms_engagement' => array(
+            'title' => ts('Webforms Engagement'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
@@ -49,7 +63,8 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   function select() {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
-    $urlSubWhere = self::createSubURLCondition();
+    $appWhere = self::createNidCondition();
+    $engageWhere = self::createEngageCondition();
     $urlVisitSubWhere = self::createVisitSubURLCondition();
 
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
@@ -77,12 +92,12 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Total applications submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) AND nid = 199
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$appWhere}
        GROUP BY nid) as e
        UNION
        SELECT 'Cumulative applications submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) AND nid = 199
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}
        GROUP BY nid) as f
        UNION
        SELECT 'Total visit registrations submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
@@ -102,7 +117,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       WHERE w.nid <> 69
+       WHERE {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        UNION
@@ -212,7 +227,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.webform w
       INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
       INNER JOIN {$this->_drupalDatabase}.url_alias u ON u.source = CONCAT_WS('/', 'node', w.nid)
-      WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)";
+      WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97)";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $default[] = $dao->nid;
@@ -223,25 +238,27 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   }
 
   function createVisitSubURLCondition() {
-    $nid = array();
-    $sql = "SELECT w.nid
-      FROM {$this->_drupalDatabase}.webform w
-      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
-      WHERE n.title LIKE '%visit%' or n.title LIKE '%registration%'";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $nid[] = $dao->nid;
+    // First get submitted params from webform
+    $webformOP = $this->_params['webforms_visits_op'];
+    $webformParams = $this->_params['webforms_visits_value'];
+    // Compute the intersection
+    if ($webformOP == 'in') {
+      $op = "IN";
     }
-    $statement = '(' . implode(",", $nid) . ')';
-    $sql = " AND nid IN {$statement}";
+    else if ($webformOP == 'notin') {
+      $op = "NOT IN";
+    }
+    $statement = '(' . implode(",", $webformParams) . ')';
+    $sql = " AND nid {$op} {$statement}";
     return $sql;
   }
   
   function createURLCondition() {
     // First get submitted params from webform
-    $webformOP = $this->_params['webforms_op'];
-    $webformParams = $this->_params['webforms_value'];
+    $webformOP = $this->_params['webforms_applications_op'];
+    $webformParams = $this->_params['webforms_applications_value'];
     $urls = $this->urls;
+    
     // Compute the intersection
     if ($webformOP == 'in') {
       $diff = array_flip(array_intersect(array_flip($urls), $webformParams));
@@ -257,10 +274,26 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     return $sql;
   }
   
-  function createSubURLCondition() {
+  function createNidCondition() {
     // First get submitted params from webform
-    $webformOP = $this->_params['webforms_op'];
-    $webformParams = $this->_params['webforms_value'];
+    $webformOP = $this->_params['webforms_applications_op'];
+    $webformParams = $this->_params['webforms_applications_value'];
+    // Compute the intersection
+    if ($webformOP == 'in') {
+      $op = "IN";
+    }
+    else if ($webformOP == 'notin') {
+      $op = "NOT IN";
+    }
+    $statement = '(' . implode(",", $webformParams) . ')';
+    $sql = " AND nid {$op} {$statement}";
+    return $sql;
+  }
+  
+  function createEngageCondition() {
+    // First get submitted params from webform
+    $webformOP = $this->_params['webforms_engagement_op'];
+    $webformParams = $this->_params['webforms_engagement_value'];
     // Compute the intersection
     if ($webformOP == 'in') {
       $op = "IN";
