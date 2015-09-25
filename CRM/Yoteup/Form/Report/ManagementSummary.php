@@ -114,7 +114,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       WHERE {$engageWhere}
+       WHERE w.{$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        UNION
@@ -282,7 +282,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       $op = "NOT IN";
     }
     $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = " nid {$op} {$statement}";
+    $sql = "nid {$op} {$statement}";
     return $sql;
   }
 
