@@ -27,19 +27,19 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
         ),
         'filters' => array(
           'webforms_visits' => array(
-            'title' => ts('Webforms Visits'),
+            'title' => ts('Webform Visits'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
           ),
           'webforms_applications' => array(
-            'title' => ts('Webforms Applications'),
+            'title' => ts('Webform Applications'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
           ),
           'webforms_engagement' => array(
-            'title' => ts('Webforms Engagement'),
+            'title' => ts('Webform Engagements'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
