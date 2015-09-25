@@ -221,6 +221,9 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_visits_op'];
     $webformParams = $this->_params['webforms_visits_value'];
+    if (empty($webformParams)) {
+      return '';
+    }
     // Compute the intersection
     if ($webformOP == 'in') {
       $op = "IN";
@@ -237,6 +240,9 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_applications_op'];
     $webformParams = $this->_params['webforms_applications_value'];
+    if (empty($webformParams)) {
+      return '';
+    }
     $urls = $this->urls;
     
     // Compute the intersection
@@ -258,6 +264,9 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_applications_op'];
     $webformParams = $this->_params['webforms_applications_value'];
+    if (empty($webformParams)) {
+      return '';
+    }
     // Compute the intersection
     if ($webformOP == 'in') {
       $op = "IN";
@@ -274,6 +283,9 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_engagement_op'];
     $webformParams = $this->_params['webforms_engagement_value'];
+    if (empty($webformParams)) {
+      return '';
+    }
     // Compute the intersection
     if ($webformOP == 'in') {
       $op = "IN";
