@@ -55,7 +55,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
     $this->_select = "
-       SELECT CONCAT('Daily Activity Report: ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
+       SELECT CONCAT('For ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
        UNION
        SELECT 'Total unique visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
