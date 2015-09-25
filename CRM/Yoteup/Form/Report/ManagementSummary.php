@@ -78,22 +78,22 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Total applications submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) AND nid = 199
-       GROUP BY nid, remote_addr) as e
+       GROUP BY nid) as e
        UNION
        SELECT 'Cumulative applications submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) AND nid = 199
-       GROUP BY nid, remote_addr) as f
+       GROUP BY nid) as f
        UNION
        SELECT 'Total visit registrations submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
-       GROUP BY nid, remote_addr) as g
+       GROUP BY nid) as g
        UNION
        SELECT 'Cumulative visit registrations submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
-       GROUP BY nid, remote_addr) as h
+       GROUP BY nid) as h
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
