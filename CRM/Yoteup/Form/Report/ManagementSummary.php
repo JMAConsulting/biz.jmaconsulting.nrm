@@ -60,9 +60,9 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
   function select() {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
-    $appWhere = self::createNidCondition();
-    $engageWhere = self::createEngageCondition();
-    $urlVisitSubWhere = self::createVisitSubURLCondition();
+    $appWhere = self::getWhereCondition('webforms_applications');
+    $engageWhere = self::getWhereCondition('webforms_engagement');
+    $urlVisitSubWhere = self::getWhereCondition('webforms_visits');
 
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
@@ -217,10 +217,10 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     }
   }
 
-  function createVisitSubURLCondition() {
+  function getWhereCondition($fieldName) {
     // First get submitted params from webform
-    $webformOP = $this->_params['webforms_visits_op'];
-    $webformParams = $this->_params['webforms_visits_value'];
+    $webformOP = $this->_params["{$fieldName}_op"];
+    $webformParams = $this->_params["{$fieldName}_value"];
     if (empty($webformParams)) {
       return '';
     }
@@ -257,44 +257,6 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     }
     $statement = implode("' OR location LIKE '%", $diff);
     $sql = " AND (location LIKE '%{$statement}')";
-    return $sql;
-  }
-  
-  function createNidCondition() {
-    // First get submitted params from webform
-    $webformOP = $this->_params['webforms_applications_op'];
-    $webformParams = $this->_params['webforms_applications_value'];
-    if (empty($webformParams)) {
-      return '';
-    }
-    // Compute the intersection
-    if ($webformOP == 'in') {
-      $op = "IN";
-    }
-    else if ($webformOP == 'notin') {
-      $op = "NOT IN";
-    }
-    $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = " AND nid {$op} {$statement}";
-    return $sql;
-  }
-  
-  function createEngageCondition() {
-    // First get submitted params from webform
-    $webformOP = $this->_params['webforms_engagement_op'];
-    $webformParams = $this->_params['webforms_engagement_value'];
-    if (empty($webformParams)) {
-      return '';
-    }
-    // Compute the intersection
-    if ($webformOP == 'in') {
-      $op = "IN";
-    }
-    else if ($webformOP == 'notin') {
-      $op = "NOT IN";
-    }
-    $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = " AND w.nid {$op} {$statement}";
     return $sql;
   }
 
