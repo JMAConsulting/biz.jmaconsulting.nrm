@@ -114,7 +114,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       WHERE w.{$engageWhere}
+       WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        UNION
@@ -132,7 +132,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        UNION
@@ -147,7 +147,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        UNION
        SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
@@ -162,7 +162,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id       
-       WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97, 199)
+       WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        UNION
        SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
@@ -282,7 +282,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       $op = "NOT IN";
     }
     $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = "nid {$op} {$statement}";
+    $sql = " AND w.nid {$op} {$statement}";
     return $sql;
   }
 
