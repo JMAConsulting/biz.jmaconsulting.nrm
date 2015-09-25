@@ -61,7 +61,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     $select = $this->_columnHeaders = array();
     $urlWhere = self::createURLCondition();
     $appWhere = self::getWhereCondition('webforms_applications');
-    $engageWhere = self::getWhereCondition('webforms_engagement');
+    $engageWhere = self::getWhereCondition('webforms_engagement', 'w.');
     $urlVisitSubWhere = self::getWhereCondition('webforms_visits');
 
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
@@ -217,7 +217,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     }
   }
 
-  function getWhereCondition($fieldName) {
+  function getWhereCondition($fieldName, $alias = '') {
     // First get submitted params from webform
     $webformOP = $this->_params["{$fieldName}_op"];
     $webformParams = $this->_params["{$fieldName}_value"];
@@ -232,7 +232,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       $op = "NOT IN";
     }
     $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = " AND nid {$op} {$statement}";
+    $sql = " AND {$alias}nid {$op} {$statement}";
     return $sql;
   }
   
