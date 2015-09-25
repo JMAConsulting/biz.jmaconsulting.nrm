@@ -31,21 +31,18 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
-            'default' => self::getDefaultWebforms(),
           ),
           'webforms_applications' => array(
             'title' => ts('Webforms Applications'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
-            'default' => self::getDefaultWebforms(),
           ),
           'webforms_engagement' => array(
             'title' => ts('Webforms Engagement'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->webForms,
-            'default' => self::getDefaultWebforms(),
           ),
         ),
       ),
@@ -218,23 +215,6 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
     while ($dao->fetch()) {
       $this->webForms[$dao->nid] = $dao->title;
     }
-  }
-  
-  function getDefaultWebforms() {
-    $default = $urls = $this->urls = array();
-    
-    $sql = "SELECT w.nid, u.alias
-      FROM {$this->_drupalDatabase}.webform w
-      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
-      INNER JOIN {$this->_drupalDatabase}.url_alias u ON u.source = CONCAT_WS('/', 'node', w.nid)
-      WHERE w.nid NOT IN (131, 132, 103, 198, 71, 75, 190, 97)";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $default[] = $dao->nid;
-      $urls[$dao->nid] = $dao->alias;
-    }
-    $this->urls = $urls;
-    return $default;
   }
 
   function createVisitSubURLCondition() {
