@@ -282,7 +282,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
       $op = "NOT IN";
     }
     $statement = '(' . implode(",", $webformParams) . ')';
-    $sql = " AND nid {$op} {$statement}";
+    $sql = " nid {$op} {$statement}";
     return $sql;
   }
 
