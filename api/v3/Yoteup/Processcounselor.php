@@ -1,6 +1,6 @@
 <?php
 define('TERRITORY_IND', 147);
-define('TERRITORY_COUNSELOR', 424);
+define('TERRITORY_COUNSELOR', 446);
 
 /**
  * YoteUp ProcessCounselor API
