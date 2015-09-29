@@ -13,7 +13,6 @@ define('TERRITORY_COUNSELOR', 424);
 function civicrm_api3_yoteup_processcounselor($params) {
   $contactParams = array(
     'return.custom_' . TERRITORY_IND  => 1,
-    'rowCount' => 100,
   );
   $contacts = civicrm_api3('Contact', 'get', $contactParams);
   $contacts = $contacts['values'];
