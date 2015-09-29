@@ -44,8 +44,10 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           ),
           'id' => array(
             'title' => ts('Contact ID'),
+            'name' => 'id',
             'operator' => CRM_Report_Form::OP_MULTISELECT,
             'options' => array(1),
+            'no_display' => TRUE,
           ),
         ),
         'grouping' => 'contact-fields',
