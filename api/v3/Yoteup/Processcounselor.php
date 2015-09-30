@@ -1,5 +1,4 @@
 <?php
-define('TERRITORY_IND', 147);
 define('TERRITORY_COUNSELOR', 446);
 
 /**
@@ -11,18 +10,13 @@ define('TERRITORY_COUNSELOR', 446);
  * @throws API_Exception
  */
 function civicrm_api3_yoteup_processcounselor($params) {
-  $contactParams = array(
-    'return.custom_' . TERRITORY_IND  => 1,
-  );
-  $contacts = civicrm_api3('Contact', 'get', $contactParams);
-  $contacts = $contacts['values'];
-  
   // Get list of counselors
+  $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counsellor'));
   $counselorParams = array(
     'contact_sub_type' => 'Counsellor',
-    'return.custom_' . TERRITORY_COUNSELOR => 1,
     'return.email' => 1,
-    'rowCount' => 200,
+    'return.custom_' . TERRITORY_COUNSELOR => 1,
+    'rowCount' => $counsellorCount,
   );
   $counselors = civicrm_api3('Contact', 'get', $counselorParams);
   $ind = array();
@@ -31,13 +25,9 @@ function civicrm_api3_yoteup_processcounselor($params) {
   if ($counselors['count'] >= 1) {
     $counselors = $counselors['values'];
     foreach ($counselors as $key => $value) {
-      foreach ($value['custom_' . TERRITORY_COUNSELOR] as $territory) {
-        foreach ($contacts as $contact) {
-          if (!empty($contact['custom_' . TERRITORY_IND]) && $territory == $contact['custom_' . TERRITORY_IND]) {
-            $ind[$value['contact_id']]['email'] = $value['email'];
-            $ind[$value['contact_id']]['contact_id'][] = $contact['contact_id'];
-          }
-        }
+      if (!empty($value['custom_' . TERRITORY_COUNSELOR])) {
+        $ind[$key]['contact_id'] = $value['contact_id'];
+        $ind[$key]['email'] = $value['email'];
       }
     }
     // Now email
@@ -61,10 +51,9 @@ function civicrm_api3_yoteup_processcounselor($params) {
       else {
         $obj->assign('reportTitle', $templateInfo['label']);
       }
-      $_GET['id_op'] = 'in';
       foreach ($ind as $key => $value) {
         $_REQUEST['email_to_send'] = $value['email'];
-        $_GET['id_value'] = implode(',', $value['contact_id']);
+        $_GET['counsellor_id_value'] = $value['contact_id'];
         $wrapper = new CRM_Utils_Wrapper();
         $arguments = array(
           'urlToSession' => array(

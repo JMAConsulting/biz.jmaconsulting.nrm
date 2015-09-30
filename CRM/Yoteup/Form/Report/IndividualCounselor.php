@@ -303,6 +303,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         }
       }
     }
+    
+    if (isset($_GET['counsellor_id_value'])) {
+      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admission_territory_424, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
+        FROM civicrm_value_territory_26 t26 WHERE t26.entity_id = " . $_GET['counsellor_id_value']);
+      $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
+    }
 
     if (empty($clauses)) {
       $this->_where = "WHERE ( 1 ) ";
@@ -339,6 +345,9 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_a");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_b");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_c");
   }
   
   function createTemp() {
@@ -509,8 +518,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         if ($purl) {
           $string = '';
           $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog
-          WHERE location REGEXP '[[:alnum:]]+.pdf'
-          AND location LIKE {$purl}";
+          WHERE location LIKE {$purl}
+          AND location LIKE '%.pdf%'";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
             $string = "<br/><hr><b>Downloads:</b><br/>";
