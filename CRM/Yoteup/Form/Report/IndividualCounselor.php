@@ -305,8 +305,8 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
     
     if (isset($_GET['counsellor_id_value'])) {
-      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admission_territory_424, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
-        FROM civicrm_value_territory_26 t26 WHERE t26.entity_id = " . $_GET['counsellor_id_value']);
+      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t27.admissions_territory_446, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
+        FROM civicrm_value_territory_27 t27 WHERE t27.entity_id = " . $_GET['counsellor_id_value']);
       $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
     }
 
@@ -540,6 +540,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg6%' AND nid = 72 AND type = 'select' AND cid IN (22,23,24)";
         $rows[$rowNum]['civicrm_contact_brochure_request'] = self::getLabels($sql, $separator = ', ', $row['civicrm_contact_brochure_request']);
+        $rows[$rowNum]['civicrm_contact_brochure_request'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_brochure_request']);
         $entryFound = TRUE;
       }
       unset($this->_columnHeaders["civicrm_contact_contact_id"]);

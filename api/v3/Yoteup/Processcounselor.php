@@ -11,9 +11,9 @@ define('TERRITORY_COUNSELOR', 446);
  */
 function civicrm_api3_yoteup_processcounselor($params) {
   // Get list of counselors
-  $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counsellor'));
+  $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
   $counselorParams = array(
-    'contact_sub_type' => 'Counsellor',
+    'contact_sub_type' => 'Counselors',
     'return.email' => 1,
     'return.custom_' . TERRITORY_COUNSELOR => 1,
     'rowCount' => $counsellorCount,
