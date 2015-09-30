@@ -501,6 +501,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
       if (array_key_exists('civicrm_contact_display_name', $row)) {
         $rows[$rowNum]['civicrm_contact_display_name'] = self::getCustomFieldDataLables($row['civicrm_contact_display_name']);
+        $rows[$rowNum]['civicrm_contact_display_name'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_display_name']);
         $entryFound = TRUE;
       }
       
@@ -510,6 +511,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg20%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+        $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
         $entryFound = TRUE;
       }
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
@@ -528,6 +530,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             $string .= urldecode(basename($dao->location)) . "<br/>";
           }
           $rows[$rowNum]['civicrm_contact_info_request'] = $rows[$rowNum]['civicrm_contact_info_request'] . $string;
+          $rows[$rowNum]['civicrm_contact_info_request'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_info_request']);
         }
         $entryFound = TRUE;
       }
