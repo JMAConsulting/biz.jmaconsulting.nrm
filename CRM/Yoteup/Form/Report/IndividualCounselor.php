@@ -374,7 +374,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.sid = wsd.sid 
       LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
-      WHERE ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
+      WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW()) AND ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
       GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
@@ -415,10 +415,12 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
       $this->infoColumn[$dao->table_name]['fields'][$dao->column_name] = array(
         'title' => $dao->label,
-        'default' => TRUE,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
         'field_id' => $dao->field_id,
       );
+      if (in_array($dao->label, array('Activity Interests', 'Major Interests', 'Athletic Interests'))) {
+        $this->infoColumn[$dao->table_name]['fields'][$dao->column_name]['default'] = TRUE;
+      }
       $this->infoColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
       $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests & Downloads');
     }
