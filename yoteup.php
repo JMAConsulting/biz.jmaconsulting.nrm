@@ -117,21 +117,6 @@ function yoteup_civicrm_alterMailParams(&$params, $context) {
       else {
         $params['toEmail'] = $email;
       }
-      // Add attachment to body
-      $csv = $params['attachments'][0]['fullPath'];
-      $body = "<html><body><table>\n\n";
-      $f = fopen($csv, "r");
-      while (($line = fgetcsv($f)) !== false) {
-        $body .= "<tr>";
-        foreach ($line as $cell) {
-          $body .= "<td>" . htmlspecialchars($cell) . "</td>";
-        }
-        $body .= "</tr>\n";
-      }
-      fclose($f);
-      $body .= "\n</table></body></html>";
-      $params['html'] .= $body;
-      unset($params['attachments']);
     }
   }  
 }
