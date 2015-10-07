@@ -110,7 +110,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
-       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       (SELECT CONCAT(p.purl_145,'.brevard2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
@@ -128,7 +128,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
-       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       (SELECT CONCAT(p.purl_145,'.brevard2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
@@ -143,7 +143,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
-       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       (SELECT CONCAT(p.purl_145,'.brevard2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
@@ -159,7 +159,7 @@ class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
-       (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
+       (SELECT CONCAT(p.purl_145,'.brevard2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id       
        WHERE (1) {$engageWhere}
