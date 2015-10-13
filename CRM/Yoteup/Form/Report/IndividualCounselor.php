@@ -181,7 +181,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_log') {
               $this->_logField = TRUE;
-              $logSelect = "MAX(DATE_FORMAT({$field['dbAlias']}, '%m/%d/%Y')) as civicrm_contact_last_update,";
+              $logSelect = "DATE_FORMAT(MAX({$field['dbAlias']}), '%m/%d/%Y') as civicrm_contact_last_update,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
