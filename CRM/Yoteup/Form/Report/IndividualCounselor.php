@@ -356,14 +356,14 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog
       GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl(255)) USING HASH";
+    $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255)) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
       SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_general_ci";
+      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
