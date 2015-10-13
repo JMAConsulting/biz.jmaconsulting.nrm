@@ -502,7 +502,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
 
       if (array_key_exists('civicrm_contact_display_name', $row)) {
-        $rows[$rowNum]['civicrm_contact_display_name'] = self::getCustomFieldDataLables($row['civicrm_contact_display_name']);
+        $rows[$rowNum]['civicrm_contact_display_name'] = self::getCustomFieldDataLabels($row['civicrm_contact_display_name']);
         $rows[$rowNum]['civicrm_contact_display_name'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_display_name']);
         $entryFound = TRUE;
       }
@@ -517,7 +517,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
         $entryFound = TRUE;
       }
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
-        $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLables($row['civicrm_contact_info_request']);
+        $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLabels($row['civicrm_contact_info_request']);
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
           $string = '';
@@ -552,7 +552,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
   }
   
-  public static function getCustomFieldDataLables($data) {
+  public static function getCustomFieldDataLabels($data) {
     if (empty($data)) {
       return $data;
     }
