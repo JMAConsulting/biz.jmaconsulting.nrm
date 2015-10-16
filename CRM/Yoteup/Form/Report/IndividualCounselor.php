@@ -438,20 +438,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->webForms[$dao->nid] = $dao->title;
     }
   }
-  
-  function getDefaultWebforms() {
-    $default = array();
-    
-    $sql = "SELECT w.nid
-      FROM {$this->_drupalDatabase}.webform w
-      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
-      WHERE w.nid IN (103, 128, 131, 132, 183, 75, 198)"; // Only surveys
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $default[] = $dao->nid;
-    }
-    return $default;
-  }
 
   function getLabels($sql, $separator, $row) {
     $items = $newArray = $web = array();
@@ -482,24 +468,6 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $entryFound = FALSE;
     $checkList = array();
     foreach ($rows as $rowNum => $row) {
-
-      if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
-        // not repeat contact display names if it matches with the one
-        // in previous row
-        $repeatFound = FALSE;
-        foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
-          ) {
-            $rows[$rowNum][$colName] = "";
-            $repeatFound = TRUE;
-          }
-          if (in_array($colName, $this->_noRepeats)) {
-            $checkList[$colName][] = $colVal;
-          }
-        }
-      }
 
       if (array_key_exists('civicrm_contact_display_name', $row)) {
         $rows[$rowNum]['civicrm_contact_display_name'] = self::getCustomFieldDataLabels($row['civicrm_contact_display_name']);
