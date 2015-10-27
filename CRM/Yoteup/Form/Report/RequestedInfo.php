@@ -38,7 +38,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'ignore_group_concat' => TRUE,
         'columnName' => 'contact_civireport.external_identifier',
       ),
-      'Submitted_Date' => array(
+      'Submitted_Time' => array(
         'title' => 'Submitted Time',
         'ignore_group_concat' => TRUE,
         'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')",
@@ -66,9 +66,9 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Permanent Address Line 2',
       ),
       'City' => array(
-        'title' => 'City'
+        'title' => 'City',
       ),
-      'State_Abbr' => array(
+      'State' => array(
         'title' => 'State',
       ),
       'Zip_Code' => array(
