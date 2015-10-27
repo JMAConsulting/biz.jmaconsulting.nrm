@@ -39,9 +39,13 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'columnName' => 'contact_civireport.external_identifier',
       ),
       'Submitted_Date' => array(
-        'title' => 'Submitted Date',
+        'title' => 'Submitted Time',
         'ignore_group_concat' => TRUE,
-        'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
+        'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')",
+      ),
+      'Type_of_Inquiry' => array(
+        'title' => 'Type of Inquiry',
+        'columnName' => 'i.name',
       ),
       'Existing_Contact' => array(
         'title' => 'Existing Contact',
@@ -49,14 +53,11 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'First_Name' => array(
         'title' => 'First Name',
       ),
-      'Last_Name' => array(
-        'title' => 'Last Name',
-      ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
       ),
-      'Email_Address' => array(
-        'title' => 'Email Address',
+      'Last_Name' => array(
+        'title' => 'Last Name',
       ),
       'Permanent_Address_Line_1' => array(
         'title' => 'Permanent Address Line 1',
@@ -67,22 +68,18 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'City' => array(
         'title' => 'City'
       ),
+      'State_Abbr' => array(
+        'title' => 'State',
+      ),
       'Zip_Code' => array(
         'title' => 'Zip Code',
-      ),
-      'State_Abbr' => array(
-        'title' => 'State Abbr',
       ),
       'Country' => array(
         'title' => 'Country',
         'columnName' => 'c.name',
       ),
-      'Gender' => array(
-        'title' => 'Gender',
-        'columnName' => 'g.label',
-      ),
-      'High_School_Graduation_Date' => array(
-        'title' => 'High School Graduation Date',
+      'Email_Address' => array(
+        'title' => 'Email Address',
       ),
       'Primary_Phone_Number' => array(
         'title' => 'Primary Phone Number',
@@ -91,9 +88,6 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Primary Phone Type',
         'columnName' => 'pt1.label',
       ),
-      'High_School_Attended' => array(
-        'title' => 'High School Attended',
-      ),
       'Secondary_Phone_Number' => array(
         'title' => 'Secondary Phone Number',
       ),
@@ -101,15 +95,21 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Secondary Phone Type',
         'columnName' => 'pt2.label',
       ),
-      'Type_of_Inquiry' => array(
-        'title' => 'Type of Inquiry',
-        'columnName' => 'i.name',
+      'Date_of_Birth' => array(
+        'title' => 'Date of Birth',
+      ),
+      'Gender' => array(
+        'title' => 'Gender',
+        'columnName' => 'g.label',
+      ),
+      'High_School_Attended' => array(
+        'title' => 'High School Attended',
+      ),
+      'High_School_Graduation_Date' => array(
+        'title' => 'High School Graduation Date',
       ),
       'College_Attended_(if_any)' => array(
         'title' => 'College Attended (if any)',
-      ),
-      'Date_of_Birth' => array(
-        'title' => 'Date of Birth',
       ),
     );
 
