@@ -52,8 +52,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
       }
       else {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
-        $column = (in_array($key, $ignoreSelectClause)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
-        $select[] = "GROUP_CONCAT(if(wc.name='{$column}', {$columnName}, NULL)) AS '{$column['title']}'";
+        $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
+        $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$column['title']}'";
       }
     }
     $form->_select = "
