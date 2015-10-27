@@ -118,6 +118,8 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Date of Birth',
       ),
     );
+    
+    $this->_select = "SELECT sq.*, sp.name AS 'State' FROM ( ";
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
