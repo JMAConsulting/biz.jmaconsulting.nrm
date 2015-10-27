@@ -87,7 +87,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       GROUP_CONCAT(if(wc.name='High School Attended', wsd.data, NULL)) AS 'High School Attended',
       GROUP_CONCAT(if(wc.name='Secondary Phone Number', wsd.data, NULL)) AS 'Secondary Phone Number',
       GROUP_CONCAT(if(wc.name='Secondary Phone Type', pt2.label, NULL)) AS 'Secondary Phone Type',
-      GROUP_CONCAT(if(wc.name='Type of Inquiry', i.label, NULL)) AS 'Type of Inquiry',
+      GROUP_CONCAT(if(wc.name='Type of Inquiry', i.name, NULL)) AS 'Type of Inquiry',
       GROUP_CONCAT(if(wc.name='College Attended (if any)', wsd.data, NULL)) AS 'College Attended (if any)',
       GROUP_CONCAT(if(wc.name='Date of Birth', wsd.data, NULL)) AS 'Date of Birth'";
   }
@@ -101,7 +101,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       LEFT JOIN civicrm_option_value pt1 ON wsd.data COLLATE utf8_unicode_ci = pt1.value AND pt1.option_group_id = 35
       LEFT JOIN civicrm_option_value pt2 ON wsd.data COLLATE utf8_unicode_ci = pt2.value AND pt2.option_group_id = 35
       LEFT JOIN civicrm_country c ON wsd.data = c.id
-      LEFT JOIN civicrm_option_value i ON wsd.data COLLATE utf8_unicode_ci = i.value AND i.option_group_id = 173";
+      LEFT JOIN inquiry i ON wsd.data COLLATE utf8_unicode_ci = i.value";
   }
 
   function where() {
@@ -126,6 +126,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
+    self::createInquiry();
 
     $sql = $this->buildQuery(FALSE);
 
@@ -135,6 +136,28 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
+  }
+  
+  function createInquiry() {
+    $sql = "SELECT extra
+      FROM {$this->_drupalDatabase}.webform_component
+      WHERE form_key = 'type_of_inquiry' AND nid = 72";
+    $result = CRM_Core_DAO::singleValueQuery($sql);
+    $result = unserialize($result);
+    $inquiry = explode('|', $result['items']);
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS inquiry (
+      value int(50) NOT NULL,
+      name varchar(64) NOT NULL)");
+    $sql = "INSERT INTO inquiry VALUES";
+    foreach ($inquiry as $key => &$items) {
+      $items = trim(preg_replace('/[0-9]+/', NULL, $items));
+      if ($key != 0) {
+        $vals[] = " ({$key}, '{$items}')";
+      }
+    }
+    $sql .= implode(',', $vals);
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   function alterDisplay(&$rows) {
