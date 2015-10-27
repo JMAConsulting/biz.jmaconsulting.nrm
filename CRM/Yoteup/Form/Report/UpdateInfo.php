@@ -42,10 +42,8 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
         'ignore_group_concat' => TRUE,
         'columnName' => 'contact_civireport.external_identifier',
       ),
-      'Submitted_Date' => array(
-        'title' => 'Submitted Date',
-        'ignore_group_concat' => TRUE,
-        'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
+      'Email' => array(
+        'title' => 'Email',
       ),
       'First_Name' => array(
         'title' => 'First Name',
@@ -68,9 +66,6 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
       ),
       'Birth_Date' => array(
         'title' => 'Birth Date',
-      ),
-      'Email' => array(
-        'title' => 'Email',
       ),
       'Street_Address' => array(
         'title' => 'Street Address',
