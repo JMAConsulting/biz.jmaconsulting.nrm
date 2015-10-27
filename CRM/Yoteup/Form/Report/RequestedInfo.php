@@ -109,7 +109,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
       'Type_of_Inquiry' => array(
         'title' => 'Type of Inquiry',
-        'columnName' => 'i.label',
+        'columnName' => 'i.name',
       ),
       'College_Attended_(if_any)' => array(
         'title' => 'College Attended (if any)',

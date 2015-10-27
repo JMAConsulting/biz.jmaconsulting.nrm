@@ -82,7 +82,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
       LEFT JOIN civicrm_option_value pt1 ON wsd.data COLLATE utf8_unicode_ci = pt1.value AND pt1.option_group_id = 35
       LEFT JOIN civicrm_option_value pt2 ON wsd.data COLLATE utf8_unicode_ci = pt2.value AND pt2.option_group_id = 35
       LEFT JOIN civicrm_country c ON wsd.data = c.id
-      LEFT JOIN civicrm_option_value i ON wsd.data COLLATE utf8_unicode_ci = i.value AND i.option_group_id = 173";
+      LEFT JOIN inquiry i ON wsd.data COLLATE utf8_unicode_ci = i.value ";
   }
   
   /*
