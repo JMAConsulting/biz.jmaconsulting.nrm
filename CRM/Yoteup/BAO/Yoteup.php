@@ -53,7 +53,12 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $select[] = "{$column['columnName']} AS '{$column['title']}'";
       }
-      else {
+      if (CRM_Utils_Array::value('same_alias', $column) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
+        $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
+        $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
+        $select[] = "GROUP_CONCAT(if((wc.name='{$col}' AND wc.cid = {$column['cid']}), {$columnName}, NULL)) AS '{$column['title']}_{$column['alias']}'";
+      }
+      elseif (!CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
         $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
         $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$column['title']}'";
@@ -96,7 +101,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportWhereClause(&$where, $webFormId) {
-    $where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId} AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+    $where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId}";
   }
   
   /*
