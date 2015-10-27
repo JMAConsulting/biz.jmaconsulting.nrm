@@ -126,7 +126,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, $this->_drupalDatabase);
   }
 
   function where() {

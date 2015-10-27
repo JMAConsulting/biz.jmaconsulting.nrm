@@ -58,7 +58,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     }
     $form->_select = "
       SELECT sq.*, sp.name AS 'State' FROM 
-      (" . implode(',', $select);
+      (SELECT " . implode(',', $select);
   }
 
   /*
