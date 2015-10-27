@@ -36,65 +36,77 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
   }
 
   function select() {
-    $select = $this->_columnHeaders = array();
-
-    $this->_columnHeaders['Chowan_ID']['title'] = ts("Chowan ID");
-    $this->_columnHeaders['Submitted_Date']['title'] = ts("Submitted Date");
-    $this->_columnHeaders['First_Name']['title'] = ts("First Name");
-    $this->_columnHeaders['Middle_Name']['title'] = ts("Middle Name");
-    $this->_columnHeaders['Last_Name']['title'] = ts("Last Name");
-    $this->_columnHeaders['Name_Suffix']['title'] = ts("Name Suffix");
-    $this->_columnHeaders['Nickname']['title'] = ts("Nickname");
-    $this->_columnHeaders['Gender']['title'] = ts("Gender");
-    $this->_columnHeaders['Birth_Date']['title'] = ts("Birth Date");
-    $this->_columnHeaders['Email']['title'] = ts("Email");
-    $this->_columnHeaders['Street_Address']['title'] = ts("Street Address");
-    $this->_columnHeaders['Street_Address_Line_2']['title'] = ts("Street Address Line 2");
-    $this->_columnHeaders['City']['title'] = ts("City");
-    $this->_columnHeaders['State']['title'] = ts("State");
-    $this->_columnHeaders['Postal_Code']['title'] = ts("Postal Code");
-    $this->_columnHeaders['Postal_Code_Suffix']['title'] = ts("Postal Code Suffix");
-    $this->_columnHeaders['Phone_Number']['title'] = ts("Phone Number");
-    $this->_columnHeaders['Phone_Type']['title'] = ts("Phone Type");
-
-    $this->_select = "
-      SELECT wsd.sid, DATE(FROM_UNIXTIME(ws.completed)) AS 'Submitted Date', contact_civireport.external_identifier AS 'Chowan ID',
-      GROUP_CONCAT(if(wc.name='First Name', wsd.data, NULL)) AS 'First Name',
-      GROUP_CONCAT(if(wc.name='Last Name', wsd.data, NULL)) AS 'Last Name',
-      GROUP_CONCAT(if(wc.name='Middle Name', wsd.data, NULL)) AS 'Middle Name',
-      GROUP_CONCAT(if(wc.name='Nickname', wsd.data, NULL)) AS 'Nickname',
-      GROUP_CONCAT(if(wc.name='Name Suffix', wsd.data, NULL)) AS 'Name Suffix',
-      GROUP_CONCAT(if(wc.name='Gender', g.label, NULL)) AS 'Gender',
-      GROUP_CONCAT(if(wc.name='Birth Date', wsd.data, NULL)) AS 'Birth Date',
-      GROUP_CONCAT(if(wc.name='Email', wsd.data, NULL)) AS 'Email',
-      GROUP_CONCAT(if(wc.name='Street Address', wsd.data, NULL)) AS 'Street Address',
-      GROUP_CONCAT(if(wc.name='Street Address Line 2', wsd.data, NULL)) AS 'Street Address Line 2',
-      GROUP_CONCAT(if(wc.name='City', wsd.data, NULL)) AS 'City',
-      GROUP_CONCAT(if(wc.name='State/Province', wsd.data, NULL)) AS 'State',
-      GROUP_CONCAT(if(wc.name='Postal Code', wsd.data, NULL)) AS 'Postal Code',
-      GROUP_CONCAT(if(wc.name='Postal Code Suffix', wsd.data, NULL)) AS 'Postal Code Suffix',
-      GROUP_CONCAT(if(wc.name='Phone Number', wsd.data, NULL)) AS 'Phone Number',
-      GROUP_CONCAT(if(wc.name='Phone Type', pt1.label, NULL)) AS 'Phone Type'";
+    $columns =  array(
+      'Chowan_ID' => array(
+        'title' => 'Chowan ID',
+        'ignore_group_concat' => TRUE,
+        'columnName' => 'contact_civireport.external_identifier',
+      ),
+      'Submitted_Date' => array(
+        'title' => 'Submitted Date',
+        'ignore_group_concat' => TRUE,
+        'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
+      ),
+      'First_Name' => array(
+        'title' => 'First Name',
+      ),
+      'Middle_Name' => array(
+        'title' => 'Middle Name',
+      ),
+      'Last_Name' => array(
+        'title' => 'Last Name',
+      ),
+      'Name_Suffix' => array(
+        'title' => 'Name Suffix',
+      ),
+      'Nickname' => array(
+        'title' => 'Nickname',
+      ),
+      'Gender' => array(
+        'title' => 'Gender',
+        'columnName' => 'g.label',
+      ),
+      'Birth_Date' => array(
+        'title' => 'Birth Date',
+      ),
+      'Email' => array(
+        'title' => 'Email',
+      ),
+      'Street_Address' => array(
+        'title' => 'Street Address',
+      ),
+      'Street_Address_Line_2' => array(
+        'title' => 'Street Address Line 2',
+      ),
+      'City' => array(
+        'title' => 'City'
+      ),
+      'State' => array(
+        'title' => 'State/Province',
+      ),
+      'Postal_Code' => array(
+        'title' => 'Postal Code',
+      ),
+      'Postal_Code_Suffix' => array(
+        'title' => 'Postal Code Suffix',
+      ),
+      'Phone_Number' => array(
+        'title' => 'Phone Number',
+      ),
+      'Phone_Type' => array(
+        'title' => 'Phone Type',
+        'columnName' => 'pt1.label',
+      ),
+    );
+    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
   function from() { 
-    $this->_from = "FROM {$this->_drupalDatabase}.webform_submitted_data wsd 
-      LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
-      LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.cid = wsd.cid 
-      LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid 
-      LEFT JOIN civicrm_option_value g ON wsd.data COLLATE utf8_unicode_ci = g.value AND g.option_group_id = 3
-      LEFT JOIN civicrm_option_value pt1 ON wsd.data COLLATE utf8_unicode_ci = pt1.value AND pt1.option_group_id = 35
-      LEFT JOIN civicrm_country c ON wsd.data = c.id";
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
   }
 
   function where() {
-    $clauses = array();
-    $clauses[] = " wc.nid = 67 AND wsd.nid = 67";
-    $clauses[] = " DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
-    
-    if (!empty($clauses)) {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
+    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 67);
   }
 
   function groupBy() {
