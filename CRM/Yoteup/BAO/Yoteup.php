@@ -36,8 +36,10 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportSelectClause(&$form, $columns) {
-    self::createInquiry();
+  public static function reportSelectClause(&$form, $columns, $addTemp = FALSE) {
+    if ($addTemp) {
+      self::createInquiry();
+    }
     $form->_columnHeaders = $select = array();
     $select[] = 'wsd.sid';
     $defaultColumnName = 'wsd.data';
@@ -57,9 +59,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
         $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$column['title']}'";
       }
     }
-    $form->_select = "
-      SELECT sq.*, sp.name AS 'State' FROM 
-      (SELECT " . implode(',', $select);
+    $form->_select .= " SELECT " . implode(',', $select);
   }
 
   /*
