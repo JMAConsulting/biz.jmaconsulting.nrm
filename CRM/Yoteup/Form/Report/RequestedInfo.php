@@ -33,42 +33,34 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
-        'ignore_group_concat' => TRUE,
-        'columnName' => 'contact_civireport.external_identifier',
-      ),
       'Submitted_Date' => array(
         'title' => 'Submitted Date',
         'ignore_group_concat' => TRUE,
         'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
       ),
-      'Existing_Contact' => array(
-        'title' => 'Existing Contact',
-      ),
       'First_Name' => array(
         'title' => 'First Name',
-      ),
-      'Last_Name' => array(
-        'title' => 'Last Name',
       ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
       ),
-      'Email_Address' => array(
-        'title' => 'Email Address',
+      'Last_Name' => array(
+        'title' => 'Last Name',
       ),
-      'Permanent_Address_Line_1' => array(
-        'title' => 'Permanent Address Line 1',
+      'Name_Suffix' => array(
+        'title' => 'Name Suffix',
       ),
-      'Permanent_Address_Line_2' => array(
-        'title' => 'Permanent Address Line 2',
+      'Nick_Name' => array(
+        'title' => 'Nickname',
+      ),
+      'Street Address' => array(
+        'title' => 'Street Address',
+      ),
+      'Street_Address_Line_2' => array(
+        'title' => 'Street Address Line 2',
       ),
       'City' => array(
         'title' => 'City'
-      ),
-      'Zip_Code' => array(
-        'title' => 'Zip Code',
       ),
       'State_Abbr' => array(
         'title' => 'State Abbr',
@@ -76,46 +68,23 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'State' => array(
         'title' => 'State',
       ),
-      'Country' => array(
-        'title' => 'Country',
-        'columnName' => 'c.name',
+      'Zip_Code' => array(
+        'title' => 'Zip Code',
       ),
-      'Country_Code' => array(
-        'title' => 'Country Code',
+      'Phone_Number' => array(
+        'title' => 'Phone Number',
       ),
-      'Gender' => array(
-        'title' => 'Gender',
-        'columnName' => 'g.label',
+      'Email' => array(
+        'title' => 'Email',
+      ),
+      'High_School_Name' => array(
+        'title' => 'High School Name',
       ),
       'High_School_Graduation_Date' => array(
         'title' => 'High School Graduation Date',
       ),
-      'Primary_Phone_Number' => array(
-        'title' => 'Primary Phone Number',
-      ),
-      'Primary_Phone_Type' => array(
-        'title' => 'Primary Phone Type',
-        'columnName' => 'pt1.label',
-      ),
-      'High_School_Attended' => array(
-        'title' => 'High School Attended',
-      ),
-      'Secondary_Phone_Number' => array(
-        'title' => 'Secondary Phone Number',
-      ),
-      'Secondary_Phone_Type' => array(
-        'title' => 'Secondary Phone Type',
-        'columnName' => 'pt2.label',
-      ),
-      'Type_of_Inquiry' => array(
-        'title' => 'Type of Inquiry',
-        'columnName' => 'i.name',
-      ),
-      'College_Attended_(if_any)' => array(
-        'title' => 'College Attended (if any)',
-      ),
-      'Date_of_Birth' => array(
-        'title' => 'Date of Birth',
+      'Major_or_Academic_Interests' => array(
+        'title' => 'Major_or_Academic_Interests',
       ),
     );
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
