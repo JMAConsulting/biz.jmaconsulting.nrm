@@ -44,12 +44,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     $select[] = 'wsd.sid';
     $defaultColumnName = 'wsd.data';
     $abr = array('Country_Code', 'State_Abbr');
-    $ignoreSelectClause = array('State');
     foreach ($columns as $key => $column) {
       $form->_columnHeaders[$key]['title'] = ts($column['title']);
-      if (in_array($key, $ignoreSelectClause)) {
-        continue;
-      }
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $select[] = "{$column['columnName']} AS '{$column['title']}'";
       }
