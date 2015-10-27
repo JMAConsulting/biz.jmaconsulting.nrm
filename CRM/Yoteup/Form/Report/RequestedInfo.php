@@ -73,15 +73,9 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'State_Abbr' => array(
         'title' => 'State Abbr',
       ),
-      'State' => array(
-        'title' => 'State',
-      ),
       'Country' => array(
         'title' => 'Country',
         'columnName' => 'c.name',
-      ),
-      'Country_Code' => array(
-        'title' => 'Country Code',
       ),
       'Gender' => array(
         'title' => 'Gender',
@@ -118,8 +112,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Date of Birth',
       ),
     );
-    
-    $this->_select = "SELECT sq.*, sp.name AS 'State' FROM ( ";
+
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns, TRUE);
   }
 
@@ -132,8 +125,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function groupBy() {
-    $this->_groupBy = "GROUP BY wsd.sid) as sq 
-      LEFT JOIN civicrm_state_province sp ON sq.`State Abbr` COLLATE utf8_unicode_ci = sp.abbreviation AND sq.`Country Code` = sp.country_id";
+    $this->_groupBy = "GROUP BY wsd.sid";
   }
 
   function orderBy() {
