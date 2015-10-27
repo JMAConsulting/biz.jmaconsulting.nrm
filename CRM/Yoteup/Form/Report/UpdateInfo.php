@@ -37,18 +37,22 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
+      'Submitted_Time' => array(
+        'title' => 'Submitted Time',
         'ignore_group_concat' => TRUE,
-        'columnName' => 'contact_civireport.external_identifier',
+        'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')",
       ),
-      'Submitted_Date' => array(
-        'title' => 'Submitted Date',
-        'ignore_group_concat' => TRUE,
-        'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
+      'Existing_Contact' => array(
+        'title' => 'Existing Contact',
+      ),
+      'Email' => array(
+        'title' => 'Email',
       ),
       'First_Name' => array(
         'title' => 'First Name',
+      ),
+      'Nickname' => array(
+        'title' => 'Nickname',
       ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
@@ -56,11 +60,11 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
       'Last_Name' => array(
         'title' => 'Last Name',
       ),
+      'Name_Prefix' => array(
+        'title' => 'Name Prefix',
+      ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
-      ),
-      'Nickname' => array(
-        'title' => 'Nickname',
       ),
       'Gender' => array(
         'title' => 'Gender',
@@ -68,9 +72,6 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
       ),
       'Birth_Date' => array(
         'title' => 'Birth Date',
-      ),
-      'Email' => array(
-        'title' => 'Email',
       ),
       'Street_Address' => array(
         'title' => 'Street Address',
