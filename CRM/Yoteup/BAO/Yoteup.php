@@ -69,8 +69,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_BAO {
    *
    *
    */
-  public static function reportFromClause(&$form) {
-    $form->_from = "FROM {$this->_drupalDatabase}.webform_submitted_data wsd 
+  public static function reportFromClause(&$from) {
+    $from = "FROM {$this->_drupalDatabase}.webform_submitted_data wsd 
       LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
       LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.cid = wsd.cid 
       LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid 
@@ -89,8 +89,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_BAO {
    *
    *
    */
-  public static function reportWhereClause(&$form, $webFormId) {
-    $form->_where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId} AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+  public static function reportWhereClause(&$where, $webFormId) {
+    $where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId} AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
   }
   
   /*

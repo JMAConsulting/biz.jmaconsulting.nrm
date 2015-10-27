@@ -126,11 +126,11 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this, 72);
+    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 72);
   }
 
   function groupBy() {
