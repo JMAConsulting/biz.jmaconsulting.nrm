@@ -76,7 +76,10 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
       'City' => array(
         'title' => 'City'
       ),
-      'State' => array(
+      'County' => array(
+        'title' => 'County',
+      ),
+      'State/Province' => array(
         'title' => 'State/Province',
       ),
       'Postal_Code' => array(
