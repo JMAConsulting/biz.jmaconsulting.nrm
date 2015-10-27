@@ -26,7 +26,7 @@
  *          Canada   M5T 2C7
  */
 
-class CRM_Yoteup_BAO_Yoteup extends CRM_Core_BAO {
+class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
 
   /*
    * function to build select clause for reports
@@ -58,7 +58,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_BAO {
     }
     $form->_select = "
       SELECT sq.*, sp.name AS 'State' FROM 
-      (" . impode(',', $select);
+      (" . implode(',', $select);
   }
 
   /*
@@ -69,11 +69,11 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_BAO {
    *
    *
    */
-  public static function reportFromClause(&$from) {
-    $from = "FROM {$this->_drupalDatabase}.webform_submitted_data wsd 
+  public static function reportFromClause(&$from, $drupalDb) {
+    $from = "FROM {$drupalDb}.webform_submitted_data wsd 
       LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
-      LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.cid = wsd.cid 
-      LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid 
+      LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
+      LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid 
       LEFT JOIN civicrm_option_value g ON wsd.data COLLATE utf8_unicode_ci = g.value AND g.option_group_id = 3
       LEFT JOIN civicrm_option_value pt1 ON wsd.data COLLATE utf8_unicode_ci = pt1.value AND pt1.option_group_id = 35
       LEFT JOIN civicrm_option_value pt2 ON wsd.data COLLATE utf8_unicode_ci = pt2.value AND pt2.option_group_id = 35
