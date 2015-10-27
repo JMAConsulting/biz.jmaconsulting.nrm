@@ -37,6 +37,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportSelectClause(&$form, $columns) {
+    self::createInquiry();
     $form->_columnHeaders = $select = array();
     $select[] = 'wsd.sid';
     $defaultColumnName = 'wsd.data';
@@ -69,7 +70,10 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportFromClause(&$from, $drupalDb) {
+  public static function reportFromClause(&$from) {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $drupalDb = $dsnArray['database'];
     $from = "FROM {$drupalDb}.webform_submitted_data wsd 
       LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
@@ -102,5 +106,38 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportGroupByClause(&$form, $columns) {    
+  }
+
+  /*
+   * function to add temp table
+   *
+   * @access public
+   * @static
+   *
+   *
+   */ 
+  public static function createInquiry() {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $drupalDatabase = $dsnArray['database'];
+    $sql = "SELECT extra
+      FROM {$drupalDatabase}.webform_component
+      WHERE form_key = 'type_of_inquiry' AND nid = 72";
+    $result = CRM_Core_DAO::singleValueQuery($sql);
+    $result = unserialize($result);
+    $inquiry = explode('|', $result['items']);
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS inquiry (
+      value int(50) NOT NULL,
+      name varchar(64) NOT NULL)");
+    $sql = "INSERT INTO inquiry VALUES";
+    foreach ($inquiry as $key => &$items) {
+      $items = trim(preg_replace('/[0-9]+/', NULL, $items));
+      if ($key != 0) {
+        $vals[] = " ({$key}, '{$items}')";
+      }
+    }
+    $sql .= implode(',', $vals);
+    CRM_Core_DAO::executeQuery($sql);
   }
 }

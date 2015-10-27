@@ -6,11 +6,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
 
   protected $_customGroupGroupBy = FALSE; 
 
-  function __construct() {
-    $config = CRM_Core_Config::singleton();
-    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-    $this->_drupalDatabase = $dsnArray['database'];
-    
+  function __construct() { 
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -126,7 +122,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, $this->_drupalDatabase);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
   }
 
   function where() {
@@ -145,7 +141,6 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-    self::createInquiry();
 
     $sql = $this->buildQuery(FALSE);
 
@@ -155,28 +150,6 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
-  }
-  
-  function createInquiry() {
-    $sql = "SELECT extra
-      FROM {$this->_drupalDatabase}.webform_component
-      WHERE form_key = 'type_of_inquiry' AND nid = 72";
-    $result = CRM_Core_DAO::singleValueQuery($sql);
-    $result = unserialize($result);
-    $inquiry = explode('|', $result['items']);
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
-    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS inquiry (
-      value int(50) NOT NULL,
-      name varchar(64) NOT NULL)");
-    $sql = "INSERT INTO inquiry VALUES";
-    foreach ($inquiry as $key => &$items) {
-      $items = trim(preg_replace('/[0-9]+/', NULL, $items));
-      if ($key != 0) {
-        $vals[] = " ({$key}, '{$items}')";
-      }
-    }
-    $sql .= implode(',', $vals);
-    CRM_Core_DAO::executeQuery($sql);
   }
 
   function alterDisplay(&$rows) {
