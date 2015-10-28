@@ -101,7 +101,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportWhereClause(&$where, $webFormId) {
-    $where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId} AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+    $where = "WHERE wc.nid IN ({$webFormId}) AND wsd.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
   }
   
   /*
