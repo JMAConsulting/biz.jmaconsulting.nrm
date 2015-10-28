@@ -45,7 +45,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
       'Type_of_Inquiry' => array(
         'title' => 'Type of Inquiry',
-        'columnName' => 'i.name',
+        'columnName' => 'inquiry_alias.name',
       ),
       'Existing_Contact' => array(
         'title' => 'Existing Contact',
@@ -117,7 +117,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array('inquiry'));
   }
 
   function where() {
