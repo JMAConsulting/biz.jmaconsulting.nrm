@@ -104,7 +104,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         'columnName' => 'civicrm_email.email',
       ),
       'What_is_the_main_reason_you_are_interested' => array(
-        'title' => 'What is your biggest apprehension about going to college?',
+        'title' => 'What is the main reason you are interested in The College of Idaho?',
         'columnName' => 'webform_items_temp.name',
       ),
       'What_is_your_biggest_apprehension' => array(
