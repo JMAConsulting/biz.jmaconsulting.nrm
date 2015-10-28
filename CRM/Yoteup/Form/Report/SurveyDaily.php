@@ -136,7 +136,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       foreach ($items as $key => &$item) {
         if($item) {
           $item = explode('|', $item);
-          $vals[] = " ({$results->cid}, {$item[0]}, '{$item[1]}')";
+          $vals[] = " ({$results->cid}, '{$item[0]}', '{$item[1]}')";
         }
       }
     }
