@@ -125,8 +125,8 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
     $results = CRM_Core_DAO::executeQuery($sql);
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS webform_items_temp");
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS webform_items_temp (
-      cid int(50) NOT NULL
-      value int(50) NOT NULL,
+      cid int(50) NOT NULL,
+      value varchar(64) NOT NULL,
       name varchar(64) NOT NULL)"
     );
     $sql = "INSERT INTO webform_items_temp VALUES";
