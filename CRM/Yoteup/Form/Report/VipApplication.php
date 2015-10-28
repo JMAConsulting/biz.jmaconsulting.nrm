@@ -32,8 +32,11 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
   }
 
   function select() {
-    $this->_select = "SELECT GROUP_CONCAT(CONCAT( wc.name, ': ', wsd.data), '<br/>' ) as applications";
+    $this->_select = "SELECT CONCAT('Submitted Time: ', DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')) AS sub,
+      CONCAT('Chowan ID: ', contact_civireport.external_identifier) AS cho, GROUP_CONCAT(CONCAT( wc.name, ': ', wsd.data), '<br/>') as applications";
     $this->_columnHeaders['applications']['title'] = ts('Applications');
+    $this->_columnHeaders['sub']['title'] = ts('Submitted Time');
+    $this->_columnHeaders['cho']['title'] = ts('Chowan ID');
   }
 
   function from() {
@@ -76,6 +79,10 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
     // custom code to alter rows
     foreach ($rows as $rowNum => &$row) {
       $row = str_replace('<br/>,', '<br/>', $row);
+      $row['applications'] = $row['cho'] . '<br/>' . $row['applications'];
+      $row['applications'] = $row['sub'] . '<br/>' . $row['applications'];
+      unset($row['sub']);
+      unset($row['cho']);
     }
   }
 }
