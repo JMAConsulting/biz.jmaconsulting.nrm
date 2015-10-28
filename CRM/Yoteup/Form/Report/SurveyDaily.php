@@ -123,7 +123,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       LEFT JOIN civicrm_state_province ON civicrm_state_province.id = civicrm_address.state_province_id
       LEFT JOIN civicrm_phone ON civicrm_phone.contact_id = civicrm_contact.id AND is_primary = 1
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id AND is_primary = 1
-      LEFT JOIN civicrm_value g ON civicrm_contact.gender_id = g.value AND g.option_group_id = 3
+      LEFT JOIN civicrm_option_value g ON civicrm_contact.gender_id = g.value AND g.option_group_id = 3
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
       LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid ";
   }

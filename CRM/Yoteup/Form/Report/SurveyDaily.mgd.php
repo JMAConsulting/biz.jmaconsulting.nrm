@@ -11,10 +11,10 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'label' => 'SurveyDaily',
-      'description' => 'SurveyDaily (biz.jmaconsulting.yoteup)',
+      'label' => 'Survey Daily Report',
+      'description' => 'Survey Daily Report (biz.jmaconsulting.yoteup)',
       'class_name' => 'CRM_Yoteup_Form_Report_SurveyDaily',
-      'report_url' => 'biz.jmaconsulting.yoteup/surveydaily',
+      'report_url' => 'yoteup/surveydaily',
       'component' => '',
     ),
   ),
