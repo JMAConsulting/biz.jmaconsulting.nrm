@@ -105,9 +105,11 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       ),
       'What_is_the_main_reason_you_are_interested' => array(
         'title' => 'What is your biggest apprehension about going to college?',
+        'columnName' => 'webform_items_temp.name',
       ),
       'What_is_your_biggest_apprehension' => array(
         'title' => 'What is your biggest apprehension about going to college?',
+        'columnName' => 'webform_items_temp.name',
       ),
     );
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
@@ -117,6 +119,29 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDb = $dsnArray['database'];
+    $sql = "SELECT extra, cid
+      FROM {$drupalDb}.webform_component
+      WHERE form_key IN ('civicrm_1_contact_1_cg20_custom_401', 'civicrm_1_contact_1_cg20_custom_403') AND nid IN (128, 131)";
+    $results = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS webform_items_temp");
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS webform_items_temp (
+      cid int(50) NOT NULL
+      value int(50) NOT NULL,
+      name varchar(64) NOT NULL)"
+    );
+    $sql = "INSERT INTO webform_items_temp VALUES";
+    while ($results->fetch()) {
+      $result = unserialize($results->extra);
+      $items = explode("\n", $result['items']);
+      foreach ($items as $key => &$item) {
+        if($item) {
+          $item = explode('|', $item);
+          $vals[] = " ({$results->cid}, {$item[0]}, '{$item[1]}')";
+        }
+      }
+    }
+    $sql .= implode(',', $vals);
+    CRM_Core_DAO::executeQuery($sql);
     $this->_from = "FROM {$drupalDb}.webform_submitted_data wsd 
       LEFT JOIN civicrm_contact ON wsd.data = civicrm_contact.id AND wsd.cid = 2
       LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1
@@ -125,7 +150,8 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1
       LEFT JOIN civicrm_option_value g ON civicrm_contact.gender_id = g.value AND g.option_group_id = 3
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
-      LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid ";
+      LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid 
+      LEFT JOIN webform_items_temp ON webform_items_temp.value = wsd.data COLLATE utf8_unicode_ci AND wc.cid = webform_items_temp.cid";
   }
 
   function where() {
