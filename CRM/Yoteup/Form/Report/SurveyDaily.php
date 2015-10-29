@@ -33,11 +33,11 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Submitted_Time' => array(
-        'title' => 'Submitted Time',
-        'ignore_group_concat' => TRUE,
-        'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')",
-      ),
+      /* 'Submitted_Time' => array( */
+      /*   'title' => 'Submitted Time', */
+      /*   'ignore_group_concat' => TRUE, */
+      /*   'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')", */
+      /* ), */
       'First_Name' => array(
         'title' => 'First Name',
         'ignore_group_concat' => TRUE,
@@ -106,15 +106,15 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       'What_is_the_main_reason_you_are_interested' => array(
         'title' => 'What is the main reason you are interested in The College of Idaho?',
         'ignore_group_concat' => TRUE,
-        'columnName' => 'What_is_the_main_reason_you_are_interested',
+        'columnName' => 'webform_items_temp_128.name',
       ),
       'What_is_your_biggest_apprehension' => array(
         'title' => 'What is your biggest apprehension about going to college?',
-        'columnName' => 'What_is_your_biggest_apprehension',
+        'columnName' => 'webform_items_temp_131.name',
         'ignore_group_concat' => TRUE,
       ),
     );
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
+    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns, FALSE, FALSE);
   }
 
   function from() { 
@@ -152,7 +152,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         'What_is_your_biggest_apprehension' => 'What is your biggest apprehension about going to college?',
       ),
     );
-    $this->_from = "FROM civicrm_contact ON wsd.data = civicrm_contact.id
+    $this->_from = "FROM civicrm_contact
       LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1
       LEFT JOIN civicrm_state_province ON civicrm_state_province.id = civicrm_address.state_province_id
       LEFT JOIN civicrm_phone ON civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1
@@ -165,20 +165,22 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         $select[] = "GROUP_CONCAT(if(wc.name='$field', wsd.data, NULL)) AS {$alias}";
       }
       $this->_from .= " LEFT JOIN (SELECT " . implode(',', $select) . 
-        "FROM yoteup_drupal.webform_submitted_data wsd
+        " FROM yoteup_drupal.webform_submitted_data wsd
   LEFT JOIN yoteup_drupal.webform_component wc ON wc.cid = wsd.cid
   LEFT JOIN yoteup_drupal.webform_submissions ws ON ws.sid = wsd.sid
-WHERE wc.nid = $nodeId AND wsd.nid = $nodeId 
-  AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) as temp_$nodeId ON temp_$nodeId.contact_id = civicrm_contact.id";
+WHERE wc.nid = {$nodeId} AND wsd.nid = {$nodeId}
+  AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) as temp_{$nodeId} ON temp_{$nodeId}.contact_id = civicrm_contact.id
+  LEFT JOIN webform_items_temp AS  webform_items_temp_{$nodeId} webform_items_temp_{$nodeId}.value = temp_{$nodeId}.{$alias}
+";
     }
   }
 
   function where() {
-    $this->_where = ' (temp_128.contact_id IS NOT NULL AND temp_131.contact_id IS NOT NULL )';
+    $this->_where = ' WHERE (temp_128.contact_id IS NOT NULL AND temp_131.contact_id IS NOT NULL )';
   }
 
   function groupBy() {
-    $this->_groupBy = "GROUP BY wsd.sid";
+    return FALSE;
   }
 
   function orderBy() {
