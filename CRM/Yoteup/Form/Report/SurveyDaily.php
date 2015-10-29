@@ -105,11 +105,13 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       ),
       'What_is_the_main_reason_you_are_interested' => array(
         'title' => 'What is the main reason you are interested in The College of Idaho?',
-        'columnName' => 'webform_items_temp.name',
+        'ignore_group_concat' => TRUE,
+        'columnName' => 'What_is_the_main_reason_you_are_interested',
       ),
       'What_is_your_biggest_apprehension' => array(
         'title' => 'What is your biggest apprehension about going to college?',
-        'columnName' => 'webform_items_temp.name',
+        'columnName' => 'What_is_your_biggest_apprehension',
+        'ignore_group_concat' => TRUE,
       ),
     );
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
@@ -142,20 +144,37 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
     }
     $sql .= implode(',', $vals);
     CRM_Core_DAO::executeQuery($sql);
-    $this->_from = "FROM {$drupalDb}.webform_submitted_data wsd 
-      LEFT JOIN civicrm_contact ON wsd.data = civicrm_contact.id AND wsd.cid = 2
+    $surveyFields = array(
+      128 => array(
+        'What_is_the_main_reason_you_are_interested' => 'What is the main reason you are interested in The College of Idaho?',
+      ),
+      131 => array(
+        'What_is_your_biggest_apprehension' => 'What is your biggest apprehension about going to college?',
+      ),
+    );
+    $this->_from = "FROM civicrm_contact ON wsd.data = civicrm_contact.id
       LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1
       LEFT JOIN civicrm_state_province ON civicrm_state_province.id = civicrm_address.state_province_id
       LEFT JOIN civicrm_phone ON civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1
-      LEFT JOIN civicrm_option_value g ON civicrm_contact.gender_id = g.value AND g.option_group_id = 3
-      LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
-      LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid 
-      LEFT JOIN webform_items_temp ON webform_items_temp.value = wsd.data COLLATE utf8_unicode_ci AND wc.cid = webform_items_temp.cid";
+      LEFT JOIN civicrm_option_value g ON civicrm_contact.gender_id = g.value AND g.option_group_id = 3 ";
+    foreach ($surveyFields as $nodeId => $fields) {
+      $select = array();
+      $select[] = "GROUP_CONCAT(if(wc.cid=2, wsd.data, NULL)) AS contact_id";
+        foreach ($fields as $alias => $field) {
+        $select[] = "GROUP_CONCAT(if(wc.name='$field', wsd.data, NULL)) AS {$alias}";
+      }
+      $this->_from .= " LEFT JOIN (SELECT " . implode(',', $select) . 
+        "FROM yoteup_drupal.webform_submitted_data wsd
+  LEFT JOIN yoteup_drupal.webform_component wc ON wc.cid = wsd.cid
+  LEFT JOIN yoteup_drupal.webform_submissions ws ON ws.sid = wsd.sid
+WHERE wc.nid = $nodeId AND wsd.nid = $nodeId 
+  AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) as temp_$nodeId ON temp_$nodeId.contact_id = civicrm_contact.id";
+    }
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, '128, 131');
+    $this->_where = ' (temp_128.contact_id IS NOT NULL AND temp_131.contact_id IS NOT NULL )';
   }
 
   function groupBy() {
