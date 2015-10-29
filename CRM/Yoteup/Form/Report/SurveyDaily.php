@@ -127,6 +127,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
       FROM {$drupalDb}.webform_component
       WHERE form_key = '$field' AND nid = $nodeId";
     $results = CRM_Core_DAO::executeQuery($sql);
+    $results->fetch();
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS webform_items_temp_{$nodeId}");
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS webform_items_temp_{$nodeId} (
       cid int(50) NOT NULL,
