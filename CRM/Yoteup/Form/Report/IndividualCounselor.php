@@ -353,7 +353,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
   function createTemp() {
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
       SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, MIN(DATE_FORMAT(DATE(FROM_UNIXTIME(timestamp)),'%m/%d/%Y')) as first_visit
-      FROM {$this->_drupalDatabase}.watchdog
+      FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
       GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255)) USING HASH";
@@ -374,7 +374,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.sid = wsd.sid 
       LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
-      WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW()) AND ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
+      WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day) AND ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
       GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
