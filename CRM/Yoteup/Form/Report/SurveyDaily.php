@@ -121,18 +121,19 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDb = $dsnArray['database'];
+    $fields = array(128 => 'civicrm_1_contact_1_cg20_custom_401', 131 => 'civicrm_1_contact_1_cg20_custom_403');
+    foreach($fields as $nodeId => $field) {
     $sql = "SELECT extra, cid
       FROM {$drupalDb}.webform_component
-      WHERE form_key IN ('civicrm_1_contact_1_cg20_custom_401', 'civicrm_1_contact_1_cg20_custom_403') AND nid IN (128, 131)";
+      WHERE form_key = '$field' AND nid = $nodeId";
     $results = CRM_Core_DAO::executeQuery($sql);
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS webform_items_temp");
-    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS webform_items_temp (
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS webform_items_temp_{$nodeId}");
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS webform_items_temp_{$nodeId} (
       cid int(50) NOT NULL,
       value varchar(64) NOT NULL,
       name varchar(64) NOT NULL)"
     );
-    $sql = "INSERT INTO webform_items_temp VALUES";
-    while ($results->fetch()) {
+    $sql = "INSERT INTO webform_items_temp_{$nodeId} VALUES";
       $result = unserialize($results->extra);
       $items = explode("\n", $result['items']);
       foreach ($items as $key => &$item) {
@@ -141,9 +142,9 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
           $vals[] = " ({$results->cid}, '{$item[0]}', '{$item[1]}')";
         }
       }
+      $sql .= implode(',', $vals);
+      CRM_Core_DAO::executeQuery($sql);
     }
-    $sql .= implode(',', $vals);
-    CRM_Core_DAO::executeQuery($sql);
     $surveyFields = array(
       128 => array(
         'What_is_the_main_reason_you_are_interested' => 'What is the main reason you are interested in The College of Idaho?',
@@ -170,7 +171,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
   LEFT JOIN yoteup_drupal.webform_submissions ws ON ws.sid = wsd.sid
 WHERE wc.nid = {$nodeId} AND wsd.nid = {$nodeId}
   AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) as temp_{$nodeId} ON temp_{$nodeId}.contact_id = civicrm_contact.id
-  LEFT JOIN webform_items_temp AS  webform_items_temp_{$nodeId} webform_items_temp_{$nodeId}.value = temp_{$nodeId}.{$alias}
+  LEFT JOIN webform_items_temp_{$nodeId} AS  webform_items_temp_{$nodeId} ON webform_items_temp_{$nodeId}.value = temp_{$nodeId}.{$alias}
 ";
     }
   }
