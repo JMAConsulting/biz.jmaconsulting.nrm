@@ -264,7 +264,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'ACT_Score' => array(
         'title' => 'ACT Score',
       ),
-      'TOEFL_ Date' => array(
+      'TOEFL_Date' => array(
         'title' => 'TOEFL Date',
       ),
       'TOEFL_Score' => array(
