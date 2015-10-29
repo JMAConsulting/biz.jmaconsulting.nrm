@@ -36,18 +36,20 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportSelectClause(&$form, $columns, $addTemp = FALSE) {
+  public static function reportSelectClause(&$form, $columns, $addTemp = FALSE, $addWSID = TRUE) {
     if ($addTemp) {
       self::createInquiry();
     }
     $form->_columnHeaders = $select = array();
-    $select[] = 'wsd.sid';
+    if ($addWSID) {
+      $select[] = 'wsd.sid';
+    }
     $defaultColumnName = 'wsd.data';
     $abr = array('Country_Code', 'State_Abbr');
     foreach ($columns as $key => $column) {
       $form->_columnHeaders[$key]['title'] = ts($column['title']);
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
-        $select[] = "{$column['columnName']} AS '{$column['title']}'";
+        $select[] = "{$column['columnName']} AS $key";
       }
       if (CRM_Utils_Array::value('same_alias', $column) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
