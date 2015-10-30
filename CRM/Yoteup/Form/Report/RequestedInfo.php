@@ -63,8 +63,8 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'City' => array(
         'title' => 'City'
       ),
-      'State' => array(
-        'title' => 'State',
+      'State_Abbr' => array(
+        'title' => 'State_Abbr',
       ),
       'Zip_Code' => array(
         'title' => 'Zip Code',
