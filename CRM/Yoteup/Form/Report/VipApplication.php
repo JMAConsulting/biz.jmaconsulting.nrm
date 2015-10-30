@@ -171,6 +171,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Have_you_attended_another_college?' => array(
         'title' => 'Have you attended another college?',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'School_Name_3' => array(
         'title' => 'School Name',
