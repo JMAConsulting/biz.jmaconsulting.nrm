@@ -25,15 +25,15 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
     $this->_groupFilter = FALSE;
     $this->_tagFilter = FALSE;
     $this->_optionGroups = array(
-     'Primary_Academic_Interest' => 133,
-     'reflects_your_ethnic_background' => 89,
-     'Relationship_1' => 136,
-     'Relationship_2' => 136,
-     'paren_reside' => 136,
-     'plan_to_live' => 138,
-     'hear_about_Brevard' => 141,
-     'Entry_Year' => 134,
-     'Application_Type' => 135,
+      'Primary_Academic_Interest' => array(133, 167),
+      'reflects_your_ethnic_background' => array(89, 132),
+      'Relationship_1' => array(136, 239),
+      'Relationship_2' => array(136, 240),
+      'paren_reside' => array(136, 199),
+      'plan_to_live' => array(138, 213),
+      'hear_about_Brevard' => array(141, 242),
+      'Entry_Year' => array(134, 204),
+      'Application_Type' => array(135, 146),
     );
     $this->_otherOptions= array(
      'civicrm_1_contact_1_contact_suffix_id' => 70,
