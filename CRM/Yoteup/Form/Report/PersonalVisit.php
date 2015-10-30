@@ -43,6 +43,7 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
       ),
       'Preferred_Visit_Time' => array(
         'title' => 'Preferred Visit Time',
+        'columnName' => 'visit_alias.label',
       ),
       'First_Name' => array(
         'title' => 'First Name',
@@ -156,6 +157,7 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
       159 => 'athletics',
       171 => 'academic',
       158 => 'extra',
+      174 => 'visit',
     );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
