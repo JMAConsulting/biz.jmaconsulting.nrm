@@ -93,6 +93,9 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
+    $custom = array(
+      7 => 'suffix',
+    );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
