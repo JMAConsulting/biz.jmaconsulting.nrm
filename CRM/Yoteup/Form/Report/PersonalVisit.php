@@ -36,7 +36,7 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
       'Chowan_ID' => array(
         'title' => 'Chowan ID',
         'ignore_group_concat' => TRUE,
-        'columnName' => 'contact_civireport.external_identifier',
+        'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
       ),
       'Preferred_Visit_Date' => array(
         'title' => 'Preferred Visit Date',

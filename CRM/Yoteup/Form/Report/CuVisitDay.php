@@ -41,7 +41,7 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
       'Chowan_ID' => array(
         'title' => 'Chowan ID',
         'ignore_group_concat' => TRUE,
-        'columnName' => 'contact_civireport.external_identifier',
+        'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
       ),
       'Which_CU_Visit_Day_will_you_be_attending?' => array(
         'title' => 'Which CU Visit Day will you be attending?',
