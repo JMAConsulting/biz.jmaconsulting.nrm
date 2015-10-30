@@ -54,7 +54,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       'Nickname' => array(
         'title' => 'Nickname',
       ),
-      'Street Address' => array(
+      'Street_Address' => array(
         'title' => 'Street Address',
       ),
       'Street_Address_Line_2' => array(
