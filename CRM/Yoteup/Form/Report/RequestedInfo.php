@@ -51,7 +51,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Name Suffix',
         'columnName' => 'suffix_alias.label',
       ),
-      'Nick_Name' => array(
+      'Nickname' => array(
         'title' => 'Nickname',
       ),
       'Street Address' => array(
@@ -85,7 +85,8 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'High School Graduation Date',
       ),
       'Major_or_Academic_Interests' => array(
-        'title' => 'Major_or_Academic_Interests',
+        'title' => 'Major or Academic Interests',
+        'columnName' => 'academic_alias.label',
       ),
     );
 
@@ -95,6 +96,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   function from() { 
     $custom = array(
       7 => 'suffix',
+      133 => 'academic',
     );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
