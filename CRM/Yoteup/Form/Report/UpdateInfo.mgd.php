@@ -14,7 +14,7 @@ return array (
       'label' => 'Update Information',
       'description' => 'Update Information (biz.jmaconsulting.yoteup)',
       'class_name' => 'CRM_Yoteup_Form_Report_UpdateInfo',
-      'report_url' => 'yoteup/updateinfo',
+      'report_url' => 'brevard/updateinfo',
       'component' => '',
     ),
   ),
