@@ -41,6 +41,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Enrollment_Status' => array(
         'title' => 'Enrollment Status',
+        'columnName' => 'enroll_alias.label',
       ),
       'Intended_Major' => array(
         'title' => 'Intended Major',
@@ -90,12 +91,14 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Please_send_occasional_admissions_related_news_and_updates_to_my_phone_as_text_messages' => array(
         'title' => 'Please send occasional admissions related news and updates to my phone as text messages',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
-      'Email_How_did_you_become_interested_in_The_College_of_Idaho_and_why_are_you_applying_for_admission?' => array(
-        'title' => 'Email	How did you become interested in The College of Idaho and why are you applying for admission?',
+      'How_did_you_become_interested_in_The_College_of_Idaho_and_why_are_you_applying_for_admission?' => array(
+        'title' => 'How did you become interested in The College of Idaho and why are you applying for admission?',
       ),
       'Are_you_a_U.S._Citizen?' => array(
         'title' => 'Are you a U.S. Citizen?',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Citizen_of' => array(
         'title' => 'Citizen of',
@@ -234,14 +237,14 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Have_you_ever_been_dismissed_for_academic_or_disciplinary_reasons_from_a_secondary_school_or_college?' => array(
         'title' => 'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'If_yes,_please_explain' => array(
         'title' => 'If yes, please explain',
       ),
       'Have_you_ever_been_convicted_of_a_crime,_other_than_a_minor_traffic_violation?' => array(
         'title' => 'Have you ever been convicted of a crime, other than a minor traffic violation?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'If_yes,_please_explain_2' => array(
         'title' => 'If yes, please explain 2',
@@ -305,7 +308,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 127,
-        'columnName' => 'edu_1_alias.name',
+        'columnName' => 'edu_1_alias.label',
       ),
       'Institution(s)_attended_1' => array(
         'title' => 'Institution(s) attended',
@@ -348,7 +351,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'same_alias' => TRUE,
         'alias' => 2,
         'cid' => 131,
-        'columnName' => 'edu_2_alias.name',
+        'columnName' => 'edu_2_alias.label',
       ),
       'Institution(s)_attended_2' => array(
         'title' => 'Institution(s) attended',
@@ -358,105 +361,35 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Are_you_of_Hispanic_or_Latino_descent' => array(
         'title' => 'Are you of Hispanic or Latino descent',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Please_select_the_category_that_best_reflects_your_ethnic_background' => array(
         'title' => 'Please select the category that best reflects your ethnic background',
-        'columnName' => 'category_alias.name',
+        'columnName' => 'category_alias.label',
       ),
       'Athletic_Interests' => array(
         'title' => 'Athletic Interests',
-        'columnName' => 'athletic_alias.name',
+        'columnName' => 'athletic_alias.label',
       ),
       'Activity_Interests' => array(
         'title' => 'Activity Interests',
-        'columnName' => 'activity_alias.name',
+        'columnName' => 'activity_alias.label',
       ),
-      /* 'Nonresident_Alien' => array( */
-      /*   'title' => 'Nonresident Alien', */
-      /* ), */
-      /* 'Race_and_Ethnicity_unknown' => array( */
-      /*   'title' => 'Race and Ethnicity unknown', */
-      /* ), */
-      /* 'Hispanics_of_any_race' => array( */
-      /*   'title' => 'Hispanics of any race', */
-      /* ), */
-      /* 'American_Indian_/_Alaska_Native_(Original_Peoples_of_the_Americas)' => array( */
-      /*   'title' => 'American Indian / Alaska Native (Original Peoples of the Americas)', */
-      /* ), */
-      /* 'Asian_(including_Indian_subcontitent_and_Phillipines)' => array( */
-      /*   'title' => 'Asian (including Indian subcontitent and Phillipines)', */
-      /* ), */
-      /* 'Black_/_African_American_(Including_Africa_and_the_Caribbean)' => array( */
-      /*   'title' => 'Black / African American (Including Africa and the Caribbean)', */
-      /* ), */
-      /* 'Native_Hawaiian_or Other Pacific Islander (Original Peoples)' => array( */
-      /*   'title' => 'Native Hawaiian or Other Pacific Islander (Original Peoples)', */
-      /* ), */
-      /* 'White_(including_Middle_Eastern)' => array( */
-      /*   'title' => 'White (including Middle Eastern)', */
-      /* ), */
-      /* 'Two_or_more_races' => array( */
-      /*   'title' => 'Two or more races', */
-      /* ), */
-      /* 'Men\'s_Baseball' => array( */
-      /*   'title' => 'Men\'s Baseball', */
-      /* ), */
-      /* 'Men\'s_Basketball' => array( */
-      /*   'title' => 'Men\'s Basketball', */
-      /* ), */
-      /* 'Men\'s_Cheerleading' => array( */
-      /*   'title' => 'Men\'s Cheerleading', */
-      /* ), */
-      /* 'Men\'s_Cross_Country' => array( */
-      /*   'title' => 'Men\'s Cross Country', */
-      /* ), */
-      /* 'Men\'s_Football' => array( */
-      /*   'title' => 'Men\'s Football', */
-      /* ), */
-      /* 'Men\'s_Golf' => array( */
-      /*   'title' => 'Men\'s Golf', */
-      /* ), */
     );
-		
-/* 			
-Men's Lacrosse	
-Men's Skiing	
-Men's Soccer	
-Men's Swimming	
-Men's Track & Field 
-Men's Tennis	 */
-/* Women's Basketball	 */
-/* Women's Cross Country	 */
-/* Women's Golf	 */
-/* Women's Skiing	 */
-/* Women's Soccer	 */
-/* Women's Softball	 */
-/* Women's Swimming	 */
-/* Women's Tennis	 */
-/* Women's Volleyball	 */
-/* Women's Track & Field	 */
-/* Women's Bowling	 */
-/* Women's Cheerleading	 */
-/* Women's LaCrosse	 */
-/* Campus Ministries	 */
-/* Clubs & Organizations	 */
-/* Greek Life	 */
-/* Intramurals	 */
-/* Outdoor Programs	 */
-/* Student Government	 */
-/* Student Publications	 */
-/* Study Abroad	 */
-/* Sustainable Living	 */
-/* Fraternity/Sorority	 */
-/* Honors/Academic Clubs	 */
-/* Campus Ministry  */
 
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array('category', 'athletic', 'activity', 'edu_1', 'edu_2', 'yesno'));
+    $custom = array(
+      167 => 'category',
+      159 => 'athletic',
+      158 => 'activity',
+      195 => 'edu_1',
+      196 => 'edu_2',
+      160 => 'enroll',
+    );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
@@ -474,16 +407,6 @@ Men's Tennis	 */
   function postProcess() {
 
     $this->beginPostProcess();
-    
-    $tempTables = array(
-      167 => 'category',
-      159 => 'athletic',
-      158 => 'activity',
-      195 => 'edu_1',
-      196 => 'edu_2',
-    );
-    self::createTemp($tempTables);
-    self::createYesNo();
 
     $sql = $this->buildQuery(FALSE);
 
@@ -493,37 +416,6 @@ Men's Tennis	 */
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
-  }
-  
-  function createYesNo() {
-    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS yesno (
-      value varchar(64) NOT NULL,
-      name varchar(64) NOT NULL)"
-    );
-    CRM_Core_DAO::executeQuery("INSERT INTO yesno VALUES (0, 'No'), (1, 'Yes')");
-  }
-
-  function createTemp($tempTables) {
-    foreach ($tempTables as $optId => $tableName) {
-      $result = $vals = array();
-      $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId}";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $result[$dao->value] = $dao->label;
-      }
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
-      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
-        value varchar(64) NOT NULL,
-        name varchar(64) NOT NULL)"
-      );
-      $sql = "INSERT INTO {$tableName} VALUES";
-      foreach ($result as $key => $items) {
-        $items = addslashes($items);
-        $vals[] = " ('{$key}', '{$items}')";
-      }
-      $sql .= implode(',', $vals);
-      CRM_Core_DAO::executeQuery($sql);
-    }
   }
 
   function alterDisplay(&$rows) {
