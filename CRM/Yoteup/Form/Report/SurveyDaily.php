@@ -103,12 +103,12 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         'ignore_group_concat' => TRUE,
         'columnName' => 'civicrm_email.email',
       ),
-      'What_is_the_main_reason_you_are_interested' => array(
+      'What_is_the_main_reason_you_are_interested_in_The_College_of_Idaho?' => array(
         'title' => 'What is the main reason you are interested in The College of Idaho?',
         'ignore_group_concat' => TRUE,
         'columnName' => 'webform_items_temp_128.name',
       ),
-      'What_is_your_biggest_apprehension' => array(
+      'What_is_your_biggest_apprehension_about_going_to_college?' => array(
         'title' => 'What is your biggest apprehension about going to college?',
         'columnName' => 'webform_items_temp_131.name',
         'ignore_group_concat' => TRUE,
