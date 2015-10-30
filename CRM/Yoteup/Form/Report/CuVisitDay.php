@@ -124,15 +124,15 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
       ),
       'Academics' => array(
         'title' => 'Academics',
-        'columnName' => 'academics_alias.name',
+        'columnName' => 'academics_alias.label',
       ),
       'Athletics' => array(
         'title' => 'Athletics',
-        'columnName' => 'athletics_alias.name',
+        'columnName' => 'athletics_alias.label',
       ),
       'Extra-Curricular' => array(
         'title' => 'Extra-Curricular',
-        'columnName' => 'extra_alias.name',
+        'columnName' => 'extra_alias.label',
       ),
       'How_did_you_hear_about_Chowan?' => array(
         'title' => 'How did you hear about Chowan?',
@@ -148,9 +148,14 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
   }
 
   function from() {
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array('athletics', 'academics', 'extra',
-      'how_did_you_hear_about_chowan', 'anticipated_academic_enroll_year', 'anticipated_academic_enroll_term',
-      'how_did_you_hear_about_cu_visit_day', 'civicrm_1_participant_1_participant_event_id'));
+    $custom = array(
+      171 => 'academics',
+      159 => 'athletics',
+      158 => 'extra',
+    );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array( 'how_did_you_hear_about_chowan', 
+      'anticipated_academic_enroll_year', 'anticipated_academic_enroll_term',
+      'how_did_you_hear_about_cu_visit_day', 'civicrm_1_participant_1_participant_event_id'), $custom);
   }
 
   function where() {
@@ -168,13 +173,6 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-
-    $tempTables = array(
-      171 => 'academics',
-      159 => 'athletics',
-      158 => 'extra',
-    );
-    self::createTemp($tempTables);
 
     $formKeys = array(
       'how_did_you_hear_about_chowan',
@@ -194,29 +192,6 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
   } 
-
-  function createTemp($tempTables) {
-    foreach ($tempTables as $optId => $tableName) {
-      $result = $vals = array();
-      $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId}";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $result[$dao->value] = $dao->label;
-      }
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
-      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
-        value varchar(64) NOT NULL,
-        name varchar(64) NOT NULL)"
-      );
-      $sql = "INSERT INTO {$tableName} VALUES";
-      foreach ($result as $key => $items) {
-        $items = addslashes($items);
-        $vals[] = " ('{$key}', '{$items}')";
-      }
-      $sql .= implode(',', $vals);
-      CRM_Core_DAO::executeQuery($sql);
-    }
-  }
 
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
