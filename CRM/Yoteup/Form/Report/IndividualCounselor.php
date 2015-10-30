@@ -356,7 +356,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
       GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255)) USING HASH";
+    $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255))";
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
@@ -365,7 +365,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
       INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
+    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)), ADD INDEX idx_c_id (contact_id)";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
@@ -377,7 +377,7 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
       WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day) AND ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
       GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
+    $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id)";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
   
