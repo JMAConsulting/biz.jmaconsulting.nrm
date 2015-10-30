@@ -49,6 +49,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
+        'columnName' => 'suffix_alias.label',
       ),
       'Nick_Name' => array(
         'title' => 'Nickname',
@@ -87,13 +88,12 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Major_or_Academic_Interests',
       ),
     );
-    
-    $this->_select = "SELECT sq.*, sp.name AS 'State' FROM ( ";
+
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
@@ -101,8 +101,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function groupBy() {
-    $this->_groupBy = "GROUP BY wsd.sid) as sq 
-      LEFT JOIN civicrm_state_province sp ON sq.`State Abbr` COLLATE utf8_unicode_ci = sp.abbreviation ";
+    $this->_groupBy = "GROUP BY wsd.sid";
   }
 
   function orderBy() {
