@@ -76,6 +76,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
       'Please_send_occasional_admissions_related_news_and_updates_to_my_phone_as_text_messages' => array(
         'title' => 'Please send occasional admissions related news and updates to my phone as text messages',
+        'columnName' => "IF (wsd.data=1, 'Yes', 'No')",
       ),
       'Gender' => array(
         'title' => 'Gender',
@@ -92,12 +93,15 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
       'Academic_Interests' => array(
         'title' => 'Academic Interests',
+        'columnName' => 'academic_alias.label',
       ),
       'Athletic_Interests' => array(
         'title' => 'Athletic Interests',
+        'columnName' => 'athletics_alias.label',
       ),
       'Extra-Curricular_Interests' => array(
         'title' => 'Extra-Curricular Interests',
+        'columnName' => 'extra_alias.label',
       ),
     );
 
@@ -105,7 +109,12 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    $custom = array(
+      159 => 'athletics',
+      171 => 'academic',
+      158 => 'extra',
+    );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {

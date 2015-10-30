@@ -49,7 +49,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     foreach ($columns as $key => $column) {
       $form->_columnHeaders[$key]['title'] = ts($column['title']);
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
-        $select[] = "{$column['columnName']} AS $key";
+        $select[] = "{$column['columnName']} AS '{$column['title']}'";
       }
       if (CRM_Utils_Array::value('same_alias', $column) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
@@ -73,7 +73,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array()) {
+  public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array(), $ov = array()) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDb = $dsnArray['database'];
@@ -90,6 +90,11 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
         foreach ($tempName as $table) {
           $from .= " LEFT JOIN {$table} {$table}_alias ON wsd.data COLLATE utf8_unicode_ci = {$table}_alias.value";
         }
+      }
+    }
+    if (!empty($ov)) {
+      foreach ($ov as $id => $name) {
+        $from .= " LEFT JOIN civicrm_option_value {$name}_alias ON wsd.data COLLATE utf8_unicode_ci = {$name}_alias.value AND {$name}_alias.option_group_id = {$id}";
       }
     }
   }
