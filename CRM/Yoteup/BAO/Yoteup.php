@@ -88,13 +88,13 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     if ($tempTable) {
       if (!empty($tempName)) {
         foreach ($tempName as $table) {
-          $from .= " LEFT JOIN {$table} {$table}_alias ON wsd.data COLLATE utf8_unicode_ci = {$table}_alias.value AND wsd.cid = {$table}_alias.cid";
+          $from .= " LEFT JOIN {$table} ON wsd.data COLLATE utf8_unicode_ci = {$table}.value AND wsd.cid = {$table}_alias.cid";
         }
       }
     }
     if (!empty($ov)) {
       foreach ($ov as $id => $name) {
-        $from .= " LEFT JOIN civicrm_option_value {$name}_alias ON wsd.data COLLATE utf8_unicode_ci = {$name}_alias.value AND {$name}_alias.option_group_id = {$id}";
+        $from .= " LEFT JOIN civicrm_option_value {$name} ON wsd.data COLLATE utf8_unicode_ci = {$name}.value AND {$name}_alias.option_group_id = {$id}";
       }
     }
   }
