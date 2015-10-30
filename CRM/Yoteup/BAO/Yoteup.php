@@ -47,17 +47,19 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     foreach ($columns as $key => $column) {
       $form->_columnHeaders[$key]['title'] = ts($column['title']);
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
-        $select[] = "{$column['columnName']} AS '{$column['title']}'";
+        $select[] = "{$column['columnName']} AS {$key}";
       }
-      if (CRM_Utils_Array::value('same_alias', $column) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
-        $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
-        $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
-        $select[] = "GROUP_CONCAT(if((wc.name='{$col}' AND wc.cid = {$column['cid']}), {$columnName}, NULL)) AS '{$column['title']}_{$column['alias']}'";
-      }
-      elseif (!CRM_Utils_Array::value('ignore_group_concat', $column)) {
-        $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
-        $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
-        $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$column['title']}'";
+      else {
+        if (CRM_Utils_Array::value('same_alias', $column)) {
+          $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
+          $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
+          $select[] = "GROUP_CONCAT(if((wc.name='{$col}' AND wc.cid = {$column['cid']}), {$columnName}, NULL)) AS {$key}";
+        }
+        else {
+          $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
+          $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
+          $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS {$key}";
+        }
       }
     }
     $form->_select .= " SELECT " . implode(',', $select);
@@ -151,5 +153,28 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     }
     $sql .= implode(',', $vals);
     CRM_Core_DAO::executeQuery($sql);
+  }
+  
+  function createTemp($tempTables) {
+    foreach ($tempTables as $optId => $tableName) {
+      $result = $vals = array();
+      $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId}";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $result[$dao->value] = $dao->label;
+      }
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
+      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
+        value varchar(64) NOT NULL,
+        name varchar(64) NOT NULL)"
+      );
+      $sql = "INSERT INTO {$tableName} VALUES";
+      foreach ($result as $key => $items) {
+        $items = addslashes($items);
+        $vals[] = " ('{$key}', '{$items}')";
+      }
+      $sql .= implode(',', $vals);
+      CRM_Core_DAO::executeQuery($sql);
+    }
   }
 }
