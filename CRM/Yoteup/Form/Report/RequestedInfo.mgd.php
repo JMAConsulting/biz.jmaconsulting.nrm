@@ -14,7 +14,7 @@ return array (
       'label' => 'Requested Information',
       'description' => 'Requested Information (biz.jmaconsulting.yoteup)',
       'class_name' => 'CRM_Yoteup_Form_Report_RequestedInfo',
-      'report_url' => 'yoteup/requestedinfo',
+      'report_url' => 'brevard/requestedinfo',
       'component' => '',
     ),
   ),
