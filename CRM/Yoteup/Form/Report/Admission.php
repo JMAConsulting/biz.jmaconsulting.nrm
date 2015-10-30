@@ -63,7 +63,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'title' => 'Preferred/Nickname',
       ),
       'Gender' => array(
-        'title' => 'Gender',
+                        'title' => 'Gender',
         'columnName' => 'g.label',
       ),
       'Birth_Date' => array(
@@ -104,6 +104,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Do you plan to play an intercollegiate sport at Brevard?' => array(
         'title' => 'Do you plan to play an intercollegiate sport at Brevard?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'If yes, what sport?' => array(
         'title' => 'If yes, what sport?',
@@ -113,6 +114,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Are you being recruited by a Brevard College coach?' => array(
         'title' => 'Are you being recruited by a Brevard College coach?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Performance Instrument' => array(
         'title' => 'Performance Instrument',
@@ -122,6 +124,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Are you a U.S. Citizen?' => array(
         'title' => 'Are you a U.S. Citizen?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'If not a U.S. Citizen, of what country are you officially a citizen?' => array(
         'title' => 'If not a U.S. Citizen, of what country are you officially a citizen?',
@@ -137,9 +140,11 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Are you a Veteran?' => array(
         'title' => 'Are you a Veteran?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Are you of Hispanic or Latino descent' => array(
         'title' => 'Are you of Hispanic or Latino descent',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Please select the category that best reflects your ethnic background' => array(
         'title' => 'Please select the category that best reflects your ethnic background',
@@ -218,12 +223,15 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Have you ever taken a college level course?' => array(
         'title' => 'Have you ever taken a college level course?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Did you/Do you participate in early college?' => array(
-        'title' => '',
+        'title' => 'Did you/Do you participate in early college?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Have you attended another college?' => array(
         'title' => 'Have you attended another college?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'School_Name' => array(
         'title' => 'School Name',
@@ -260,6 +268,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'I would like to apply Test Optional' => array(
         'title' => 'I would like to apply Test Optional',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'Answer these questions' => array(
         'title' => 'Answer these questions',
@@ -299,18 +308,21 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?' => array(
         'title' => 'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'If yes, please explain' => array(
         'title' => 'If yes, please explain',
       ),
       'Have you ever been convicted of a crime, other than a minor traffic violation?' => array(
         'title' => 'Have you ever been convicted of a crime, other than a minor traffic violation?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'If yes, please explain 2' => array(
         'title' => 'If yes, please explain 2',
       ),
       'Do you intend to Graduate from Brevard?' => array(
         'title' => 'Do you intend to Graduate from Brevard?',
+        'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
       ),
       'What other colleges or universities are you applying to?' => array(
         'title' => 'What other colleges or universities are you applying to?',
