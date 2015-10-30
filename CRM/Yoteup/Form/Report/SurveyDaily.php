@@ -167,13 +167,13 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         $select[] = "GROUP_CONCAT(if(wc.name='$field', wsd.data, NULL)) AS {$alias}";
       }
       $this->_from .= " LEFT JOIN (SELECT " . implode(',', $select) . 
-        " FROM yoteup_drupal.webform_submitted_data wsd
-  LEFT JOIN yoteup_drupal.webform_component wc ON wc.cid = wsd.cid
-  LEFT JOIN yoteup_drupal.webform_submissions ws ON ws.sid = wsd.sid
-WHERE wc.nid = {$nodeId} AND wsd.nid = {$nodeId}
-  AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) as temp_{$nodeId} ON temp_{$nodeId}.contact_id = civicrm_contact.id
-  LEFT JOIN webform_items_temp_{$nodeId} AS  webform_items_temp_{$nodeId} ON webform_items_temp_{$nodeId}.value = temp_{$nodeId}.{$alias}
-";
+        " FROM {$drupalDb}.webform_submitted_data wsd
+          LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid
+          LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid
+          WHERE wc.nid = {$nodeId} AND wsd.nid = {$nodeId}
+          AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) GROUP BY wsd.sid) AS temp_{$nodeId} ON temp_{$nodeId}.contact_id = civicrm_contact.id
+          LEFT JOIN webform_items_temp_{$nodeId} AS webform_items_temp_{$nodeId} ON webform_items_temp_{$nodeId}.value = temp_{$nodeId}.{$alias}
+        ";
     }
   }
 
