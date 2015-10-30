@@ -134,12 +134,15 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
       ),
       'Academics' => array(
         'title' => 'Academics',
+        'columnName' => 'academic_alias.label',
       ),
       'Athletics' => array(
         'title' => 'Athletics',
+        'columnName' => 'athletics_alias.label',
       ),
       'Extra-Curricular' => array(
         'title' => 'Extra-Curricular',
+        'columnName' => 'extra_alias.label',
       ),
       'Comments/Requests' => array(
         'title' => 'Comments/Requests',
@@ -148,8 +151,13 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
-  function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+  function from() {
+    $custom = array(
+      159 => 'athletics',
+      171 => 'academic',
+      158 => 'extra',
+    );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
