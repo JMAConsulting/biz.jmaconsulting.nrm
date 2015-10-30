@@ -62,9 +62,11 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
       ),
       'Name_Prefix' => array(
         'title' => 'Name Prefix',
+        'columnName' => 'prefix_alias.label',
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
+        'columnName' => 'suffix_alias.label',
       ),
       'Gender' => array(
         'title' => 'Gender',
@@ -103,7 +105,11 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    $custom = array(
+      6 => 'prefix',
+      7 => 'suffix',
+     );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
