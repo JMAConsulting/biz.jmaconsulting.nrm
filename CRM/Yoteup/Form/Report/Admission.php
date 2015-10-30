@@ -5,6 +5,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
   protected $_summary = NULL;
 
   protected $_customGroupGroupBy = FALSE; 
+  protected $_optionGroups = array(); 
 
   function __construct() { 
     $this->_columns = array(
@@ -23,6 +24,22 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
     );
     $this->_groupFilter = FALSE;
     $this->_tagFilter = FALSE;
+    $this->_optionGroups = array(
+     'Primary_Academic_Interest' => 133,
+     'reflects_your_ethnic_background' => 89,
+     'Relationship_1' => 136,
+     'Relationship_2' => 136,
+     'paren_reside' => 136,
+     'plan_to_live' => 138,
+     'hear_about_Brevard' => 141,
+     'Entry_Year' => 134,
+     'Application_Type' => 135,
+    );
+    $this->_otherOptions= array(
+     'civicrm_1_contact_1_contact_suffix_id' => 70,
+     'civicrm_1_contact_1_cg7_custom_419' => 70,
+     'civicrm_1_contact_1_cg7_custom_420' => 70,
+    );
     parent::__construct();
   }
   
@@ -40,9 +57,11 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Entry_Year' => array(
         'title' => 'Entry Year',
+        'columnName' => 'Entry_Year.name', 
       ),
       'Application_Type' => array(
         'title' => 'Application Type',
+        'columnName' => 'Application_Type.name', 
       ),
       'First_Name_1' => array(
         'title' => 'First Name',
@@ -61,6 +80,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
+        'columnName' => 'civicrm_1_contact_1_contact_suffix_id.name', 
       ),
       'Social Security Number' => array(
         'title' => 'Social Security Number',
@@ -110,6 +130,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Primary_Academic_Interest' => array(
         'title' => 'Primary Academic Interest',
+        'columnName' => 'Primary_Academic_Interest.name',        
       ),
       'Do_you_plan_to_play_an_intercollegiate_sport_at_Brevard' => array(
         'title' => 'Do you plan to play an intercollegiate sport at Brevard?',
@@ -157,6 +178,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Please_select_the_category_that_best_reflects_your_ethnic_background' => array(
         'title' => 'Please select the category that best reflects your ethnic background',
+        'columnName' => 'reflects_your_ethnic_background.name', 
       ),
       'Religious_Preference' => array(
         'title' => 'Religious Preference',
@@ -190,12 +212,14 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 127,
+        'columnName' => 'civicrm_1_contact_1_cg7_custom_419.name', 
       ),
       'Relationship_1' => array(
         'title' => 'Relationship',
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 239,
+        'columnName' => 'Relationship_1.name', 
       ),
       'First_Name_3' => array(
         'title' => 'First Name',
@@ -226,15 +250,18 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'same_alias' => TRUE,
         'alias' => 2,
         'cid' => 131,
+        'columnName' => 'civicrm_1_contact_1_cg7_custom_420.name', 
       ),
       'Relationship_2' => array(
         'title' => 'Relationship',
         'same_alias' => TRUE,
         'alias' => 2,
         'cid' => 240,
+        'columnName' => 'Relationship_2.name', 
       ),
       'With_which_parent_do_you_reside' => array(
         'title' => 'With which parent do you reside?',
+        'columnName' => 'paren_reside.name', 
       ),
       'School_Name_1' => array(
         'title' => 'School Name',
@@ -333,7 +360,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'cid' => 55,
       ),
       'Degree_Earned_3' => array(
-        'title' => 'Degree(s) Earned',
+        'title' => 'Degrees Earned',
         'same_alias' => TRUE,
         'alias' => 3,
         'cid' => 56,
@@ -363,7 +390,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'cid' => 50,
       ),
       'Degree_Earned_4' => array(
-        'title' => 'Degree(s) Earned',
+        'title' => 'Degrees Earned',
         'same_alias' => TRUE,
         'alias' => 4,
         'cid' => 51,
@@ -434,16 +461,19 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Where_do_you_plan_to_live' => array(
         'title' => 'Where do you plan to live?',
+        'columnName' => 'plan_to_live.name', 
       ),
       'How_you_hear_about_Brevard' => array(
         'title' => 'How did you hear about Brevard?',
+        'columnName' => 'hear_about_Brevard.name', 
       ),
     );
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
   }
 
   function from() {
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    $temptables = array_merge($this->_optionGroups, $this->_otherOptions);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, $temptables);
   }
 
   function where() {
@@ -461,6 +491,8 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
+    self::createTemp($this->_optionGroups);
+    self::createTemp($this->_otherOptions);
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -469,6 +501,51 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
+  }
+
+  
+  function createTemp($tempTables, $isOptionGroup = TRUE, $drupalDb = NULL) {
+    foreach ($tempTables as $tableName => $optId) {
+      $result = $vals = array();
+      if ($isOptionGroup) {
+        $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId[0]}";
+        $cid = $optId[1];
+      }
+      else {
+        $sql = "SELECT extra, cid
+          FROM {$drupalDb}.webform_component
+          WHERE form_key = '$tableName' AND nid = $optId";
+      }
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        if ($isOptionGroup) {
+          $result[$dao->value] = $dao->label;
+        }
+        else {
+          $result = unserialize($dao->extra);
+          $result = explode("\n", $result['items']);
+          $cid = $dao->cid;
+        }
+      }
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
+      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
+        cid int(10) NOT NULL,
+        value varchar(64) NOT NULL,
+        name varchar(64) NOT NULL)"
+      );
+      $sql = "INSERT INTO {$tableName} VALUES";
+      foreach ($result as $key => $items) {
+        if ($items) {
+          if (!$isOptionGroup) {
+            list($key, $items) = explode('|', $items);
+          }
+          $items = addslashes($items);
+          $vals[] = " ($cid, {$dao->cid}, '{$key}', '{$items}')";
+        }
+      }
+      $sql .= implode(',', $vals);
+      CRM_Core_DAO::executeQuery($sql);
+    }
   }
 
   function alterDisplay(&$rows) {
