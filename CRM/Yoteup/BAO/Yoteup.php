@@ -88,7 +88,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     if ($tempTable) {
       if (!empty($tempName)) {
         foreach ($tempName as $table) {
-          $from .= " LEFT JOIN {$table} {$table}_alias ON wsd.data COLLATE utf8_unicode_ci = {$table}_alias.value";
+          $from .= " LEFT JOIN {$table} {$table}_alias ON wsd.data COLLATE utf8_unicode_ci = {$table}_alias.value AND wsd.cid = {$table}_alias.cid";
         }
       }
     }
@@ -153,28 +153,5 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     }
     $sql .= implode(',', $vals);
     CRM_Core_DAO::executeQuery($sql);
-  }
-  
-  function createTemp($tempTables) {
-    foreach ($tempTables as $optId => $tableName) {
-      $result = $vals = array();
-      $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId}";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $result[$dao->value] = $dao->label;
-      }
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
-      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
-        value varchar(64) NOT NULL,
-        name varchar(64) NOT NULL)"
-      );
-      $sql = "INSERT INTO {$tableName} VALUES";
-      foreach ($result as $key => $items) {
-        $items = addslashes($items);
-        $vals[] = " ('{$key}', '{$items}')";
-      }
-      $sql .= implode(',', $vals);
-      CRM_Core_DAO::executeQuery($sql);
-    }
   }
 }
