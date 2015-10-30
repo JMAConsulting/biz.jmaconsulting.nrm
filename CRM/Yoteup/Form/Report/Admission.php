@@ -82,7 +82,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'title' => 'Name Suffix',
         'columnName' => 'civicrm_1_contact_1_contact_suffix_id.name', 
       ),
-      'Social Security Number' => array(
+      'Social_Security_Number' => array(
         'title' => 'Social Security Number',
       ),
       'Preferred_Nickname' => array(
@@ -107,7 +107,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       'County' => array(
         'title' => 'County',
       ),
-      'State/Province' => array(
+      'State_Province' => array(
         'title' => 'State/Province',
       ),
       'Postal_Code' => array(
@@ -395,7 +395,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'alias' => 4,
         'cid' => 51,
       ),
-      'Unweighted GPA' => array(
+      'Unweighted_GPA' => array(
         'title' => 'Unweighted GPA',
       ),
       'I_would_like_to_apply_Test_Optional' => array(
@@ -473,7 +473,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
 
   function from() {
     $temptables = array_merge($this->_optionGroups, $this->_otherOptions);
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, $temptables);
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array_keys($temptables));
   }
 
   function where() {
@@ -492,7 +492,10 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
 
     $this->beginPostProcess();
     self::createTemp($this->_optionGroups);
-    self::createTemp($this->_otherOptions);
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $drupalDb = $dsnArray['database'];
+    self::createTemp($this->_otherOptions, FALSE, $drupalDb);
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -540,7 +543,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
             list($key, $items) = explode('|', $items);
           }
           $items = addslashes($items);
-          $vals[] = " ($cid, {$dao->cid}, '{$key}', '{$items}')";
+          $vals[] = " ($cid, '{$key}', '{$items}')";
         }
       }
       $sql .= implode(',', $vals);
