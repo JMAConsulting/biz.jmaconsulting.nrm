@@ -99,7 +99,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'title' => 'Street Address',
       ),
       'Street_Address_Line_2' => array(
-        'title' => 'Street Address Line 2',
+        'title' => 'Address Line 2',
       ),
       'City' => array(
         'title' => 'City'
