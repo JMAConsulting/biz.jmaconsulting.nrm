@@ -73,12 +73,12 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array(), $ov = array()) {
+  public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array(), $ov = array(), $cid = 2) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDb = $dsnArray['database'];
     $from = "FROM {$drupalDb}.webform_submitted_data wsd 
-      LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
+      LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = {$cid}
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid 
       LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid 
       LEFT JOIN civicrm_option_value g ON wsd.data COLLATE utf8_unicode_ci = g.value AND g.option_group_id = 3
