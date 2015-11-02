@@ -115,6 +115,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Country' => array(
         'title' => 'Country',
+        'columnName' => 'c.name',
       ),
       'Home_Phone' => array(
         'title' => 'Home Phone',
@@ -473,7 +474,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
 
   function from() {
     $temptables = array_merge($this->_optionGroups, $this->_otherOptions);
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array_keys($temptables));
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array_keys($temptables), array(), 117);
   }
 
   function where() {
