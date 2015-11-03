@@ -84,7 +84,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Postal Code',
       ),
       'State_of_Official_Residence_Country' => array(
-        'title' => 'State of Official Residence Country',
+        'title' => 'State of Official Residence',
       ),
       'Phone_Number' => array(
         'title' => 'Phone Number',
