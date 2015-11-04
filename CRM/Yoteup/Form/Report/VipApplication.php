@@ -99,6 +99,12 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Please send occasional admissions related news and updates to my phone as text messages',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
+      'Email_3' => array(
+        'title' => 'Email',
+        'same_alias' => TRUE,
+        'alias' => 3,
+        'cid' => 155,
+      ),
       'How_did_you_become_interested_in_The_College_of_Idaho_and_why_are_you_applying_for_admission?' => array(
         'title' => 'How did you become interested in The College of Idaho and why are you applying for admission?',
       ),
