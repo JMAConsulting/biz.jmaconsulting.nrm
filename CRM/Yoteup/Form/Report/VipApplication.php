@@ -299,7 +299,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias_new' => 'Have you ever been suspended or expelled?',
         'columnName' => 'yesno_alias.name',
       ),
-      'If_yes,_please explain:_1' => array(
+      'Explanation_1' => array(
         'title' => 'Explanation',
         'same_alias' => TRUE,
         'alias' => 1,
@@ -313,7 +313,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias_new' => 'Have you ever been convicted of a crime, other than a minor traffic violation?',
         'columnName' => 'yesno_alias.name',
       ),
-      'If_yes,_please explain:_2' => array(
+      'Explanation_2' => array(
         'title' => 'Explanation',
         'same_alias' => TRUE,
         'alias' => 2,
@@ -396,7 +396,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 1,
         'cid' => 221,
       ),
-      'College(s)_Attended_1' => array(
+      'College_Attended_1' => array(
         'title' => 'College Attended',
         'same_alias' => TRUE,
         'alias' => 1,
@@ -408,6 +408,9 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Degree Earned',
         'is_alias' => TRUE,
         'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 223,
       ),
       'First_Name_3' => array(
         'title' => 'First Name',
