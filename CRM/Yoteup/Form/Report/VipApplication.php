@@ -141,7 +141,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'Social_Security_Number' => array(
         'title' => 'Social Security Number',
       ),
-      'Are_you_a_U.S._Citizen?' => array(
+      'Are_you_a_U_S__Citizen?' => array(
         'title' => 'USA Citizen?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you a U.S. Citizen?',
