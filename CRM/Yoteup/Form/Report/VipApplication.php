@@ -47,7 +47,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Prefix',
         'is_alias' => TRUE,
         'alias_new' => 'Name Prefix',
-        'columnName' => 'prefixes_alias.name',
+        'columnName' => 'prefixes_alias.label',
       ),
       'First_Name_1' => array(
         'title' => 'First Name',
@@ -80,7 +80,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Intended_Major' => array(
         'title' => 'Intended Major',
-        'columnName' => 'major_alias.name',
+        'columnName' => 'major_alias.label',
       ),
       'Permanent_Address' => array(
         'title' => 'Permanent Address',
@@ -145,7 +145,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'USA Citizen?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you a U.S. Citizen?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'State_of_Legal_Residence' => array(
         'title' => 'State of Legal Residence',
@@ -168,7 +168,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Ethnicity',
         'is_alias' => TRUE,
         'alias_new' => 'Race',
-        'columnName' => 'race_alias.name',
+        'columnName' => 'race_alias.label',
       ),
       'If_other,_please_specify:' => array(
         'title' => 'If other, please specify',
@@ -179,7 +179,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Hispanic or Latino descent?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you of Hispanic or Latino descent',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Church_Affiliation/Denomination' => array(
         'title' => 'Religion',
@@ -195,7 +195,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Active member?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you an active member?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Church_City' => array(
         'title' => 'Church City',
@@ -210,7 +210,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Visited Chowan?',
         'is_alias' => TRUE,
         'alias_new' => 'Have you visited Chowan University?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'How_did_you_become_interested_in_Chowan_University_and_why_are_you_applying_for_admission?' => array(
         'title' => 'How did you become interested into Chowan University and why are you applying for admission?',
@@ -291,13 +291,13 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Are you enrolled in Teacher Cadet?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you enrolled in a Teacher Cadet Program?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Have_you_ever_been_suspended_or_expelled?' => array(
         'title' => 'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?',
         'is_alias' => TRUE,
         'alias_new' => 'Have you ever been suspended or expelled?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Explanation_1' => array(
         'title' => 'Explanation',
@@ -311,7 +311,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Have you ever been convicted of a crime other than a minor traffic violation?',
         'is_alias' => TRUE,
         'alias_new' => 'Have you ever been convicted of a crime, other than a minor traffic violation?',
-        'columnName' => 'yesno_alias.name',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Explanation_2' => array(
         'title' => 'Explanation',
@@ -509,8 +509,13 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
     CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns, TRUE);
   }
 
-  function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array('yesno', 'prefixes', 'major', 'race'));
+  function from() {
+    $custom = array(
+      6 => 'prefixes',
+      171 => 'major',
+      202 => 'race',
+    );
+    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array(), $custom);
   }
 
   function where() {
@@ -528,14 +533,6 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-    
-    $tempTables = array(
-      6 => 'prefixes',
-      171 => 'major',
-      202 => 'race',
-    );
-    self::createTemp($tempTables);
-    self::createYesNo();
 
     $sql = $this->buildQuery(FALSE);
 
@@ -546,67 +543,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
   }  
-  
-  function createYesNo() {
-    CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS yesno (
-      value varchar(64) NOT NULL,
-      name varchar(64) NOT NULL)"
-    );
-    CRM_Core_DAO::executeQuery("INSERT INTO yesno VALUES (0, 'No'), (1, 'Yes')");
-  }
-
-  function createTemp($tempTables) {
-    foreach ($tempTables as $optId => $tableName) {
-      $result = $vals = array();
-      $sql = "SELECT label, value FROM civicrm_option_value WHERE option_group_id = {$optId}";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $result[$dao->value] = $dao->label;
-      }
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tableName}");
-      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$tableName} (
-        value varchar(64) NOT NULL,
-        name varchar(64) NOT NULL)"
-      );
-      $sql = "INSERT INTO {$tableName} VALUES";
-      foreach ($result as $key => $items) {
-        $items = addslashes($items);
-        $vals[] = " ('{$key}', '{$items}')";
-      }
-      $sql .= implode(',', $vals);
-      CRM_Core_DAO::executeQuery($sql);
-    }
-  }
-
-
 
   function alterDisplay(&$rows) {
-    // custom code to alter rows
-    $entryFound = FALSE;
-    $checkList = array();
-    foreach ($rows as $rowNum => $row) {
-
-      if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
-        // not repeat contact display names if it matches with the one
-        // in previous row
-        $repeatFound = FALSE;
-        foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
-          ) {
-            $rows[$rowNum][$colName] = "";
-            $repeatFound = TRUE;
-          }
-          if (in_array($colName, $this->_noRepeats)) {
-            $checkList[$colName][] = $colVal;
-          }
-        }
-      }
-
-      if (!$entryFound) {
-        break;
-      }
-    }
   }
 }
