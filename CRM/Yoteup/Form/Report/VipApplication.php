@@ -450,7 +450,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 3,
         'cid' => 130,
       ),
-      'Home_Phone_2' => array(
+      'Phone_(H)_2' => array(
         'title' => 'Phone (H)',
         'same_alias' => TRUE,
         'alias' => 2,
@@ -458,7 +458,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'is_alias' => TRUE,
         'alias_new' => 'Home Phone',
       ),
-      'Work_Phone_2' => array(
+      '(W)_2' => array(
         'title' => '(W)',
         'same_alias' => TRUE,
         'alias' => 2,
@@ -478,7 +478,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 2,
         'cid' => 214,
       ),
-      'College(s)_Attended_2' => array(
+      'College_Attended_2' => array(
         'title' => 'College Attended',
         'same_alias' => TRUE,
         'alias' => 2,
