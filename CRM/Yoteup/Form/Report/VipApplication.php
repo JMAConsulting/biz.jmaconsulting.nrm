@@ -45,7 +45,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Intended_Major' => array(
         'title' => 'Intended Major',
-        'columnName' => 'major_alias.name',
+        'columnName' => 'major_alias.label',
       ),
       'Legal_First_Name' => array(
         'title' => 'Legal First Name',
@@ -118,7 +118,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'What_is_your_current_Visa_Status_in_the_US?' => array(
         'title' => 'What is your current Visa Status in the US?',
-        'columnName' => 'visa_alias.name',
+        'columnName' => 'visa_alias.label',
       ),
       'Number_of_years_residing_in_the_USA' => array(
         'title' => 'Number of years residing in the USA',
