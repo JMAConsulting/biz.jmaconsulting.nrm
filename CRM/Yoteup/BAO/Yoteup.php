@@ -108,7 +108,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportWhereClause(&$where, $webFormId) {
-    $where = "WHERE wc.nid = {$webFormId} AND wsd.nid = {$webFormId} AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+    self::createUniqueSid();
+    $where = "WHERE wc.nid IN ({$webFormId}) AND wsd.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
   
   /*
@@ -153,5 +154,24 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     }
     $sql .= implode(',', $vals);
     CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /*
+   * Function to get latest submissions
+   *
+   * @access public
+   * @static
+   *
+   *
+   */ 
+  function createUniqueSid() {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $drupalDatabase = $dsnArray['database'];
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE validsids AS
+      SELECT MAX(d.sid) as sids from {$drupalDatabase}.webform_submitted_data d
+      LEFT JOIN {$drupalDatabase}.webform_submissions s ON s.sid = d.sid
+      WHERE d.cid =2 and d.nid=71 AND s.nid = 71
+      GROUP BY d.data");
   }
 }
