@@ -51,10 +51,20 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
       if (CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $select[] = "{$column['columnName']} AS '{$column['title']}'";
       }
-      if (CRM_Utils_Array::value('same_alias', $column) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
+      if ((CRM_Utils_Array::value('is_alias', $column) || CRM_Utils_Array::value('same_alias', $column)) && !CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
-        $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
-        $select[] = "GROUP_CONCAT(if((wc.name='{$col}' AND wc.cid = {$column['cid']}), {$columnName}, NULL)) AS '{$column['title']}_{$column['alias']}'";
+        if (CRM_Utils_Array::value('is_alias', $column)) {
+          $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['alias_new'];
+        }
+        else {
+          $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
+        }
+        if (CRM_Utils_Array::value('same_alias', $column)) {
+          $select[] = "GROUP_CONCAT(if((wc.name='{$col}' AND wc.cid = {$column['cid']}), {$columnName}, NULL)) AS '{$column['title']}_{$column['alias']}'";
+        }
+        else {
+          $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$column['title']}'";
+        }
       }
       elseif (!CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);

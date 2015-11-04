@@ -74,8 +74,11 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'Address_Line_3' => array(
         'title' => 'Address Line 3',
       ),
-      'City' => array(
+      'City_1' => array(
         'title' => 'City',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 149,
       ),
       'State/Province' => array(
         'title' => 'State/Province',
@@ -84,7 +87,9 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Postal Code',
       ),
       'State_of_Official_Residence' => array(
-        'title' => 'State of Official Residence',
+        'title' => 'State of Official Residence Country',
+        'is_alias' => TRUE,
+        'alias_new' => 'State of Official Residence',
       ),
       'Phone_Number' => array(
         'title' => 'Phone Number',
@@ -96,12 +101,13 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'How_did_you_become_interested_in_The_College_of_Idaho_and_why_are_you_applying_for_admission?' => array(
         'title' => 'How did you become interested in The College of Idaho and why are you applying for admission?',
       ),
-      'Are_you_a_U.S._Citizen?' => array(
+      'Are_you_a_U_S__Citizen?' => array(
         'title' => 'Are you a U.S. Citizen?',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Citizen_of' => array(
         'title' => 'Citizen of',
+        'columnName' => 'c.name',
       ),
       'What_is_your_current_Visa_Status_in_the_US?' => array(
         'title' => 'What is your current Visa Status in the US?',
