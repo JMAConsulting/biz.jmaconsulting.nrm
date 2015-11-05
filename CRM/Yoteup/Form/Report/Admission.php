@@ -497,7 +497,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDb = $dsnArray['database'];
     self::createTemp($this->_otherOptions, FALSE, $drupalDb);
-    $sql = $this->buildQuery(TRUE);
+    $sql = $this->buildQuery(FALSE);
 
     $rows = array();
     $this->buildRows($sql, $rows);
