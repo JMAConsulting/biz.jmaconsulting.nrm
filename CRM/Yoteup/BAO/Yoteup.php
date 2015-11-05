@@ -94,7 +94,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     }
     if (!empty($ov)) {
       foreach ($ov as $id => $name) {
-        $from .= " LEFT JOIN civicrm_option_value {$name} ON wsd.data COLLATE utf8_unicode_ci = {$name}.value AND {$name}_alias.option_group_id = {$id}";
+        $from .= " LEFT JOIN civicrm_option_value {$name}_alias ON wsd.data COLLATE utf8_unicode_ci = {$name}_alias.value AND {$name}_alias.option_group_id = {$id}";
       }
     }
   }
@@ -107,8 +107,8 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportWhereClause(&$where, $webFormId) {
-    self::createUniqueSid($webFormId);
+  public static function reportWhereClause(&$where, $webFormId, $cid = 2) {
+    self::createUniqueSid($webFormId, $cid);
     $where = "WHERE wc.nid IN ({$webFormId}) AND wsd.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
   
@@ -164,14 +164,14 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    *
    */ 
-  function createUniqueSid($webFormId) {
+  function createUniqueSid($webFormId, $cid = 2) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDatabase = $dsnArray['database'];
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE validsids AS
       SELECT MAX(d.sid) as sids from {$drupalDatabase}.webform_submitted_data d
       LEFT JOIN {$drupalDatabase}.webform_submissions s ON s.sid = d.sid
-      WHERE d.cid = 2 AND d.nid IN ({$webFormId}) AND s.nid IN ({$webFormId})
+      WHERE d.cid = {$cid} AND d.nid IN ({$webFormId}) AND s.nid IN ({$webFormId})
       GROUP BY d.data");
   }
 }

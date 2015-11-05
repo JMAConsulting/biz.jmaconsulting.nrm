@@ -478,7 +478,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 70);
+    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 70, 117);
   }
 
   function groupBy() {
