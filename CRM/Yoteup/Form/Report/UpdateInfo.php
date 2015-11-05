@@ -37,11 +37,6 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
-        'ignore_group_concat' => TRUE,
-        'columnName' => 'contact_civireport.external_identifier',
-      ),
       'Email' => array(
         'title' => 'Email',
       ),
