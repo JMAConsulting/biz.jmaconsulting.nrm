@@ -168,6 +168,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDatabase = $dsnArray['database'];
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS validsids");
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE validsids AS
       SELECT MAX(d.sid) as sids from {$drupalDatabase}.webform_submitted_data d
       LEFT JOIN {$drupalDatabase}.webform_submissions s ON s.sid = d.sid
