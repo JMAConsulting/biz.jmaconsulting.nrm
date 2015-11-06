@@ -116,12 +116,6 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
       'High_School_Graduation_Date' => array(
         'title' => 'High School Graduation Date',
       ),
-      'Your_Interests' => array(
-        'title' => 'Your Interests',
-      ),
-      'Disclaimer' => array(
-        'title' => 'Disclaimer',
-      ),
       'Academics' => array(
         'title' => 'Academics',
         'columnName' => 'academics_alias.label',
