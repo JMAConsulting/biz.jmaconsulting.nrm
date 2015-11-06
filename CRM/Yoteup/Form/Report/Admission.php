@@ -488,6 +488,56 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
   function orderBy() {
     return FALSE;
   }
+  
+  /**
+   * @param int $rowCount
+   * @return array
+   */
+  
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+    // lets do the pager if in html mode
+    $this->_limit = NULL;
+
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
+    if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
+      $this->_select = str_replace('SELECT ', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select);
+
+      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+
+      // @todo all http vars should be extracted in the preProcess
+      // - not randomly in the class
+      if (!$pageId && !empty($_POST)) {
+        if (isset($_POST['PagerBottomButton']) && isset($_POST['crmPID_B'])) {
+          $pageId = max((int) $_POST['crmPID_B'], 1);
+        }
+        elseif (isset($_POST['PagerTopButton']) && isset($_POST['crmPID'])) {
+          $pageId = max((int) $_POST['crmPID'], 1);
+        }
+        unset($_POST['crmPID_B'], $_POST['crmPID']);
+      }
+
+      $pageId = $pageId ? $pageId : 1;
+      $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
+      $offset = ($pageId - 1) * $rowCount;
+
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+
+      $this->_limit = " LIMIT $offset, $rowCount";
+      return array($offset, $rowCount);
+    }
+    if ($this->_limitValue) {
+      if ($this->_offsetValue) {
+        $this->_limit = " LIMIT {$this->_offsetValue}, {$this->_limitValue} ";
+      }
+      else {
+        $this->_limit = " LIMIT " . $this->_limitValue;
+      }
+    }
+  }
 
   function postProcess() {
 
