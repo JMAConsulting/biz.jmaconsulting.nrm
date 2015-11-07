@@ -8,7 +8,7 @@
  * @see civicrm_api3_create_error
  * @throws API_Exception
  */
-function civicrm_api3_yoteup_jmamailreport($params) {
+function civicrm_api3_nrm_jmamailreport($params) {
   $sql = "SELECT parameters FROM civicrm_job WHERE api_action='mail_report' AND run_frequency='Daily' AND is_active=1";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $format = array('format' => 'csv', 'version' => 3);
