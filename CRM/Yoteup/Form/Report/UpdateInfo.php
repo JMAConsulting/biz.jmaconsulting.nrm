@@ -39,53 +39,68 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
     $columns =  array(
       'Email' => array(
         'title' => 'Email',
+        'columnTitle' => 'Email',
       ),
       'First_Name' => array(
         'title' => 'First Name',
+        'columnTitle' => 'First_Name',
       ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
+        'columnTitle' => 'Middle_Name',
       ),
       'Last_Name' => array(
         'title' => 'Last Name',
+        'columnTitle' => 'Last_Name',
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
         'columnName' => 'suffix_alias.label',
+        'columnTitle' => 'name_suffix',
       ),
       'Nickname' => array(
         'title' => 'Nickname',
+        'columnTitle' => 'Nick_name',
       ),
       'Gender' => array(
         'title' => 'Gender',
         'columnName' => 'g.label',
+        'columnTitle' => 'Gender',
       ),
       'Birth_Date' => array(
+        'columnTitle' => 'Birth_Date',
         'title' => 'Birth Date',
       ),
       'Street_Address' => array(
         'title' => 'Street Address',
+        'columnTitle' => 'Street_Address',
       ),
       'Street_Address_Line_2' => array(
         'title' => 'Street Address Line 2',
+        'columnTitle' => 'Address_Line_2',
       ),
       'City' => array(
+        'columnTitle' => 'City',
         'title' => 'City'
       ),
       'County' => array(
         'title' => 'County',
+        'columnTitle' => 'County',
       ),
       'State/Province' => array(
         'title' => 'State/Province',
+        'columnTitle' => 'State',
       ),
       'Postal_Code' => array(
         'title' => 'Postal Code',
+        'columnTitle' => 'Postal_Code',
       ),
       'Postal_Code_Suffix' => array(
         'title' => 'Postal Code Suffix',
       ),
       'Phone_Number' => array(
         'title' => 'Phone Number',
+        'columnTitle' => 'Phone',
       ),
       'Phone_Type' => array(
         'title' => 'Phone Type',
