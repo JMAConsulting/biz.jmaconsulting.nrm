@@ -471,6 +471,7 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
       ),
       'Unweighted_GPA' => array(
         'title' => 'Unweighted GPA',
+        'columnTitle' => 'gpa',
       ),
       'I_would_like_to_apply_Test_Optional' => array(
         'title' => 'I would like to apply Test Optional',
