@@ -45,7 +45,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
     $defaultColumnName = 'wsd.data';
     $abr = array('Country_Code', 'State_Abbr');
     foreach ($columns as $key => $column) {
-      if (($form->_sendmail || $form->_outputMode == 'csv') && !empty($column['columnTitle'])) { 
+      if (($form->getVar('_sendmail') || $form->getVar('_outputMode') == 'csv') && !empty($column['columnTitle'])) {
         $title = $column['columnTitle'];
       }
       else {
