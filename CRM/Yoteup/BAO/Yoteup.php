@@ -37,6 +37,7 @@ class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
    *
    */
   public static function reportSelectClause(&$form, $columns, $addTemp = FALSE) {
+    CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = 204800');
     if ($addTemp) {
       self::createInquiry();
     }
