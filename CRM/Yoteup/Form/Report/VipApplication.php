@@ -94,7 +94,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 3,
         'cid' => 149,
       ),
-      'State' => array(
+      'State_3' => array(
         'title' => 'State',
         'same_alias' => TRUE,
         'alias' => 3,
