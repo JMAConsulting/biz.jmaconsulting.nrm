@@ -78,6 +78,10 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'Enrollment_Classification' => array(
         'title' => 'Enrollment Classification',
       ),
+      'Enrollment_Status' => array(
+        'title' => 'Enrollment Status',
+        'columnName' => 'enrollment_status_alias.label',
+      ),
       'Intended_Major' => array(
         'title' => 'Intended Major',
         'columnName' => 'major_alias.label',
@@ -514,6 +518,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       6 => 'prefixes',
       171 => 'major',
       202 => 'race',
+      200 => 'enrollment_status',
     );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array(), $custom);
   }
