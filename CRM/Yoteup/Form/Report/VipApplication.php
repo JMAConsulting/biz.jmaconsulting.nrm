@@ -78,6 +78,10 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'Enrollment_Classification' => array(
         'title' => 'Enrollment Classification',
       ),
+      'Enrollment_Status' => array(
+        'title' => 'Enrollment Status',
+        'columnName' => 'enrollment_status_alias.label',
+      ),
       'Intended_Major' => array(
         'title' => 'Intended Major',
         'columnName' => 'major_alias.label',
@@ -94,7 +98,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 3,
         'cid' => 149,
       ),
-      'State' => array(
+      'State_3' => array(
         'title' => 'State',
         'same_alias' => TRUE,
         'alias' => 3,
@@ -163,6 +167,10 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Marital_Status' => array(
         'title' => 'Marital Status',
+      ),
+      'hear_about_Chowan_University' => array(
+        'title' => 'How did you hear about Chowan University?',
+        'columnName' => 'hear_chowan_alias.label',
       ),
       'Race' => array(
         'title' => 'Ethnicity',
@@ -514,6 +522,8 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       6 => 'prefixes',
       171 => 'major',
       202 => 'race',
+      200 => 'enrollment_status',
+      201 => 'hear_chowan',
     );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array(), $custom);
   }
