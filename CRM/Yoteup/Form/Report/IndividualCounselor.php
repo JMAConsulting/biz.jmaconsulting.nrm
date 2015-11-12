@@ -352,9 +352,16 @@ class CRM_Yoteup_Form_Report_IndividualCounselor extends CRM_Report_Form {
   
   function createTemp() {
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
-      SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, DATE_FORMAT(DATE(FROM_UNIXTIME(MIN(timestamp))),'%m/%d/%Y') as first_visit
-      FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-      GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
+            SELECT w.* FROM (
+              SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
+              MIN(DATE_FORMAT(DATE(FROM_UNIXTIME(timestamp)),'%m/%d/%Y')) as first_visit
+              FROM {$this->_drupalDatabase}.watchdog 
+              GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)
+              ) AS w INNER JOIN (
+              SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl 
+              FROM {$this->_drupalDatabase}.watchdog 
+              WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
+            ON w.purl=wy.purl;";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255))";
     $dao = CRM_Core_DAO::executeQuery($sql);
