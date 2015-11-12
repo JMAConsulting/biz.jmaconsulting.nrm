@@ -168,6 +168,10 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       'Marital_Status' => array(
         'title' => 'Marital Status',
       ),
+      'hear_about_Chowan_University' => array(
+        'title' => 'How did you hear about Chowan University?',
+        'columnName' => 'hear_chowan_alias.label',
+      ),
       'Race' => array(
         'title' => 'Ethnicity',
         'is_alias' => TRUE,
@@ -519,6 +523,7 @@ class CRM_Yoteup_Form_Report_VipApplication extends CRM_Report_Form {
       171 => 'major',
       202 => 'race',
       200 => 'enrollment_status',
+      201 => 'hear_chowan',
     );
     CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array(), $custom);
   }
