@@ -14,7 +14,7 @@ return array (
       'label' => 'Individual Counselor',
       'description' => 'Individual Counselor (biz.jmaconsulting.nrm)',
       'class_name' => 'CRM_Nrm_Form_Report_IndividualCounselor',
-      'report_url' => 'yoteup/individualcounselor',
+      'report_url' => 'chowan/individualcounselor',
       'component' => '',
     ),
   ),

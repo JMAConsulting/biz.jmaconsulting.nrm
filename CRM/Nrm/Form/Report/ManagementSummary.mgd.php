@@ -14,7 +14,7 @@ return array (
       'label' => 'Management Summary',
       'description' => 'Management Summary (biz.jmaconsulting.nrm)',
       'class_name' => 'CRM_Nrm_Form_Report_ManagementSummary',
-      'report_url' => 'yoteup/managementsummary',
+      'report_url' => 'chowan/managementsummary',
       'component' => '',
     ),
   ),
