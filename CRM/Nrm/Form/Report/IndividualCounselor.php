@@ -352,7 +352,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   
   function createTemp() {
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
-            SELECT w.* FROM (
+            SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
               MIN(DATE_FORMAT(DATE(FROM_UNIXTIME(timestamp)),'%m/%d/%Y')) as first_visit
               FROM {$this->_drupalDatabase}.watchdog 
