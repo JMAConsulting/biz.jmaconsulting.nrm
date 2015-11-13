@@ -1,14 +1,14 @@
 <?php
 
-require_once 'yoteup.civix.php';
+require_once 'nrm.civix.php';
 
 /**
  * Implementation of hook_civicrm_config
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function yoteup_civicrm_config(&$config) {
-  _yoteup_civix_civicrm_config($config);
+function nrm_civicrm_config(&$config) {
+  _nrm_civix_civicrm_config($config);
 }
 
 /**
@@ -18,8 +18,8 @@ function yoteup_civicrm_config(&$config) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function yoteup_civicrm_xmlMenu(&$files) {
-  _yoteup_civix_civicrm_xmlMenu($files);
+function nrm_civicrm_xmlMenu(&$files) {
+  _nrm_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -27,8 +27,8 @@ function yoteup_civicrm_xmlMenu(&$files) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function yoteup_civicrm_install() {
-  _yoteup_civix_civicrm_install();
+function nrm_civicrm_install() {
+  _nrm_civix_civicrm_install();
 }
 
 /**
@@ -36,8 +36,8 @@ function yoteup_civicrm_install() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function yoteup_civicrm_uninstall() {
-  _yoteup_civix_civicrm_uninstall();
+function nrm_civicrm_uninstall() {
+  _nrm_civix_civicrm_uninstall();
 }
 
 /**
@@ -45,8 +45,8 @@ function yoteup_civicrm_uninstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function yoteup_civicrm_enable() {
-  _yoteup_civix_civicrm_enable();
+function nrm_civicrm_enable() {
+  _nrm_civix_civicrm_enable();
 }
 
 /**
@@ -54,8 +54,8 @@ function yoteup_civicrm_enable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
-function yoteup_civicrm_disable() {
-  _yoteup_civix_civicrm_disable();
+function nrm_civicrm_disable() {
+  _nrm_civix_civicrm_disable();
 }
 
 /**
@@ -69,8 +69,8 @@ function yoteup_civicrm_disable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function yoteup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _yoteup_civix_civicrm_upgrade($op, $queue);
+function nrm_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  return _nrm_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -81,8 +81,8 @@ function yoteup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function yoteup_civicrm_managed(&$entities) {
-  _yoteup_civix_civicrm_managed($entities);
+function nrm_civicrm_managed(&$entities) {
+  _nrm_civix_civicrm_managed($entities);
 }
 
 /**
@@ -94,8 +94,8 @@ function yoteup_civicrm_managed(&$entities) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function yoteup_civicrm_caseTypes(&$caseTypes) {
-  _yoteup_civix_civicrm_caseTypes($caseTypes);
+function nrm_civicrm_caseTypes(&$caseTypes) {
+  _nrm_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -103,11 +103,11 @@ function yoteup_civicrm_caseTypes(&$caseTypes) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function yoteup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _yoteup_civix_civicrm_alterSettingsFolders($metaDataFolders);
+function nrm_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _nrm_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-function yoteup_civicrm_alterMailParams(&$params, $context) { 
+function nrm_civicrm_alterMailParams(&$params, $context) { 
   if (CRM_Utils_Array::value('groupName', $params) == 'Report Email Sender') {
     $email = CRM_Utils_Request::retrieve('email_to_send', 'String', CRM_Core_DAO::$_nullObject);
     if ($email) {
