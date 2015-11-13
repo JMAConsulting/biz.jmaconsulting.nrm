@@ -1,4 +1,4 @@
-Package: biz.jmaconsulting.yoteup
+Package: biz.jmaconsulting.nrm
 Copyright (C) 2015, joe.murray@jmaconsulting.biz <edsel.lopez@jmaconsulting.biz>
 Licensed under the GNU Affero Public License 3.0 (below).
 
