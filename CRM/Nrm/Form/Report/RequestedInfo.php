@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_RequestedInfo extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -107,7 +107,7 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       ),
     );
 
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() { 
@@ -115,11 +115,11 @@ class CRM_Yoteup_Form_Report_RequestedInfo extends CRM_Report_Form {
       7 => 'suffix',
       133 => 'academic',
     );
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 72);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 72);
   }
 
   function groupBy() {
