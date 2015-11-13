@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_Admission extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -563,16 +563,16 @@ class CRM_Yoteup_Form_Report_Admission extends CRM_Report_Form {
         'columnTitle' => 'plan_to_live',
       ),
     );
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() {
     $temptables = array_merge($this->_optionGroups, $this->_otherOptions);
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array_keys($temptables), array(), 117);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array_keys($temptables), array(), 117);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 70, 117);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 70, 117);
   }
 
   function groupBy() {

@@ -1,8 +1,8 @@
 <?php
 
-require_once 'yoteup_constants.php';
+require_once 'nrm_constants.php';
 
-class CRM_Yoteup_Form_Report_ManagementSummary extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
