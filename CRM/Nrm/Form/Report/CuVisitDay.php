@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -138,7 +138,7 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
       ),
     );
 
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns, TRUE);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE);
   }
 
   function from() {
@@ -147,13 +147,13 @@ class CRM_Yoteup_Form_Report_CuVisitDay extends CRM_Report_Form {
       159 => 'athletics',
       158 => 'extra',
     );
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, TRUE, array( 'how_did_you_hear_about_chowan', 
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array( 'how_did_you_hear_about_chowan', 
       'anticipated_academic_enroll_year', 'anticipated_academic_enroll_term',
       'how_did_you_hear_about_cu_visit_day', 'civicrm_1_participant_1_participant_event_id'), $custom);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 71);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 71);
   }
 
   function groupBy() {

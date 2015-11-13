@@ -9,7 +9,7 @@ define('TERRITORY_COUNSELOR', 446);
  * @see civicrm_api3_create_error
  * @throws API_Exception
  */
-function civicrm_api3_yoteup_processcounselor($params) {
+function civicrm_api3_nrm_processcounselor($params) {
   // Get list of counselors
   $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
   $counselorParams = array(
