@@ -14,7 +14,7 @@ return array (
       'name' => 'Process Counselors',
       'description' => 'Send mail report to counselors',
       'run_frequency' => 'Daily',
-      'api_entity' => 'Yoteup',
+      'api_entity' => 'Nrm',
       'api_action' => 'Processcounselor',
       'parameters' => '',
     ),
