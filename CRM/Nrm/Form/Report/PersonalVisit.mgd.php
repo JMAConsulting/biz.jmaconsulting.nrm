@@ -6,14 +6,14 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_PersonalVisit',
+    'name' => 'CRM_Nrm_Form_Report_PersonalVisit',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
       'label' => 'Personal Visit Day',
-      'description' => 'Personal Visit Day (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_PersonalVisit',
+      'description' => 'Personal Visit Day (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_PersonalVisit',
       'report_url' => 'chowan/personalvisit',
       'component' => '',
     ),
