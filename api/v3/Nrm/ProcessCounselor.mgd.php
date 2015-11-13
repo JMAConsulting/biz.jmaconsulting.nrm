@@ -6,7 +6,7 @@
 return array (
   0 => 
   array (
-    'name' => 'Cron:YoteUp.ProcessCounselor',
+    'name' => 'Cron:Nrm.ProcessCounselor',
     'entity' => 'Job',
     'params' => 
     array (
