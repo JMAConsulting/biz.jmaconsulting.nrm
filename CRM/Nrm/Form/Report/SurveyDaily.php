@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_SurveyDaily extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -114,7 +114,7 @@ class CRM_Yoteup_Form_Report_SurveyDaily extends CRM_Report_Form {
         'ignore_group_concat' => TRUE,
       ),
     );
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns, FALSE, FALSE);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, FALSE, FALSE);
   }
 
   function from() { 

@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_VipApplication',
+    'name' => 'CRM_Nrm_Form_Report_RequestedInfo',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'VIP Application Report',
-      'description' => 'VIP Application Report (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_VipApplication',
-      'report_url' => 'chowan/vipapplication',
+      'label' => 'Requested Information',
+      'description' => 'Requested Information (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_RequestedInfo',
+      'report_url' => 'chowan/requestedinfo',
       'component' => '',
     ),
   ),

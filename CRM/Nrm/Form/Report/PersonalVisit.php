@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_PersonalVisit extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -149,7 +149,7 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
         'title' => 'Comments/Requests',
       ),
     );
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() {
@@ -159,11 +159,11 @@ class CRM_Yoteup_Form_Report_PersonalVisit extends CRM_Report_Form {
       158 => 'extra',
       174 => 'visit',
     );
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from, FALSE, array(), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, FALSE, array(), $custom);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 89);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 89);
   }
 
   function groupBy() {

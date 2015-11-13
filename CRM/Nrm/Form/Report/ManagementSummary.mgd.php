@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_CuVisitDay',
+    'name' => 'CRM_Nrm_Form_Report_ManagementSummary',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'CU Visit Day Report',
-      'description' => 'CU Visit Day Report (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_CuVisitDay',
-      'report_url' => 'chowan/cuvisitday',
+      'label' => 'Management Summary',
+      'description' => 'Management Summary (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_ManagementSummary',
+      'report_url' => 'yoteup/managementsummary',
       'component' => '',
     ),
   ),

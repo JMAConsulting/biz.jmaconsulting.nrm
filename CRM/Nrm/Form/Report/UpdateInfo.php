@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_UpdateInfo extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -98,15 +98,15 @@ class CRM_Yoteup_Form_Report_UpdateInfo extends CRM_Report_Form {
         'columnName' => 'pt1.label',
       ),
     );
-    CRM_Yoteup_BAO_Yoteup::reportSelectClause($this, $columns);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() { 
-    CRM_Yoteup_BAO_Yoteup::reportFromClause($this->_from);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from);
   }
 
   function where() {
-    CRM_Yoteup_BAO_Yoteup::reportWhereClause($this->_where, 67);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 67);
   }
 
   function groupBy() {
