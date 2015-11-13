@@ -113,7 +113,7 @@ function _nrm_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * @return CRM_NRM_Upgrader
  */
 function _nrm_civix_upgrader() {
-  if (!file_exists(__DIR__.'/CRM/NRM/Upgrader.php')) {
+  if (!file_exists(__DIR__.'/CRM/Nrm/Upgrader.php')) {
     return NULL;
   } else {
     return CRM_NRM_Upgrader_Base::instance();
