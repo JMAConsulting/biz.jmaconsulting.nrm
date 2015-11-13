@@ -221,7 +221,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
     // For first visit times
     $this->_from .= "
-             LEFT JOIN civicrm_watchdog_temp_b t
+             INNER JOIN civicrm_watchdog_temp_b t
                        ON t.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
     
     $this->_from .= "
