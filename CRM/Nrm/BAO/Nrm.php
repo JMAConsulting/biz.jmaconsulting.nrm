@@ -1,6 +1,7 @@
+
 <?php
 /**
- * Yote Up extension integrates CiviCRM's reports
+ * NRM extension integrates CiviCRM's reports
  * 
  * Copyright (C) 2015 JMA Consulting
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * Support: https://github.com/JMAConsulting/biz.jmaconsulting.yoteup/issues
+ * Support: https://github.com/JMAConsulting/biz.jmaconsulting.nrm/issues
  * 
  * Contact: info@jmaconsulting.biz
  *          JMA Consulting
@@ -26,7 +27,7 @@
  *          Canada   M5T 2C7
  */
 
-class CRM_Yoteup_BAO_Yoteup extends CRM_Core_DAO {
+class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
 
   /*
    * function to build select clause for reports

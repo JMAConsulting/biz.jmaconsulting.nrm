@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_PersonalVisit',
+    'name' => 'CRM_Nrm_Form_Report_SurveyDaily',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'Personal Visit Day',
-      'description' => 'Personal Visit Day (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_PersonalVisit',
-      'report_url' => 'chowan/personalvisit',
+      'label' => 'Survey Daily Report',
+      'description' => 'Survey Daily Report (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_SurveyDaily',
+      'report_url' => 'yoteup/surveydaily',
       'component' => '',
     ),
   ),

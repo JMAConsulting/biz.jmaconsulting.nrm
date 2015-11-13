@@ -6,7 +6,7 @@
 return array (
   0 => 
   array (
-    'name' => 'Cron:YoteUp.ProcessCounselor',
+    'name' => 'Cron:Nrm.ProcessCounselor',
     'entity' => 'Job',
     'params' => 
     array (
@@ -14,7 +14,7 @@ return array (
       'name' => 'Process Counselors',
       'description' => 'Send mail report to counselors',
       'run_frequency' => 'Daily',
-      'api_entity' => 'Yoteup',
+      'api_entity' => 'Nrm',
       'api_action' => 'Processcounselor',
       'parameters' => '',
     ),

@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_SurveyDaily',
+    'name' => 'CRM_Nrm_Form_Report_RequestedInfo',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'Survey Daily Report',
-      'description' => 'Survey Daily Report (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_SurveyDaily',
-      'report_url' => 'yoteup/surveydaily',
+      'label' => 'Requested Information',
+      'description' => 'Requested Information (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_RequestedInfo',
+      'report_url' => 'yoteup/requestedinfo',
       'component' => '',
     ),
   ),
