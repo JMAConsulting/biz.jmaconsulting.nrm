@@ -6,14 +6,14 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Yoteup_Form_Report_ManagementSummary',
+    'name' => 'CRM_Nrm_Form_Report_ManagementSummary',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
       'label' => 'Management Summary',
-      'description' => 'Management Summary (biz.jmaconsulting.yoteup)',
-      'class_name' => 'CRM_Yoteup_Form_Report_ManagementSummary',
+      'description' => 'Management Summary (biz.jmaconsulting.nrm)',
+      'class_name' => 'CRM_Nrm_Form_Report_ManagementSummary',
       'report_url' => 'yoteup/managementsummary',
       'component' => '',
     ),
