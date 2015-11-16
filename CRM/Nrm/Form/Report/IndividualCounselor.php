@@ -406,7 +406,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
         'field_id' => $dao->field_id,
       );
-      if (in_array($dao->label, array('Activity Interests', 'Major Interests', 'Athletic Interests'))) {
+      if (in_array($dao->label, array('Activity Interests', 'High School Name'))) {
         $this->infoColumn[$dao->table_name]['fields'][$dao->column_name]['default'] = TRUE;
       }
       $this->infoColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
