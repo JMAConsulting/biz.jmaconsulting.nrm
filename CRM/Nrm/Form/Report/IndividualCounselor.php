@@ -305,8 +305,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
     
     if (isset($_GET['counsellor_id_value'])) {
-      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t27.admissions_territory_446, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
-        FROM civicrm_value_territory_27 t27 WHERE t27.entity_id = " . $_GET['counsellor_id_value']);
+      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admissions_territory_459, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
+        FROM civicrm_value_territory_26 t26 WHERE t26.entity_id = " . $_GET['counsellor_id_value']);
       $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
     }
 
