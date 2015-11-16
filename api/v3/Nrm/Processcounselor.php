@@ -31,7 +31,7 @@ function civicrm_api3_nrm_processcounselor($params) {
       }
     }
     // Now email
-    $instanceId = CRM_Utils_Array::value('instanceId', $params);
+    $instanceId = (int)CRM_Utils_Array::value('instanceId', $params);
     $_REQUEST['instanceId'] = $instanceId;
     $_REQUEST['sendmail'] = CRM_Utils_Array::value('sendmail', $params, 1);
 
