@@ -341,7 +341,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->endPostProcess($rows);
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_a");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_b");
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_c");
   }
   
   function createTemp() {
