@@ -172,7 +172,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                 $this->_infoField = TRUE;
                 $infoFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
                 $this->customNRMField = "CONCAT(" . implode(', ', $infoFields) . ")";
-                $nrmField = "{$this->customNRMField} as civicrm_contact_info_request,";
+                $nrmField = "{$this->customNRMField} as civicrm_contact_info_request";
               }
             }
             elseif ($tableName == 'civicrm_email') {
@@ -202,15 +202,13 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$surveyField}
-      {$nrmField}
-      ct.brochures as civicrm_contact_brochure_request";
+      {$nrmField}";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
-    $this->_columnHeaders["civicrm_contact_brochure_request"]['title'] = ts('Brochure Requests');
   }
 
   function from() {
@@ -223,10 +221,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_from .= "
              INNER JOIN civicrm_watchdog_temp_b t
                        ON t.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
-    
-    $this->_from .= "
-             LEFT JOIN civicrm_watchdog_temp_c ct
-                       ON ct.contact_id = {$this->_aliases['civicrm_contact']}.id\n";
 
     $this->_from .= "{$this->surveyTables}";
 
@@ -347,7 +341,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->endPostProcess($rows);
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_a");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_b");
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_c");
   }
   
   function createTemp() {
@@ -373,18 +366,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
-      SELECT id AS contact_id, GROUP_CONCAT(brochure ORDER BY brochure SEPARATOR ', ') as brochures FROM (SELECT cc.id, wsd22.data as brochure
-      FROM civicrm_contact cc
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.data = cc.id AND wsd.cid = 2
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd22 ON wsd22.sid = wsd.sid 
-      LEFT JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.sid = wsd.sid
-      WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day) AND ws.nid = 72 AND wsd22.data IS NOT NULL and wsd22.data <> '' AND wsd22.cid IN (22,23,24)) as s 
-      GROUP BY s.id";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_c ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
   
@@ -509,15 +490,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_contact_info_request'] = $rows[$rowNum]['civicrm_contact_info_request'] . $string;
           $rows[$rowNum]['civicrm_contact_info_request'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_info_request']);
         }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_contact_brochure_request', $row)) {
-        // First retrieve all the components used for brochures
-        $sql = "SELECT nid, extra
-          FROM {$this->_drupalDatabase}.webform_component
-          WHERE form_key LIKE '%cg6%' AND nid = 72 AND type = 'select' AND cid IN (22,23,24)";
-        $rows[$rowNum]['civicrm_contact_brochure_request'] = self::getLabels($sql, $separator = ', ', $row['civicrm_contact_brochure_request']);
-        $rows[$rowNum]['civicrm_contact_brochure_request'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_brochure_request']);
         $entryFound = TRUE;
       }
       unset($this->_columnHeaders["civicrm_contact_contact_id"]);
