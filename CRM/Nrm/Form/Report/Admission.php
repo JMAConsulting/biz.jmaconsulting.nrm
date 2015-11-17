@@ -475,11 +475,8 @@ class CRM_Nrm_Form_Report_Admission extends CRM_Report_Form {
       ),
       'I_would_like_to_apply_Test_Optional' => array(
         'title' => 'I would like to apply Test Optional',
-        'columnTitle' => 'gpa test_optional',
+        'columnTitle' => 'test_optional',
         'columnName' => "IF(wsd.data=1, 'Yes', 'No')",
-      ),
-      'Answer_these_questions' => array(
-        'title' => 'Answer these questions',
       ),
       'Potential_Indication' => array(
         'title' => 'Potential Indication',
