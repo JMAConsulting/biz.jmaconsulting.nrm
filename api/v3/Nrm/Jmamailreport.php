@@ -25,6 +25,10 @@ function civicrm_api3_nrm_jmamailreport($params) {
   }
   foreach ($instances as $instance) {
     $instance = array_merge($instance, $format);
+    if ($instance['instanceId'] == 75) {
+      $instance['format'] = 'print';
+    }
+
     $result = CRM_Report_Utils_Report::processReport($instance);
 
     if ($result['is_error'] != 0) {
