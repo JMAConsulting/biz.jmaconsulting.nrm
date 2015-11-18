@@ -59,6 +59,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
 
   function select() {
     $select = $this->_columnHeaders = array();
+    self::getDefaultWebforms();
     $urlWhere = self::createURLCondition();
     $appWhere = self::getWhereCondition('webforms_applications');
     $engageWhere = self::getWhereCondition('webforms_engagement', 'w.');
@@ -220,6 +221,23 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
       $this->webForms[$dao->nid] = $dao->title;
     }
   }
+  
+  function getDefaultWebforms() {
+    $appWhere = self::getWhereCondition('webforms_applications', 'w.');
+    $defaults = $urls = $this->urls = array();
+
+    $sql = "SELECT w.nid, u.alias
+      FROM {$this->_drupalDatabase}.webform w
+      INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid
+      INNER JOIN {$this->_drupalDatabase}.url_alias u ON u.source = CONCAT_WS('/', 'node', w.nid)
+      WHERE (1) {$appWhere}";
+     $dao = CRM_Core_DAO::executeQuery($sql);
+     while ($dao->fetch()) {
+       $default[] = $dao->nid;
+       $urls[$dao->nid] = $dao->alias;
+     }
+     $this->urls = $urls;
+   }
 
   function getWhereCondition($fieldName, $alias = '') {
     // First get submitted params from webform
