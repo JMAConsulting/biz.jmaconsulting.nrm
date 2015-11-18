@@ -79,30 +79,34 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND (SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)) NOT IN (SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))
        FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as b
        UNION
-       SELECT 'Cumulative unique visitors' as description, perday_visitor as perday_visitor_count FROM
+       SELECT 'Cumulative unique visitors to date' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog) as c
        UNION
-       SELECT 'Total applications started' as description, perday_start as perday_visitor_count FROM
+       SELECT 'Applications started - yesterday' as description, perday_start as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as d
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) {$urlWhere}) as d
        UNION
-       SELECT 'Total applications submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       SELECT 'Applications submitted - yesterday' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$appWhere}
        GROUP BY nid) as e
        UNION
-       SELECT 'Cumulative applications submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
+       SELECT 'Cumulative applications started to date' as description, SUM(perday_completed) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(location)) as perday_completed
+       FROM {$this->_drupalDatabase}.watchdog WHERE (1) {$urlWhere}) as x
+       UNION
+       SELECT 'Cumulative applications submitted to date' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}
        GROUP BY nid) as f
        UNION
-       SELECT 'Total visit registrations submitted' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       SELECT 'Total visit registrations - yesterday' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
        GROUP BY nid) as g
        UNION
-       SELECT 'Cumulative visit registrations submitted' as description, SUM(perday_completed) as perday_visitor_count FROM
+       SELECT 'Cumulative visit registrations submitted to date' as description, SUM(perday_completed) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(nid)) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
        GROUP BY nid) as h
