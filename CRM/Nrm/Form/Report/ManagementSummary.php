@@ -116,8 +116,9 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
        WHERE (1) {$engageWhere}
-       AND data IS NOT NULL and data <> '' group by w.cid
+       AND data IS NOT NULL and data <> '' 
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY w.cid
        UNION
        SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
        FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
@@ -134,8 +135,9 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
        WHERE (1) {$engageWhere}
-       AND data IS NOT NULL and data <> '' group by w.cid
+       AND data IS NOT NULL and data <> ''
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY w.cid
        UNION
        SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
        FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
