@@ -273,8 +273,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     if (empty($diff)) {
       return " AND (1)";
     }
-    $statement = implode("' OR location LIKE '%", $diff);
-    $sql = " AND (location LIKE '%{$statement}')";
+    $statement = implode("%' OR location LIKE '%", $diff);
+    $sql = " AND (location LIKE '%{$statement}%')";
     return $sql;
   }
 
