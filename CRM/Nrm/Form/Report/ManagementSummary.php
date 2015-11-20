@@ -101,14 +101,12 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}) as f
        UNION
        SELECT 'Total visit registrations - yesterday' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
-       GROUP BY nid) as g
+       ( SELECT COUNT(nid) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}) as g
        UNION
        SELECT 'Cumulative visit registrations submitted to date' as description, SUM(perday_completed) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(nid)) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
-       GROUP BY nid) as h
+       ( SELECT COUNT(nid) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}) as h
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
