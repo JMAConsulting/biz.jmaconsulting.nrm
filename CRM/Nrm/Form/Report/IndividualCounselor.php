@@ -25,6 +25,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     self::getWebforms();
     self::createSurveyResponse();
     self::createInfoRequest();
+    self::createVIPApp();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -122,6 +123,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     );
     $this->_columns = array_merge($this->_columns, $this->surveyColumn);
     $this->_columns = array_merge($this->_columns, $this->infoColumn);
+    $this->_columns = array_merge($this->_columns, $this->vipColumn);
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -189,6 +191,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $this->customSurveyField = "CONCAT(" . implode(', ', $surveyFields) . ")";
               $surveyField = "{$this->customSurveyField} as civicrm_contact_survey_response,";
             }
+            elseif (array_key_exists($tableName, $this->vipColumn)) {
+              $this->_vipField = TRUE;
+              $vipFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              $this->customVIPField = "CONCAT(" . implode(', ', $vipFields) . ")";
+              $vipField = "{$this->customVIPField} as civicrm_contact_vip_application,";
+            }
             else {
               $select[] = "{$field['dbAlias']}";
               $select[] = "'<br/>'";
@@ -202,6 +210,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$surveyField}
+      {$vipField}
       {$nrmField}";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
@@ -209,6 +218,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
+    $this->_columnHeaders["civicrm_contact_vip_application"]['title'] = ts('VIP Applications');
   }
 
   function from() {
@@ -225,6 +235,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_from .= "{$this->surveyTables}";
 
     $this->_from .= "{$this->nrmTables}";
+
+    $this->_from .= "{$this->vipTables}";
 
     //used when address field is selected
     if ($this->_addressField) {
@@ -354,7 +366,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl 
               FROM {$this->_drupalDatabase}.watchdog 
               WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
-            ON w.purl=wy.purl;";
+            ON w.purl=wy.purl";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255)) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -363,7 +375,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
+      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_unicode_ci";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -413,6 +425,30 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests & Downloads');
     }
     $this->nrmTables = implode(' ', $tables);
+  }
+
+  function createVIPApp() {
+    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
+      FROM civicrm_custom_group g 
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      WHERE g.id IN (7,8)";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    
+    while ($dao->fetch()) {
+      $fieldAlias = 'group_' . $dao->group_id;
+      $field =  $fieldAlias . '.' . $dao->column_name;
+      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
+      $this->vipColumn[$dao->table_name]['fields'][$dao->column_name] = array(
+        'title' => $dao->label,
+        'dbAlias' => $fieldAlias . '.' . $dao->column_name,
+        'field_id' => $dao->field_id,
+        'default' => TRUE,
+      );
+      //$this->vipColumn[$dao->table_name]['fields'][$dao->column_name]['default'] = TRUE;
+      $this->vipColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
+      $this->vipColumn[$dao->table_name]['group_title'] = ts('VIP Applications');
+    }
+    $this->vipTables = implode(' ', $tables);
   }
 
   function getWebforms() {
@@ -472,6 +508,17 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
         $entryFound = TRUE;
       }
+      
+      if (array_key_exists('civicrm_contact_vip_application', $row)) {
+        // First retrieve all the components used for surveys
+        $sql = "SELECT nid, extra
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE form_key LIKE '%cg7%' OR form_key LIKE '%cg8%' AND type = 'select'";
+        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_vip_application']);
+        $rows[$rowNum]['civicrm_contact_vip_application'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_vip_application']);
+        $entryFound = TRUE;
+      }
+
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
         $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLabels($row['civicrm_contact_info_request']);
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
