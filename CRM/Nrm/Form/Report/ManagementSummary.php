@@ -72,7 +72,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Total unique visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as a
+       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)<>'chowan2016.com') as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) as perday_visitor  
@@ -197,7 +198,9 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-
+    
+    $this->updateWatchdog_nrm();
+    
     $sql = $this->buildQuery(FALSE);
 
     $rows = array();
@@ -279,7 +282,24 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $sql = " AND (location LIKE '%{$statement}%')";
     return $sql;
   }
-
+  
+  /**
+   * Fill watchdog_nrm with records matching watchdog including calculated purls
+   * 
+   * @return CRM_Core_DAO|object
+   *   object that holds the results of the query, in this case no records
+   */
+  function updateWatchdog_nrm() {
+    $sql = "INSERT INTO {$this->_drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
+            SELECT w.wid, w.location, w.timestamp, 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
+            FROM {$this->_drupalDatabase}.watchdog w 
+            LEFT JOIN {$this->_drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
+            WHERE n.wid IS NULL;";
+            
+    return CRM_Core_DAO::executeQuery($sql);
+  }
+  
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
