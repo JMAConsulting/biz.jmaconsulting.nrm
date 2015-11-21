@@ -127,8 +127,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ) AS num
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) AS visit
-       FROM {$this->_drupalDatabase}.watchdog WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) AS denom
+       (SELECT COUNT(DISTINCT(purl)) AS visit
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
@@ -141,8 +141,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY w.cid
        UNION
-       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
-       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
+       SELECT DISTINCT(purl) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
        ) AS num
        UNION
        SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount as perday_visitor_count FROM
@@ -155,12 +155,12 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        UNION
-       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
-       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as e GROUP BY location) as ue
+       SELECT DISTINCT(purl) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%files/%') as e GROUP BY location) as ue
        ) AS num
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT COUNT(DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1)))) AS visit FROM {$this->_drupalDatabase}.watchdog) AS denom
+       (SELECT COUNT(DISTINCT(purl)) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT location FROM 
@@ -170,8 +170,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        UNION
-       SELECT DISTINCT((SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '/', 1))) COLLATE utf8_unicode_ci as download 
-       FROM {$this->_drupalDatabase}.watchdog WHERE location LIKE '%files/%') as e GROUP BY location) as ue
+       SELECT DISTINCT(purl) COLLATE utf8_unicode_ci as download 
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%files/%') as e GROUP BY location) as ue
        ) AS num";
   }
 
