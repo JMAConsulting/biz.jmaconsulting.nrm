@@ -114,8 +114,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT location FROM 
        (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' 
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
@@ -133,8 +133,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT location FROM 
        (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> ''
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
@@ -149,8 +149,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT location FROM 
        (SELECT CONCAT(p.purl_145,'.yoteup2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       LEFT JOIN ". PURLS ." p on c.cid=p.entity_id
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' group by w.cid
        UNION
