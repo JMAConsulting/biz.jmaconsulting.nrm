@@ -466,7 +466,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
-      WHERE g.id IN (6,11)";
+      WHERE g.id IN (6,7,11)";
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     while ($dao->fetch()) {
