@@ -199,6 +199,16 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
+    // Build watchdog table
+    $wdNrm = "CREATE TABLE IF NOT EXISTS {$this->_drupalDatabase}.watchdog_nrm (
+      `wid` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: Unique watchdog event ID.',
+      `location` text NOT NULL COMMENT 'URL of the origin of the event.',
+      `timestamp` int(11) NOT NULL DEFAULT '0' COMMENT 'Unix timestamp of when event occurred.',
+      `purl` varchar(255) NOT NULL COMMENT 'NRM PURL.',
+      PRIMARY KEY (`wid`),
+      KEY `purl` (`purl`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
+    CRM_Core_DAO::executeQuery($wdNrm);
     
     $this->updateWatchdog_nrm();
     
