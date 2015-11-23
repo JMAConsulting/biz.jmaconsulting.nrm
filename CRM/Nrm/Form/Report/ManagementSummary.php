@@ -73,7 +73,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Total unique visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl<>'chowan2016.com') as a
+       AND purl<>'brevard2016.com') as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
