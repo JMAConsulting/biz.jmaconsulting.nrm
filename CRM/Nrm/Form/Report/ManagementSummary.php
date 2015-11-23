@@ -146,7 +146,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
          ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       ) as e GROUP BY location) as ue
+       ) as e GROUP BY contact_id) as ue
        ) AS num
        UNION
        SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount as perday_visitor_count FROM
