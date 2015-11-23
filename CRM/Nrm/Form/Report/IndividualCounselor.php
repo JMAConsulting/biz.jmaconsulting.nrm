@@ -447,7 +447,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     while ($dao->fetch()) {
-      $fieldAlias = 'vgroup_' . $dao->group_id;
+      $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
       $this->vipColumn[$dao->table_name]['fields'][$dao->column_name] = array(
@@ -470,7 +470,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     while ($dao->fetch()) {
-      $fieldAlias = 'group_' . $dao->group_id;
+      $fieldAlias = 'vgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
       $this->visitColumn[$dao->table_name]['fields'][$dao->column_name] = array(
