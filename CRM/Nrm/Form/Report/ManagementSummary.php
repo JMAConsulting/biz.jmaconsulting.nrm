@@ -111,18 +111,21 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
-       (SELECT location FROM 
-       (SELECT CONCAT(p.purl_145,'.brevard2016.com') as location from {$this->_drupalDatabase}.webform_submitted_data w
+       (SELECT contact_id FROM 
+       (SELECT p.entity_id as contact_id 
+       FROM {$this->_drupalDatabase}.webform_submitted_data w
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       LEFT JOIN ". PURLS ." p on w.data=p.entity_id
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' 
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY w.sid
        UNION
-       SELECT DISTINCT(purl) COLLATE utf8_unicode_ci as download 
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
+       SELECT p.entity_id as download 
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
+         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+       WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       ) as e GROUP BY contact_id) as ue
        ) AS num
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
