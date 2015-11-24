@@ -513,7 +513,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $op = array_filter(explode($separator, $row));
     foreach($op as $values) {
       if (isset($web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)])) {
-        $newArray[] = $web[$values][0] . ': ' . $web[$values][1];
+        $newArray[] = $web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)][0] . ': ' . $web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)][1];
       }
       else {
         $newArray[] = $values;
