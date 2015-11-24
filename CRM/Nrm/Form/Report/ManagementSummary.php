@@ -78,13 +78,13 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Total unique new visitors for the day' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl<>'chowan2016.com'
+       AND purl<>'yoteup2016.com'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as b
        UNION
        SELECT 'Cumulative unique visitors to date' as description, perday_visitor as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'chowan2016.com') as c
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'yoteup2016.com') as c
        UNION
        SELECT 'Applications started - yesterday' as description, perday_start as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as perday_start
@@ -142,7 +142,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
-         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.yoteup2016.com')
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        ) as e GROUP BY contact_id) as ue
        ) AS num
@@ -159,14 +159,14 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
-         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.yoteup2016.com')
        WHERE wn.location LIKE '%files/%'
        ) as e GROUP BY contact_id
        ) as ue
        ) AS num
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT COUNT(DISTINCT(purl)) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'chowan2016.com') AS denom
+       (SELECT COUNT(DISTINCT(purl)) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'yoteup2016.com') AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT contact_id FROM 
@@ -180,7 +180,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn 
-       LEFT JOIN civicrm_value_nrmpurls_5 p on wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+       LEFT JOIN civicrm_value_nrmpurls_5 p on wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.yoteup2016.com')
        WHERE location LIKE '%files/%'
        ) as e GROUP BY contact_id
        ) as ue
