@@ -501,7 +501,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
   function getLabels($where, $separator, $row) {
     $newArray = $webform = array();
-    $cacheKey = '';
+    $cacheKey = CRM_Utils_String::munge($where);
     if (empty(self::$_fieldLabels[$cacheKey])) {
       $sql = "SELECT nid, extra, name
           FROM {$this->_drupalDatabase}.webform_component
