@@ -497,17 +497,24 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
   }
 
-  function getLabels($sql, $separator, $row) {
-    $items = $newArray = $web = array();
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $items = unserialize($dao->extra);
-      $webform[$dao->name] = array_filter(explode("\n", $items['items']));
-    }
-    foreach ($webform as $key => $d) {
-      foreach ($d as $data) {
-        list($k, $v) = explode('|', $data);
-        $web[$k] = array($key, $v);
+  function getLabels($where, $separator, $row) {
+    $newArray = $webform = array();
+    $cacheKey = CRM_Utils_String::munge($where);
+    if (empty(self::$_fieldLabels[$cacheKey])) {
+      $sql = "SELECT nid, extra, name
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE $where AND type = 'select'";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $items = unserialize($dao->extra);
+        $webform[$dao->name] = array_filter(explode("\n", $items['items']));
+      }
+      self::$_fieldLabels[$cacheKey] = array();
+      foreach ($webform as $key => $d) {
+        foreach ($d as $data) {
+          list($k, $v) = explode('|', $data);
+          self::$_fieldLabels[$cacheKey][$k] = array($key, $v);
+        }
       }
     }
     $op = array_filter(explode($separator, $row));
