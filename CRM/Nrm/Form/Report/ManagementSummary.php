@@ -115,8 +115,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT w.data as contact_id 
        FROM {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
-       LEFT JOIN ". PURLS ." p on w.data=p.entity_id
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1) {$engageWhere}
        AND data IS NOT NULL and data <> '' 
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
@@ -134,7 +133,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT contact_id FROM 
        (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid     
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> ''
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
@@ -152,7 +151,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT contact_id FROM 
        (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid      
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid   
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> '' 
        GROUP BY w.sid
@@ -173,6 +172,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        (SELECT w.data as contact_id FROM 
        {$this->_drupalDatabase}.webform_submitted_data w
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid  
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> '' 
        GROUP BY w.sid
