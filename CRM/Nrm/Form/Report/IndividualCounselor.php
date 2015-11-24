@@ -450,7 +450,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
-      $this->vipColumn['civicrm_value_application_7']]['fields'][$dao->column_name] = array(
+      $this->vipColumn['civicrm_value_application_7']['fields'][$dao->column_name] = array(
         'title' => $dao->label,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
         'field_id' => $dao->field_id,
