@@ -515,6 +515,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       if (isset($web[$values])) {
         $newArray[] = $web[$values][0] . ': ' . $web[$values][1];
       }
+      else {
+        $newArray[] = $values;
+      }
+
     }
     return implode('<br/>', $newArray);
   }
@@ -605,11 +609,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'sequential' => 1,
             'id' => $value[1],
           ));
-          $options[$value[1]]= array();
+          $options[$value[1]] = array();
           CRM_Core_BAO_CustomField::buildOption($result, $options[$value[1]]);
-          self::$_customFieldOptions[$value[1]] = $options;
+          self::$_customFieldOptions[$value[1]] = array($result['label'], $options);
         }
-        $tempArray[] = CRM_Core_BAO_CustomField::getDisplayValue($value[0], $value[1], self::$_customFieldOptions[$value[1]]);
+        $tempArray[] = self::$_customFieldOptions[$value[1]][0] . ': ' . CRM_Core_BAO_CustomField::getDisplayValue($value[0], $value[1], self::$_customFieldOptions[$value[1]][1]);
       }
       else {
         $tempArray[] = $value[0];
