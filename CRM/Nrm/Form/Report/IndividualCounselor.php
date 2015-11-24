@@ -450,14 +450,14 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
-      $this->vipColumn[$dao->table_name]['fields'][$dao->column_name] = array(
+      $this->vipColumn['civicrm_value_application_7']]['fields'][$dao->column_name] = array(
         'title' => $dao->label,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
         'field_id' => $dao->field_id,
         'default' => TRUE,
       );
-      $this->vipColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
-      $this->vipColumn[$dao->table_name]['group_title'] = ts('VIP Applications');
+      $this->vipColumn['civicrm_value_application_7']['use_accordian_for_field_selection'] = TRUE;
+      $this->vipColumn['civicrm_value_application_7']['group_title'] = ts('VIP Applications');
     }
     $this->vipTables = implode(' ', $tables);
   }
@@ -473,14 +473,14 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $fieldAlias = 'vgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
       $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
-      $this->visitColumn[$dao->table_name]['fields'][$dao->column_name] = array(
+      $this->visitColumn['civicrm_value_visit_day_support_11']['fields'][$fieldAlias . $dao->column_name] = array(
         'title' => $dao->label,
         'dbAlias' => $fieldAlias . '.' . $dao->column_name,
         'field_id' => $dao->field_id,
         'default' => TRUE,
       );
-      $this->visitColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
-      $this->visitColumn[$dao->table_name]['group_title'] = ts('Visit Day Registrations');
+      $this->visitColumn['civicrm_value_visit_day_support_11']['use_accordian_for_field_selection'] = TRUE;
+      $this->visitColumn['civicrm_value_visit_day_support_11']['group_title'] = ts('Visit Day Registrations');
     }
     $this->visitTables = implode(' ', $tables);
   }
