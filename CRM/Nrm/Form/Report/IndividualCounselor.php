@@ -501,21 +501,19 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $items = $newArray = $web = array();
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
-      $items[$dao->nid] = unserialize($dao->extra);
-      $webform[] = array_filter(explode("\n", $items[$dao->nid]['items']));
+      $items = unserialize($dao->extra);
+      $webform[$dao->name] = array_filter(explode("\n", $items['items']));
     }
-    foreach ($webform as $d) {
+    foreach ($webform as $key => $d) {
       foreach ($d as $data) {
         list($k, $v) = explode('|', $data);
-        $web[$k] = $v;
+        $web[$k] = array($key, $v);
       }
     }
     $op = array_filter(explode($separator, $row));
-    $count = 1;
     foreach($op as $values) {
       if (isset($web[$values])) {
-        $newArray[] = $count . '. ' . $web[$values];
-        $count++;
+        $newArray[] = $web[$values][0] . ': ' . $web[$values][1];
       }
     }
     return implode('<br/>', $newArray);
@@ -535,7 +533,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra
+        $sql = "SELECT nid, extra, name
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg20%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
@@ -545,7 +543,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra
+        $sql = "SELECT nid, extra, name
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg7%' OR form_key LIKE '%cg8%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_vip_application'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_vip_application']);
@@ -555,7 +553,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra
+        $sql = "SELECT nid, extra, name
           FROM {$this->_drupalDatabase}.webform_component
           WHERE form_key LIKE '%cg6%' OR form_key LIKE '%cg11%' AND type = 'select'";
         $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_visit_registration']);
