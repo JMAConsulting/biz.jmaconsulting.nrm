@@ -171,7 +171,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    *
    */ 
-  function createUniqueSid($webFormId, $cid = 2) {
+  public static function createUniqueSid($webFormId, $cid = 2) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $drupalDatabase = $dsnArray['database'];
