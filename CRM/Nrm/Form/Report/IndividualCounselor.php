@@ -17,8 +17,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
   
   public static $_customFieldOptions = array();
-
-  public static $_fieldLabels = array();
  
   function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -172,7 +170,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                 $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
               }
               elseif ($fieldName == GRAD_YEAR) {
-                $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}, '<br/>'))";
+                $select[$field['dbAlias']] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT('{$field['title']}: ', {$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
               }
               elseif (array_key_exists($tableName, $this->infoColumn)) {
                 $this->_infoField = TRUE;
@@ -191,19 +189,19 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
-              $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
               $this->customSurveyField = "CONCAT(" . implode(', ', $surveyFields) . ")";
               $surveyField = "{$this->customSurveyField} as civicrm_contact_survey_response,";
             }
             elseif (array_key_exists($tableName, $this->vipColumn)) {
               $this->_vipField = TRUE;
-              $vipFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              $vipFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
               $this->customVIPField = "CONCAT(" . implode(', ', $vipFields) . ")";
               $vipField = "{$this->customVIPField} as civicrm_contact_vip_application,";
             }
             elseif (array_key_exists($tableName, $this->visitColumn)) {
               $this->_visitField = TRUE;
-              $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
               $this->customVisitField = "CONCAT(" . implode(', ', $visitFields) . ")";
               $visitField = "{$this->customVisitField} as civicrm_contact_visit_registration,";
             }
@@ -499,41 +497,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
   }
 
-  function getLabels($where, $separator, $row) {
-    $newArray = $webform = array();
-    $cacheKey = CRM_Utils_String::munge($where);
-    if (empty(self::$_fieldLabels[$cacheKey])) {
-      $sql = "SELECT nid, extra, name
-          FROM {$this->_drupalDatabase}.webform_component
-          WHERE $where AND type = 'select'";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $items = unserialize($dao->extra);
-        if (CRM_Utils_Array::value('items', $items)) {
-          $webform[$dao->name] = array_filter(explode("\n", $items['items']));
-        }
-      }
-      self::$_fieldLabels[$cacheKey] = array();
-      foreach ($webform as $key => $d) {
-        foreach ($d as $data) {
-          list($k, $v) = explode('|', $data);
-          self::$_fieldLabels[$cacheKey][$k] = array($key, $v);
-        }
-      }
-    }
-    $op = array_filter(explode($separator, $row));
-    foreach($op as $values) {
-      $values = trim($values, CRM_Core_DAO::VALUE_SEPARATOR);
-      if (isset(self::$_fieldLabels[$cacheKey][$values])) {
-        $newArray[] = self::$_fieldLabels[$cacheKey][$values][0] . ': ' . self::$_fieldLabels[$cacheKey][$values][1];
-      }
-      else {
-        $newArray[] = $values;
-      }
-    }
-    return implode('<br/>', $newArray);
-  }
-
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -547,25 +510,19 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        // First retrieve all the components used for surveys
-        $where = "form_key LIKE '%cg20%'";
-        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getCustomFieldDataLabels($row['civicrm_contact_survey_response']);
         $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
         $entryFound = TRUE;
       }
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
-        // First retrieve all the components used for surveys
-        $where = "form_key LIKE '%cg7%' OR form_key LIKE '%cg8%'";
-        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_vip_application']);
+        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getCustomFieldDataLabels($row['civicrm_contact_vip_application']);
         $rows[$rowNum]['civicrm_contact_vip_application'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_vip_application']);
         $entryFound = TRUE;
       }
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
-        // First retrieve all the components used for surveys
-        $where = "form_key LIKE '%cg6%' OR form_key LIKE '%cg11%'";
-        $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_visit_registration']);
+        $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getCustomFieldDataLabels($row['civicrm_contact_visit_registration']);
         $rows[$rowNum]['civicrm_contact_visit_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_visit_registration']);
         $entryFound = TRUE;
       }
