@@ -509,7 +509,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         $items = unserialize($dao->extra);
-        $webform[$dao->name] = array_filter(explode("\n", $items['items']));
+        if (CRM_Utils_Array::value('items', $items)) {
+          $webform[$dao->name] = array_filter(explode("\n", $items['items']));
+        }
       }
       self::$_fieldLabels[$cacheKey] = array();
       foreach ($webform as $key => $d) {
