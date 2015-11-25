@@ -162,7 +162,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
-         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+       ON REPLACE(wn.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%'
        ) as e GROUP BY contact_id
        ) as ue
@@ -183,7 +183,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn 
-       LEFT JOIN civicrm_value_nrmpurls_5 p on wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.chowan2016.com')
+       LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE location LIKE '%files/%'
        ) as e GROUP BY contact_id
        ) as ue
