@@ -17,6 +17,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
   
   public static $_customFieldOptions = array();
+
+  public static $_fieldLabels = array();
  
   function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -497,28 +499,35 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
   }
 
-  function getLabels($sql, $separator, $row) {
-    $items = $newArray = $web = array();
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $items = unserialize($dao->extra);
-      $webform[$dao->name] = array_filter(explode("\n", $items['items']));
-    }
-    foreach ($webform as $key => $d) {
-      foreach ($d as $data) {
-        list($k, $v) = explode('|', $data);
-        $web[$k] = array($key, $v);
+  function getLabels($where, $separator, $row) {
+    $newArray = $webform = array();
+    $cacheKey = CRM_Utils_String::munge($where);
+    if (empty(self::$_fieldLabels[$cacheKey])) {
+      $sql = "SELECT nid, extra, name
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE $where AND type = 'select'";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $items = unserialize($dao->extra);
+        $webform[$dao->name] = array_filter(explode("\n", $items['items']));
+      }
+      self::$_fieldLabels[$cacheKey] = array();
+      foreach ($webform as $key => $d) {
+        foreach ($d as $data) {
+          list($k, $v) = explode('|', $data);
+          self::$_fieldLabels[$cacheKey][$k] = array($key, $v);
+        }
       }
     }
     $op = array_filter(explode($separator, $row));
     foreach($op as $values) {
-      if (isset($web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)])) {
-        $newArray[] = $web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)][0] . ': ' . $web[trim($values, CRM_Core_DAO::VALUE_SEPARATOR)][1];
+      $values = trim($values, CRM_Core_DAO::VALUE_SEPARATOR);
+      if (isset(self::$_fieldLabels[$cacheKey][$values])) {
+        $newArray[] = self::$_fieldLabels[$cacheKey][$values][0] . ': ' . self::$_fieldLabels[$cacheKey][$values][1];
       }
       else {
         $newArray[] = $values;
       }
-
     }
     return implode('<br/>', $newArray);
   }
@@ -537,30 +546,24 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra, name
-          FROM {$this->_drupalDatabase}.webform_component
-          WHERE form_key LIKE '%cg20%' AND type = 'select'";
-        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+        $where = "form_key LIKE '%cg20%'";
+        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_survey_response']);
         $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
         $entryFound = TRUE;
       }
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra, name
-          FROM {$this->_drupalDatabase}.webform_component
-          WHERE form_key LIKE '%cg7%' OR form_key LIKE '%cg8%' AND type = 'select'";
-        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_vip_application']);
+        $where = "form_key LIKE '%cg7%' OR form_key LIKE '%cg8%'";
+        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_vip_application']);
         $rows[$rowNum]['civicrm_contact_vip_application'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_vip_application']);
         $entryFound = TRUE;
       }
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
         // First retrieve all the components used for surveys
-        $sql = "SELECT nid, extra, name
-          FROM {$this->_drupalDatabase}.webform_component
-          WHERE form_key LIKE '%cg6%' OR form_key LIKE '%cg11%' AND type = 'select'";
-        $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getLabels($sql, $separator = '<br/>', $row['civicrm_contact_visit_registration']);
+        $where = "form_key LIKE '%cg6%' OR form_key LIKE '%cg11%'";
+        $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_visit_registration']);
         $rows[$rowNum]['civicrm_contact_visit_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_visit_registration']);
         $entryFound = TRUE;
       }
