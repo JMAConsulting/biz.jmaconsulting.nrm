@@ -17,6 +17,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
   
   public static $_customFieldOptions = array();
+  
+  public static $_fieldLabels = array();
  
   function __construct() {
     $config = CRM_Core_Config::singleton();
