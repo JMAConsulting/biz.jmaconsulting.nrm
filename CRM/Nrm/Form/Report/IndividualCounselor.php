@@ -189,7 +189,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
-              $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
               $this->customSurveyField = "CONCAT(" . implode(', ', $surveyFields) . ")";
               $surveyField = "{$this->customSurveyField} as civicrm_contact_survey_response,";
             }
@@ -510,7 +510,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getCustomFieldDataLabels($row['civicrm_contact_survey_response']);
+        // First retrieve all the components used for surveys
+        $where = "form_key LIKE '%cg20%'";
+        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_survey_response']);
         $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
         $entryFound = TRUE;
       }
@@ -552,6 +554,41 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
         break;
       }
     }
+  }
+
+  function getLabels($where, $separator, $row) {
+    $newArray = $webform = array();
+    $cacheKey = CRM_Utils_String::munge($where);
+    if (empty(self::$_fieldLabels[$cacheKey])) {
+      $sql = "SELECT nid, extra, name
+          FROM {$this->_drupalDatabase}.webform_component
+          WHERE $where AND type = 'select'";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $items = unserialize($dao->extra);
+        if (CRM_Utils_Array::value('items', $items)) {
+          $webform[$dao->name] = array_filter(explode("\n", $items['items']));
+        }
+      }
+      self::$_fieldLabels[$cacheKey] = array();
+      foreach ($webform as $key => $d) {
+        foreach ($d as $data) {
+          list($k, $v) = explode('|', $data);
+          self::$_fieldLabels[$cacheKey][$k] = array($key, $v);
+        }
+      }
+    }
+    $op = array_filter(explode($separator, $row));
+    foreach($op as $values) {
+      $values = trim($values, CRM_Core_DAO::VALUE_SEPARATOR);
+      if (isset(self::$_fieldLabels[$cacheKey][$values])) {
+        $newArray[] = self::$_fieldLabels[$cacheKey][$values][0] . ': ' . self::$_fieldLabels[$cacheKey][$values][1];
+      }
+      else {
+        $newArray[] = $values;
+      }
+    }
+    return implode('<br/>', $newArray);
   }
   
   public static function getCustomFieldDataLabels($data) {
