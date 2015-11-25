@@ -122,8 +122,11 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY w.sid
        UNION
-       SELECT DISTINCT(purl) COLLATE utf8_unicode_ci as download 
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)) as e GROUP BY location) as ue
+       SELECT p.entity_id as download 
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
+         ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.yoteup2016.com')
+       WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       ) as e GROUP BY contact_id) as ue
        ) AS num
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
