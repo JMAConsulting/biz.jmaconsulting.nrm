@@ -266,6 +266,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Test_Optional' => array(
         'title' => 'Test Optional',
+        'columnName' => 'test_alias.label',
       ),
       'Test-Optional_Email_Address' => array(
         'title' => 'Test-Optional Email Address',
@@ -411,6 +412,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       160 => 'enroll',
       171 => 'major',
       208 => 'visa',
+      211 => 'test',
     );
     CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, FALSE, array(), $custom);
   }
