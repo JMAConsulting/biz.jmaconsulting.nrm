@@ -264,6 +264,13 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       'If_yes,_please_explain_2' => array(
         'title' => 'If yes, please explain 2',
       ),
+      'Test_Optional' => array(
+        'title' => 'Test Optional',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
+      ),
+      'Test-Optional_Email_Address' => array(
+        'title' => 'Test-Optional Email Address',
+      ),
       'Date_Taken_(or_planned)' => array(
         'title' => 'Date Taken (or planned)',
       ),
