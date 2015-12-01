@@ -265,7 +265,8 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'If yes, please explain 2',
       ),
       'Test_Optional' => array(
-        'title' => 'Test Optional',
+        'title' => 'Test_Optional',
+        'columnTitle' => 'Test Optional',
         'columnName' => 'test_alias.label',
       ),
       'Test-Optional_Email_Address' => array(
