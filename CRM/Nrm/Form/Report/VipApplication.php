@@ -266,7 +266,6 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Test_Optional' => array(
         'title' => 'Test Optional',
-        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
       'Test-Optional_Email_Address' => array(
         'title' => 'Test-Optional Email Address',
