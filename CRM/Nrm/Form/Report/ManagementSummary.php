@@ -220,6 +220,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
       `location` text NOT NULL COMMENT 'URL of the origin of the event.',
       `timestamp` int(11) NOT NULL DEFAULT '0' COMMENT 'Unix timestamp of when event occurred.',
       `purl` varchar(255) NOT NULL COMMENT 'NRM PURL.',
+      KEY `wid` (`wid`),
       KEY `purl` (`purl`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
     CRM_Core_DAO::executeQuery($wdNrm);
