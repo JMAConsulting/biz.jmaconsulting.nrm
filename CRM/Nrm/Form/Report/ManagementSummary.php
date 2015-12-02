@@ -134,7 +134,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT COUNT(DISTINCT(purl)) AS visit
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) AND purl <> 'yoteup2016.com') AS denom
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) AND purl <> 'chowan2016.com') AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT contact_id FROM 
