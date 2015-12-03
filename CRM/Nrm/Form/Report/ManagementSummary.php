@@ -127,7 +127,6 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
          ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.brevard2016.com')
        WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        ) as e 
-       INNER JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
        GROUP BY contact_id
        ) as ue
        ) AS num
@@ -151,7 +150,6 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
          ON wn.purl COLLATE utf8_unicode_ci = CONCAT(p.purl_145,'.brevard2016.com')
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        ) as e 
-       INNER JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
        GROUP BY contact_id
        ) as ue
        ) AS num
@@ -171,7 +169,6 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
          ON REPLACE(wn.purl, '.brevard2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%'
        ) as e 
-       INNER JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
        GROUP BY contact_id
        ) as ue
        ) AS num
@@ -194,7 +191,6 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.brevard2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE location LIKE '%files/%'
        ) as e 
-       INNER JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
        GROUP BY contact_id
        ) as ue
        ) AS num";
