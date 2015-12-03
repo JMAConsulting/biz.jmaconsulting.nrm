@@ -196,25 +196,24 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
         WHERE form_key = '{$formKey}' AND nid = 71";
-      if (in_array($formKey, array('how_did_you_hear_about_chowan', 'anticipated_academic_enroll_term', 'how_did_you_hear_about_cu_visit_day'))) {
+      if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id', 'how_did_you_hear_about_chowan', 'anticipated_academic_enroll_term', 'how_did_you_hear_about_cu_visit_day'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
         $item = explode('|', $result['items']);
         $flag = TRUE;
+        if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
+          $flag = FALSE;
+          $date = TRUE;
+          $temp = $item;
+          $item = array();
+          $item['dates'] = array_chunk($temp, 2);
+        }
       }
       if ($formKey == 'anticipated_academic_enroll_year') {
         $item = array(
           1 => 2015,
           2 => 2016,
           3 => 2017,
-        );
-        $flag = FALSE;
-      }
-      if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
-        $item = array(
-          "12-7" => 'November 14, 2015',
-          "1-7" => 'October 17, 2015',
-          "11-7" => 'November 14, 2015',
         );
         $flag = FALSE;
       }
@@ -227,8 +226,13 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
         if ($flag) {
           $items = trim(preg_replace('/[0-9]+/', NULL, $items));
         }
-        if ($key != 0) {
+        if ($key != 'dates' && $key != 0) {
           $vals[] = " ('{$key}', '{$items}')";
+        }
+        if ($key == 'dates') {
+          foreach ($items as $k => $v) {
+            $vals[] = " ('{$v[0]}', '{$v[1]}')";
+          } 
         }
       }
       $sql .= implode(',', $vals);
