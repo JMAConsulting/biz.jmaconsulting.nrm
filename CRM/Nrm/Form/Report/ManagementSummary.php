@@ -116,14 +116,24 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         LENGTH(location)
         )) as location
        FROM {$this->_drupalDatabase}.watchdog_nrm
-       GROUP BY location ) as loc
        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND location LIKE '%.yoteup2016.com%' {$urlWhere}
+       GROUP BY location ) as loc
        ) as g
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND location LIKE 'https://yoteup2016.com%' {$urlWhere}
+       FROM
+       ( SELECT 
+       SUBSTR(location, 
+       INSTR(location, '://') + 3, 
+       IF(INSTR(location,'?')>0, 
+        INSTR(location,'?') - INSTR(location, '://') - 3, 
+        LENGTH(location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm
+       WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND location LIKE 'yoteup2016.com%' {$urlWhere}
+       GROUP BY location ) as loc
        ) as h
        UNION
        SELECT 'Applications submitted - yesterday' as description, i.perday_completed as perday_visitor_count FROM
@@ -142,14 +152,22 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         LENGTH(location)
         )) as location
        FROM {$this->_drupalDatabase}.watchdog_nrm
+       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
-       WHERE (1)
-       AND location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as j
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE (1)
-       AND location LIKE 'https://yoteup2016.com%' {$urlWhere}
+       FROM 
+       ( SELECT 
+       SUBSTR(location, 
+       INSTR(location, '://') + 3, 
+       IF(INSTR(location,'?')>0, 
+        INSTR(location,'?') - INSTR(location, '://') - 3, 
+        LENGTH(location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm
+       WHERE location LIKE '%yoteup2016.com%' {$urlWhere}
+       GROUP BY location ) as loc
        ) as k
        UNION
        SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
