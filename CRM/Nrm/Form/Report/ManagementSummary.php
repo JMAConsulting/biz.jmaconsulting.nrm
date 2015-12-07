@@ -70,45 +70,82 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $this->_select = "
        SELECT CONCAT('For ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
        UNION
-       SELECT 'Total unique visitors for the day' as description, perday_visitor as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
+       SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + b.non_purl_perday_visitor) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl<>'brevard2016.com') as a
+       AND purl <> 'brevard2016.com'
+       ) as a
+       JOIN
+       (SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND purl = 'brevard2016.com'
+       ) as b
        UNION
-       SELECT 'Total unique new visitors for the day' as description, perday_visitor as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
+       SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + d.non_purl_perday_visitor) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl<>'brevard2016.com'
+       AND purl <> 'yoteup2016.com'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))) as b
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))
+       ) as c
+       JOIN
+       (SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND purl = 'brevard2016.com'
+       AND (purl) NOT IN (SELECT DISTINCT(purl)
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY)) 
+       ) as d
        UNION
-       SELECT 'Cumulative unique visitors to date' as description, perday_visitor as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'brevard2016.com') as c
+       SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + f.non_purl_perday_visitor) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'brevard2016.com'
+       ) as e
+       JOIN
+       ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl = 'brevard2016.com'
+       ) as f
        UNION
-       SELECT 'Applications started - yesterday' as description, perday_start as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(location)) as perday_start
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) {$urlWhere}) as d
+       SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + h.non_purl_perday_start) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND location LIKE '%.brevard2016.com%' {$urlWhere}
+       ) as g
+       JOIN
+       ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       AND location LIKE 'https://brevard2016.com%' {$urlWhere}
+       ) as h
        UNION
-       SELECT 'Applications submitted - yesterday' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       SELECT 'Applications submitted - yesterday' as description, i.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$appWhere}) as e
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$appWhere}
+       ) as i
        UNION
-       SELECT 'Cumulative applications started to date' as description, SUM(perday_completed) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(location)) as perday_completed
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE (1) {$urlWhere}) as x
+       SELECT 'Cumulative applications started to date' as description, (j.purl_perday_start + k.non_purl_perday_start) as perday_visitor_count FROM
+       ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE (1)
+       AND location LIKE '%.brevard2016.com%' {$urlWhere}
+       ) as j
+       JOIN
+       ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE (1)
+       AND location LIKE 'https://brevard2016.com%' {$urlWhere}
+       ) as k
        UNION
-       SELECT 'Cumulative applications submitted to date' as description, SUM(perday_completed) as perday_visitor_count FROM
+       SELECT 'Cumulative applications submitted to date' as description, l.purl_perday_completed as perday_visitor_count FROM
+       ( SELECT COUNT(nid) as perday_completed, 0 as non_purl_perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}
+       ) as l
+       UNION
+       SELECT 'Total visit registrations - yesterday' as description, m.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}) as f
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}
+       ) as m
        UNION
-       SELECT 'Total visit registrations - yesterday' as description, IF(SUM(perday_completed) IS NULL, 0, SUM(perday_completed)) as perday_visitor_count FROM
+       SELECT 'Cumulative visit registrations submitted to date' as description, n.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE DATE(FROM_UNIXTIME(completed)) = DATE(NOW() - INTERVAL 1 DAY) {$urlVisitSubWhere}) as g
-       UNION
-       SELECT 'Cumulative visit registrations submitted to date' as description, SUM(perday_completed) as perday_visitor_count FROM
-       ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}) as h
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
+       ) as n
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM 
@@ -133,7 +170,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT COUNT(DISTINCT(purl)) AS visit
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY) AND purl <> 'brevard2016.com') AS denom
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT contact_id FROM 
@@ -174,7 +212,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ) AS num
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT COUNT(DISTINCT(purl)) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'brevard2016.com') AS denom
+       (SELECT COUNT(DISTINCT(purl)) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+       ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
        (SELECT contact_id FROM 
