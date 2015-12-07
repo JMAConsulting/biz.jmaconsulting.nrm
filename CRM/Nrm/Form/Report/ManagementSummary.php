@@ -132,8 +132,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND location LIKE 'https://brevard2016.com%' {$urlWhere}
        ) as k
        UNION
-       SELECT 'Cumulative applications submitted to date' as description, l.purl_perday_completed as perday_visitor_count FROM
-       ( SELECT COUNT(nid) as perday_completed, 0 as non_purl_perday_completed
+       SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
+       ( SELECT COUNT(nid) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}
        ) as l
        UNION
