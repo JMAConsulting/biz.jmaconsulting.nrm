@@ -129,7 +129,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        IF(INSTR(location,'?')>0, 
         INSTR(location,'?') - INSTR(location, '://') - 3, 
         LENGTH(location)
-        )) as location
+        )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND location LIKE 'brevard2016.com%' {$urlWhere}
@@ -164,7 +164,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        IF(INSTR(location,'?')>0, 
         INSTR(location,'?') - INSTR(location, '://') - 3, 
         LENGTH(location)
-        )) as location
+        )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE location LIKE 'brevard2016.com%' {$urlWhere}
        GROUP BY location ) as loc
