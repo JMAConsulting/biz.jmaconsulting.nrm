@@ -106,8 +106,18 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ) as f
        UNION
        SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + h.non_purl_perday_start) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       ( SELECT COUNT(DISTINCT(loc.location)) as purl_perday_start
+       FROM
+       ( SELECT 
+       SUBSTR(location, 
+       INSTR(location, '://') + 3, 
+       IF(INSTR(location,'?')>0, 
+        INSTR(location,'?') - INSTR(location, '://') - 3, 
+        LENGTH(location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm
+       GROUP BY location ) as loc
+       WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND location LIKE '%.chowan2016.com%' {$urlWhere}
        ) as g
        JOIN
@@ -123,7 +133,17 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative applications started to date' as description, (j.purl_perday_start + k.non_purl_perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE (1)
+       FROM
+       ( SELECT 
+       SUBSTR(location, 
+       INSTR(location, '://') + 3, 
+       IF(INSTR(location,'?')>0, 
+        INSTR(location,'?') - INSTR(location, '://') - 3, 
+        LENGTH(location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm
+       GROUP BY location ) as loc
+       WHERE (1)
        AND location LIKE '%.chowan2016.com%' {$urlWhere}
        ) as j
        JOIN
