@@ -117,8 +117,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         )) as location
        FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND location LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
+       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as g
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
@@ -132,8 +132,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND location LIKE 'yoteup2016.com%' AND location NOT LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
+       WHERE location LIKE 'yoteup2016.com%' {$urlWhere}
        ) as h
        UNION
        SELECT 'Applications submitted - yesterday' as description, i.perday_completed as perday_visitor_count FROM
@@ -152,8 +152,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         LENGTH(location)
         )) as location
        FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
+       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as j
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
@@ -166,8 +166,8 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         LENGTH(location)
         )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE location LIKE '%yoteup2016.com%' AND location NOT LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
+       WHERE location LIKE 'yoteup2016.com%' {$urlWhere}
        ) as k
        UNION
        SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
