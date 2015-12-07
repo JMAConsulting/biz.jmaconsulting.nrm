@@ -132,7 +132,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND location LIKE 'yoteup2016.com%' {$urlWhere}
+       AND location LIKE 'yoteup2016.com%' AND location NOT LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
        ) as h
        UNION
@@ -166,7 +166,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         LENGTH(location)
         )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE location LIKE '%yoteup2016.com%' {$urlWhere}
+       WHERE location LIKE '%yoteup2016.com%' AND location NOT LIKE '%.yoteup2016.com%' {$urlWhere}
        GROUP BY location ) as loc
        ) as k
        UNION
