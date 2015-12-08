@@ -263,10 +263,10 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY w.sid
        UNION
-       SELECT p.entity_id as download 
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn 
+       SELECT p.entity_id as download
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn
        LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.brevard2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY)
+       WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
        ) as e 
        GROUP BY contact_id
        ) as ue
