@@ -613,6 +613,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       'contact_sub_type' => 'Counselors',
       'return.email' => 1,
       'return.custom_' . TERRITORY_COUNSELOR => 1,
+      'return.display_name' => 1,
       'rowCount' => $counsellorCount,
     );
     $counselors = civicrm_api3('Contact', 'get', $counselorParams);
