@@ -29,7 +29,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     self::createInfoRequest();
     self::createVIPApp();
     self::createVisitDay();
-    self::getCounsellors();
+    $counsellors = self::getCounsellors();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -51,7 +51,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'title' => ts('Counsellor Name'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->counsellors,
+            'options' => $counsellors,
           ),
           'id' => array(
             'title' => ts('Contact ID'),
@@ -607,6 +607,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   }
   
   public static function getCounsellors() {
+    $counsellors = array();
     $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
     $counselorParams = array(
       'contact_sub_type' => 'Counselors',
@@ -619,10 +620,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $counselors = $counselors['values'];
       foreach ($counselors as $key => $value) {
         if (!empty($value['custom_' . TERRITORY_COUNSELOR])) {
-          $this->counsellors['contact_id'] = $value['display_name'];
+          $counsellors['contact_id'] = $value['display_name'];
         }
       }
     }
+    return $counsellors;
   }
   
   public static function getCustomFieldDataLabels($data) {
