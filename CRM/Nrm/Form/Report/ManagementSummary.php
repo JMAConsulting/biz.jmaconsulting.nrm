@@ -97,12 +97,12 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ) as d
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + f.non_purl_perday_visitor) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'yoteup2016.com'
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor 
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'yoteup2016.com' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY) 
        ) as e
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl = 'yoteup2016.com'
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl = 'yoteup2016.com' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY) 
        ) as f
        UNION
        SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + h.non_purl_perday_start) as perday_visitor_count FROM
@@ -151,7 +151,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         INSTR(location,'?') - INSTR(location, '://') - 3, 
         LENGTH(location)
         )) as location
-       FROM {$this->_drupalDatabase}.watchdog_nrm
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as j
@@ -165,14 +165,14 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         INSTR(location,'?') - INSTR(location, '://') - 3, 
         LENGTH(location)
         )) as location, timestamp
-       FROM {$this->_drupalDatabase}.watchdog_nrm
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY location ) as loc
        WHERE location LIKE 'yoteup2016.com%' {$urlWhere}
        ) as k
        UNION
        SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere}
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$appWhere} AND DATE(FROM_UNIXTIME(completed)) <= DATE(NOW() - INTERVAL 1 DAY)
        ) as l
        UNION
        SELECT 'Total visit registrations - yesterday' as description, m.perday_completed as perday_visitor_count FROM
@@ -182,7 +182,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative visit registrations submitted to date' as description, n.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(nid) as perday_completed
-       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere}
+       FROM {$this->_drupalDatabase}.webform_submissions WHERE (1) {$urlVisitSubWhere} AND DATE(FROM_UNIXTIME(completed)) <= DATE(NOW() - INTERVAL 1 DAY)
        ) as n
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
@@ -237,13 +237,13 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid   
        WHERE (1) {$engageWhere}
-       AND w.data IS NOT NULL and w.data <> '' 
+       AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY) 
        GROUP BY w.sid
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p 
        ON REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE wn.location LIKE '%files/%'
+       WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY) 
        ) as e 
        GROUP BY contact_id
        ) as ue
@@ -260,13 +260,13 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid  
        WHERE (1) {$engageWhere}
-       AND w.data IS NOT NULL and w.data <> '' 
+       AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY)
        GROUP BY w.sid
        UNION
        SELECT p.entity_id as download 
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn 
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn
        LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE location LIKE '%files/%'
+       WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY)
        ) as e 
        GROUP BY contact_id
        ) as ue
