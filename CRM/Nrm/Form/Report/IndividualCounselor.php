@@ -48,7 +48,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'operator' => 'like',
           ),
           'counsellor' => array(
-            'title' => ts('Counsellor Name'),
+            'title' => ts('Counsellor'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $counsellors,
@@ -621,7 +621,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $counselors = $counselors['values'];
       foreach ($counselors as $key => $value) {
         if (!empty($value['custom_' . TERRITORY_COUNSELOR])) {
-          $counsellors['contact_id'] = $value['display_name'];
+          $counsellors[$value['contact_id']] = $value['display_name'];
         }
       }
     }
