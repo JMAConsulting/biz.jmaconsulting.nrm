@@ -1,5 +1,6 @@
 <?php
-define('TERRITORY_COUNSELOR', 459);
+
+require_once 'nrm_constants.php';
 
 /**
  * YoteUp ProcessCounselor API
