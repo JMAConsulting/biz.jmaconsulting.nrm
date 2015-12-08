@@ -29,6 +29,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     self::createInfoRequest();
     self::createVIPApp();
     self::createVisitDay();
+    self::getCounsellors();
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -45,6 +46,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           'display_name' => array(
             'title' => ts('Student Name'),
             'operator' => 'like',
+          ),
+          'counsellor' => array(
+            'title' => ts('Counsellor Name'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->counsellors,
           ),
           'id' => array(
             'title' => ts('Contact ID'),
@@ -306,6 +313,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
           else {
+            if ($fieldName == 'counsellor') {
+              continue;
+            }
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
               $clause = $this->whereClause($field,
@@ -324,9 +334,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
     }
     
-    if (isset($_GET['counsellor_id_value'])) {
+    if (($counsellor = CRM_Utils_Array::value("counsellor_value", $this->_params)) || $counsellor = $_GET['counsellor_id_value']) {
+      if (is_array($counsellor)) {
+        $counsellor = implode(',', $counsellor);
+      }
       $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t27.admissions_territory_446, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
-        FROM civicrm_value_territory_27 t27 WHERE t27.entity_id = " . $_GET['counsellor_id_value']);
+        FROM civicrm_value_territory_27 t27 WHERE t27.entity_id IN (" . $counsellor . ")");
       $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
     }
 
@@ -591,6 +604,25 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
     }
     return implode('<br/>', $newArray);
+  }
+  
+  public static function getCounsellors() {
+    $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
+    $counselorParams = array(
+      'contact_sub_type' => 'Counselors',
+      'return.email' => 1,
+      'return.custom_' . TERRITORY_COUNSELOR => 1,
+      'rowCount' => $counsellorCount,
+    );
+    $counselors = civicrm_api3('Contact', 'get', $counselorParams);
+    if ($counselors['count'] >= 1) {
+      $counselors = $counselors['values'];
+      foreach ($counselors as $key => $value) {
+        if (!empty($value['custom_' . TERRITORY_COUNSELOR])) {
+          $this->counsellors['contact_id'] = $value['display_name'];
+        }
+      }
+    }
   }
   
   public static function getCustomFieldDataLabels($data) {
