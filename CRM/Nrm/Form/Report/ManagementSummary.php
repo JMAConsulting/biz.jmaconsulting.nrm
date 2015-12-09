@@ -68,9 +68,9 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
 
-    $visitCountDaily = self::getVisitCount('yesterday');
-    $visitCountUnique = self::getVisitCount('unique_yesterday');
-    $visitCountCumulative = self::getVisitCount('cumulative');
+    $visitCountDaily = $this->getVisitCount('yesterday');
+    $visitCountUnique = $this->getVisitCount('unique_yesterday');
+    $visitCountCumulative = $this->getVisitCount('cumulative');
 
     $this->_select = "
        SELECT CONCAT('For ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
@@ -400,7 +400,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     return CRM_Core_DAO::executeQuery($sql);
   }
   
-  public static function getVisitCount($dateWhere) {
+  function getVisitCount($dateWhere) {
     $subQuery = '';
     switch ($dateWhere) {
       case 'yesterday':
