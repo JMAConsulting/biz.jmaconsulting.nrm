@@ -67,43 +67,32 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
 
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
+
+    $visitCountDaily = self::getVisitCount('yesterday');
+    $visitCountUnique = self::getVisitCount('unique_yesterday');
+    $visitCountCumulative = self::getVisitCount('cumulative');
+
     $this->_select = "
        SELECT CONCAT('For ', DAYNAME(DATE_ADD(CURDATE(),INTERVAL -1 DAY)), ', ', DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL -1 DAY), '%m/%d/%Y')) as description, '' as perday_visitor_count
        UNION
-       SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + b.non_purl_perday_visitor) as perday_visitor_count FROM
+       SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND purl <> 'chowan2016.com'
        ) as a
-       JOIN
-       (SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl = 'chowan2016.com'
-       ) as b
        UNION
-       SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + d.non_purl_perday_visitor) as perday_visitor_count FROM
+       SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
        AND purl <> 'chowan2016.com'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY))
        ) as c
-       JOIN
-       (SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       AND purl = 'chowan2016.com'
-       AND (purl) NOT IN (SELECT DISTINCT(purl)
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < DATE(NOW() - INTERVAL 1 DAY)) 
-       ) as d
        UNION
-       SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + f.non_purl_perday_visitor) as perday_visitor_count FROM
+       SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'chowan2016.com' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY) 
        ) as e
-       JOIN
-       ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_visitor  
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2016.com' AND DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
-       ) as f
        UNION
        SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + h.non_purl_perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
@@ -409,6 +398,45 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
             WHERE n.wid IS NULL;";
             
     return CRM_Core_DAO::executeQuery($sql);
+  }
+  
+  public static function getVisitCount($dateWhere) {
+    $subQuery = '';
+    switch ($dateWhere) {
+      case 'yesterday':
+        $date = "DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+        break;
+      case 'unique_yesterday':
+        $date = "DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY)";
+        $subQuery = "AND w.data NOT IN (SELECT wsub.data from {$this->_drupalDatabase}.webform_submitted_data wsub 
+          INNER JOIN {$this->_drupalDatabase}.webform_component csub ON csub.cid = wsub.cid AND csub.name = 'Contact ID' AND wsub.nid = csub.nid 
+          INNER JOIN {$this->_drupalDatabase}.webform_submissions wssub ON wssub.nid = wsub.nid AND wsub.sid = wssub.sid   
+          WHERE wsub.data IS NOT NULL and wsub.data <> '' AND DATE(FROM_UNIXTIME(wssub.completed)) < DATE(NOW() - INTERVAL 1 DAY)
+          GROUP BY wsub.sid)";
+        break;
+      case 'cumulative':
+        $date = "DATE(FROM_UNIXTIME(ws.completed)) <= DATE(NOW() - INTERVAL 1 DAY)";
+        break;
+        
+    default:
+        break;
+    }
+    // Number of non purl visits 
+    $sql = "SELECT COUNT(*) as visitcount FROM 
+       (SELECT contact_id FROM 
+       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid   
+       WHERE (1)
+       AND w.data IS NOT NULL and w.data <> '' AND {$date} 
+       {$subQuery}
+       GROUP BY w.sid
+       ) as e 
+       LEFT JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
+       WHERE cp.entity_id IS NULL
+       GROUP BY contact_id
+       ) as ue";
+    return CRM_Core_DAO::singleValueQuery($sql);
   }
   
   function alterDisplay(&$rows) {
