@@ -147,7 +147,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ( SELECT
        SUBSTR(sub.location, 
        INSTR(sub.location, '://') + 3, 
-       IF(sub.INSTR(location,'?')>0, 
+       IF(INSTR(sub.location,'?')>0, 
         INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
         LENGTH(sub.location)
         )) as location, timestamp
