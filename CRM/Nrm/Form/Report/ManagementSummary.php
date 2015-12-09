@@ -106,33 +106,33 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        ) as f
        UNION
        SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + h.non_purl_perday_start) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(loc.location)) as purl_perday_start
+       ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
-       ( SELECT 
-       SUBSTR(location, 
-       INSTR(location, '://') + 3, 
-       IF(INSTR(location,'?')>0, 
-        INSTR(location,'?') - INSTR(location, '://') - 3, 
-        LENGTH(location)
-        )) as location
-       FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       GROUP BY location ) as loc
+       ( SELECT
+       SUBSTR(sub.location, 
+       INSTR(sub.location, '://') + 3, 
+       IF(INSTR(sub.location,'?')>0, 
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+        LENGTH(sub.location)
+        )) as location, timestamp 
+       FROM {$this->_drupalDatabase}.watchdog_nrm sub
+       WHERE DATE(FROM_UNIXTIME(sub.timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY sub.location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as g
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
        FROM
        ( SELECT 
-       SUBSTR(location, 
-       INSTR(location, '://') + 3, 
-       IF(INSTR(location,'?')>0, 
-        INSTR(location,'?') - INSTR(location, '://') - 3, 
-        LENGTH(location)
+       SUBSTR(sub.location, 
+       INSTR(sub.location, '://') + 3, 
+       IF(INSTR(sub.location,'?')>0, 
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+        LENGTH(sub.location)
         )) as location, timestamp
-       FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
-       GROUP BY location ) as loc
+       FROM {$this->_drupalDatabase}.watchdog_nrm sub
+       WHERE DATE(FROM_UNIXTIME(sub.timestamp)) = DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY sub.location ) as loc
        WHERE location LIKE 'yoteup2016.com%' {$urlWhere}
        ) as h
        UNION
@@ -144,29 +144,31 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Cumulative applications started to date' as description, (j.purl_perday_start + k.non_purl_perday_start) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
-       ( SELECT 
-       SUBSTR(location, 
-       INSTR(location, '://') + 3, 
-       IF(INSTR(location,'?')>0, 
-        INSTR(location,'?') - INSTR(location, '://') - 3, 
-        LENGTH(location)
-        )) as location
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
-       GROUP BY location ) as loc
+       ( SELECT
+       SUBSTR(sub.location, 
+       INSTR(sub.location, '://') + 3, 
+       IF(sub.INSTR(location,'?')>0, 
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+        LENGTH(sub.location)
+        )) as location, timestamp
+       FROM {$this->_drupalDatabase}.watchdog_nrm sub
+       WHERE DATE(FROM_UNIXTIME(sub.timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY sub.location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as j
        JOIN
        ( SELECT COUNT(DISTINCT(timestamp)) as non_purl_perday_start
        FROM 
        ( SELECT 
-       SUBSTR(location, 
-       INSTR(location, '://') + 3, 
-       IF(INSTR(location,'?')>0, 
-        INSTR(location,'?') - INSTR(location, '://') - 3, 
-        LENGTH(location)
+       SUBSTR(sub.location, 
+       INSTR(sub.location, '://') + 3, 
+       IF(INSTR(sub.location,'?')>0, 
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+        LENGTH(sub.location)
         )) as location, timestamp
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
-       GROUP BY location ) as loc
+       FROM {$this->_drupalDatabase}.watchdog_nrm sub
+       WHERE DATE(FROM_UNIXTIME(sub.timestamp)) <= DATE(NOW() - INTERVAL 1 DAY)
+       GROUP BY sub.location ) as loc
        WHERE location LIKE 'yoteup2016.com%' {$urlWhere}
        ) as k
        UNION
