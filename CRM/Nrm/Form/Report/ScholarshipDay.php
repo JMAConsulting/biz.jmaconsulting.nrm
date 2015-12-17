@@ -35,7 +35,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
     $columns =  array(
       'Which_Scholarship_Day_will_you_be_attending?' => array(
         'title' => 'Which Scholarship Day will you be attending?',
-        'columnName' => 'civicrm_1_participant_1_participant_event_id_alias.name',
+        'columnName' => 'disabled_1_participant_1_participant_event_id_alias.name',
       ),
       'First_Name' => array(
         'title' => 'First Name',
@@ -60,7 +60,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
         'columnName' => 'pt1.label',
       ),
       'Secondary_Phone_Number' => array(
-        'title' => 'Secondary Phone',
+        'title' => 'Secondary Phone Number',
       ),
       'Secondary_Phone_Type' => array(
         'title' => 'Secondary Phone Type',
@@ -125,7 +125,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       159 => 'athletics',
       158 => 'extra',
     );
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('civicrm_1_participant_1_participant_event_id'), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('disabled_1_participant_1_participant_event_id'), $custom);
   }
 
   function where() {
@@ -145,7 +145,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
     $this->beginPostProcess();
     
     $formKeys = array(
-      'civicrm_1_participant_1_participant_event_id',
+      'disabled_1_participant_1_participant_event_id',
     );
     self::createWebformTemp($formKeys);
 
@@ -168,12 +168,12 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
         WHERE form_key = '{$formKey}' AND nid = 277";
-      if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
+      if (in_array($formKey, array('disabled_1_participant_1_participant_event_id'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
         $item = explode('|', $result['items']);
         $flag = TRUE;
-        if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
+        if ($formKey == 'disabled_1_participant_1_participant_event_id') {
           $flag = FALSE;
           $date = TRUE;
           $temp = $item;
