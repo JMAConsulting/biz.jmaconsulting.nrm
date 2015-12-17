@@ -129,7 +129,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 277);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 277, 16);
   }
 
   function groupBy() {
