@@ -115,7 +115,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'chowan2016.com'
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'brevard2016.com'
        AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e
        UNION
