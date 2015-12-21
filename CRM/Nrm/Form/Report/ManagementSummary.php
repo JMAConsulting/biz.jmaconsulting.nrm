@@ -67,11 +67,14 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $relative = CRM_Utils_Array::value("date_relative", $this->_params);
     $from = CRM_Utils_Array::value("date_from", $this->_params);
     $to = CRM_Utils_Array::value("date_to", $this->_params);
-    list($from, $to) = CRM_Report_Form::getFromTo($relative, $from, $to);
-    $from = date('Y-m-d', strtotime($from));
-    $to = date('Y-m-d', strtotime($to));
-    if (empty($from) && empty($to)) {
-      $from = $to = date('Y-m-d', strtotime("-1 days")); // Set date to yesterday if no filter selected.
+    if (empty($relative) && empty($from) && empty($to)) {
+      // Set date to yesterday if no filter selected.
+      $from = $to = date('Y-m-d', strtotime("-1 days")); 
+    }
+    else {
+      list($from, $to) = CRM_Report_Form::getFromTo($relative, $from, $to);
+      $from = date('Y-m-d', strtotime($from));
+      $to = date('Y-m-d', strtotime($to));
     }
     $dateName = "For " . date('l, m/d/Y', strtotime($from));
     if ($from != $to) {
@@ -113,7 +116,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'chowan2016.com'
-       AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e
        UNION
        SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + {$applicationCountDaily}) as perday_visitor_count FROM
