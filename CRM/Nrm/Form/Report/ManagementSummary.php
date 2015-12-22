@@ -133,6 +133,16 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        WHERE DATE(FROM_UNIXTIME(sub.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(sub.timestamp)) <= '{$to}'
        GROUP BY sub.location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
+       AND location NOT IN (SELECT
+       SUBSTR(wn.location,
+       INSTR(wn.location, '://') + 3,
+       IF(INSTR(wn.location,'?')>0,
+        INSTR(wn.location,'?') - INSTR(wn.location, '://') - 3,
+        LENGTH(wn.location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn
+       WHERE DATE(FROM_UNIXTIME(wn.timestamp)) < '{$from}'
+       )
        ) as g
        UNION
        SELECT 'Applications submitted - yesterday' as description, i.perday_completed as perday_visitor_count FROM
@@ -154,6 +164,16 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        WHERE DATE(FROM_UNIXTIME(sub.timestamp)) <= '{$from}'
        GROUP BY sub.location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
+       AND location NOT IN (SELECT
+       SUBSTR(wn.location,
+       INSTR(wn.location, '://') + 3,
+       IF(INSTR(wn.location,'?')>0,
+        INSTR(wn.location,'?') - INSTR(wn.location, '://') - 3,
+        LENGTH(wn.location)
+        )) as location
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn
+       WHERE DATE(FROM_UNIXTIME(wn.timestamp)) < '{$from}'
+       )
        ) as j
        UNION
        SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
