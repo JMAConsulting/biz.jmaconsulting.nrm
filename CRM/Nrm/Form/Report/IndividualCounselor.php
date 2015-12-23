@@ -208,7 +208,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_last_visit') {
               $this->_visitedField = TRUE;
-              $logSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+              $vistedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
@@ -240,6 +240,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
+      {$visitedSelect}
       {$surveyField}
       {$vipField}
       {$visitField}
