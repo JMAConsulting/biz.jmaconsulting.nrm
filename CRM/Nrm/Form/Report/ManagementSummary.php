@@ -119,7 +119,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e
        UNION
-       SELECT 'Applications started - yesterday' as description, (g.purl_perday_start + {$applicationCountDaily}) as perday_visitor_count FROM
+       SELECT 'Application page visits - yesterday' as description, (g.purl_perday_start + {$applicationCountDaily}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
        ( SELECT
@@ -150,7 +150,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.webform_submissions w WHERE DATE(FROM_UNIXTIME(w.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}' {$appWhere}
        ) as i
        UNION
-       SELECT 'Cumulative applications started to date' as description, (j.purl_perday_start + {$applicationCountCumulative}) as perday_visitor_count FROM
+       SELECT 'Cumulative application page visits to date' as description, (j.purl_perday_start + {$applicationCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
        ( SELECT
