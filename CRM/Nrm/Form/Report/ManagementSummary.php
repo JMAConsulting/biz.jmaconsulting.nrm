@@ -317,7 +317,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
     CRM_Core_DAO::executeQuery($wdNrm);
     
-    $this->updateWatchdog_nrm();
+    self::updateWatchdog_nrm();
     
     $sql = $this->buildQuery(FALSE);
 
