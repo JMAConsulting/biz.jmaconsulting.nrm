@@ -414,7 +414,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
         $date = " DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}' ";
         break;
       case 'unique_yesterday':
-        $date = " DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) ";
+        $date = " DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}' ";
         $subQuery = " AND w.data NOT IN (SELECT DISTINCT(wsub.data) from {$this->_drupalDatabase}.webform_submitted_data wsub 
           INNER JOIN {$this->_drupalDatabase}.webform_component csub ON csub.cid = wsub.cid AND csub.name = 'Contact ID' AND wsub.nid = csub.nid 
           INNER JOIN {$this->_drupalDatabase}.webform_submissions wssub ON wssub.nid = wsub.nid AND wsub.sid = wssub.sid   
