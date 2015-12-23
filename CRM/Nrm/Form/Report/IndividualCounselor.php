@@ -207,7 +207,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $logSelect = "DATE_FORMAT(MAX({$field['dbAlias']}), '%m/%d/%Y') as civicrm_contact_last_update,";
             }
             elseif ($tableName == 'civicrm_last_visit') {
-              $this->_visitField = TRUE;
+              $this->_visitedField = TRUE;
               $logSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
@@ -310,7 +310,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                            {$this->_aliases['civicrm_log']}.entity_id AND
                            {$this->_aliases['civicrm_log']}.entity_table = 'civicrm_contact'\n";
     }
-    if ($this->_visitField) {
+    if ($this->_visitedField) {
       $this->_from .= "
               INNER JOIN {$this->_drupalDatabase}.webform_submitted_data wsd
                         ON wsd.data = {$this->_aliases['civicrm_contact']}.id
