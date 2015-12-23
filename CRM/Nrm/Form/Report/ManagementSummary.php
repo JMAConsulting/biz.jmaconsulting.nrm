@@ -407,7 +407,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query, in this case no records
    */
-  function updateWatchdog_nrm() {
+  public static function updateWatchdog_nrm() {
     $sql = "INSERT INTO {$this->_drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
             SELECT w.wid, w.location, w.timestamp, 
             SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
