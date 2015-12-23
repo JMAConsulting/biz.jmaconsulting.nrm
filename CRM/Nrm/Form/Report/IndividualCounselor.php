@@ -130,6 +130,16 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
+      'civicrm_last_visit' => array(
+        'dao' => 'CRM_Core_DAO_Log',
+        'fields' => array(
+          'completed' => array(
+            'title' => ts('Last Visited'),
+            'default' => TRUE,
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
     );
     $this->_columns = array_merge($this->_columns, $this->surveyColumn);
     $this->_columns = array_merge($this->_columns, $this->infoColumn);
@@ -197,8 +207,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $logSelect = "DATE_FORMAT(MAX({$field['dbAlias']}), '%m/%d/%Y') as civicrm_contact_last_update,";
             }
             elseif ($tableName == 'civicrm_last_visit') {
-              $this->_visitedField = TRUE;
-              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(cvt.visit_time)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+              $this->_visitField = TRUE;
+              $logSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
@@ -245,6 +255,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   }
 
   function from() {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $this->_drupalDatabase = $dsnArray['database'];
+
     $this->_from = NULL;
 
     $this->_from = "
@@ -295,11 +309,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                            {$this->_aliases['civicrm_log']}.entity_id AND
                            {$this->_aliases['civicrm_log']}.entity_table = 'civicrm_contact'\n";
     }
-    if ($this->_visitedField) {
+    if ($this->_visitField) {
       $this->_from .= "
-              LEFT JOIN civicrm_visit_times cvt 
-                        ON {$this->_aliases['civicrm_contact']}.id =
-                           cvt.contact_id\n";   
+              INNER JOIN {$this->_drupalDatabase}.webform_submitted_data wsd
+                        ON wsd.data = {$this->_aliases['civicrm_contact']}.id
+              INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND c.name = 'Contact ID' and wsd.nid = c.nid
+              INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = wsd.nid AND wsd.sid = ws.sid\n";   
     }
     //used when log field is selected
     if ($this->_customNRMField) {
