@@ -400,6 +400,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    CRM_Nrm_Form_Report_ManagementSummary::updateWatchdog_nrm();
     self::createTemp();
     $sql = $this->buildQuery(TRUE);
 
@@ -418,11 +419,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
               DATE_FORMAT(DATE(FROM_UNIXTIME(MIN(timestamp))),'%m/%d/%Y') as first_visit
-              FROM {$this->_drupalDatabase}.watchdog 
+              FROM {$this->_drupalDatabase}.watchdog_nrm
               GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)
               ) AS w INNER JOIN (
               SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl 
-              FROM {$this->_drupalDatabase}.watchdog 
+              FROM {$this->_drupalDatabase}.watchdog_nrm
               WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
             ON w.purl=wy.purl";
     $dao = CRM_Core_DAO::executeQuery($sql);
