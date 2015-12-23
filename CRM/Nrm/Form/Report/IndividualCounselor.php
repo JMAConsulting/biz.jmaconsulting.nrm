@@ -208,7 +208,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_last_visit') {
               $this->_visitedField = TRUE;
-              $vistedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
@@ -248,8 +248,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
-    $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
-    $this->_columnHeaders["civicrm_contact_last_visited"]['title'] = ts('Last Visited');
+    if ($this->_logField) {
+      $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
+    }
+    if ($this->_visitedField) {
+      $this->_columnHeaders["civicrm_contact_last_visited"]['title'] = ts('Last Visited');
+    }
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
     $this->_columnHeaders["civicrm_contact_vip_application"]['title'] = ts('VIP Applications');
