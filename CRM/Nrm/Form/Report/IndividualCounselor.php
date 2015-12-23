@@ -248,6 +248,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
+    $this->_columnHeaders["civicrm_contact_last_visited"]['title'] = ts('Last Visited');
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
     $this->_columnHeaders["civicrm_contact_vip_application"]['title'] = ts('VIP Applications');
