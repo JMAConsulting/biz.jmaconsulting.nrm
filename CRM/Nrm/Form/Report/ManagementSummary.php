@@ -317,7 +317,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
     CRM_Core_DAO::executeQuery($wdNrm);
     
-    self::updateWatchdog_nrm();
+    self::updateWatchdog_nrm($this->_drupalDatabase);
     
     $sql = $this->buildQuery(FALSE);
 
@@ -407,12 +407,12 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query, in this case no records
    */
-  public static function updateWatchdog_nrm() {
-    $sql = "INSERT INTO {$this->_drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
+  public static function updateWatchdog_nrm($drupalDatabase) {
+    $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
             SELECT w.wid, w.location, w.timestamp, 
             SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
-            FROM {$this->_drupalDatabase}.watchdog w 
-            LEFT JOIN {$this->_drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
+            FROM {$drupalDatabase}.watchdog w 
+            LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
             WHERE n.wid IS NULL;";
             
     return CRM_Core_DAO::executeQuery($sql);
