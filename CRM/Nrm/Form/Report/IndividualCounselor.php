@@ -449,7 +449,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
       WHERE w.purl <> 'chowan2016.com'
-      AND p.entity_id = contact_civireport.id
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
