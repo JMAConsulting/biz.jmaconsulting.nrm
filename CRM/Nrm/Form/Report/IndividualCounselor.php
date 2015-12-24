@@ -196,6 +196,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $this->_logField = TRUE;
               $logSelect = "DATE_FORMAT(MAX({$field['dbAlias']}), '%m/%d/%Y') as civicrm_contact_last_update,";
             }
+            elseif ($tableName == 'civicrm_last_visit') {
+              $this->_visitedField = TRUE;
+              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(cvt.visit_time)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+            }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
               $surveyFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
@@ -291,6 +295,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                            {$this->_aliases['civicrm_log']}.entity_id AND
                            {$this->_aliases['civicrm_log']}.entity_table = 'civicrm_contact'\n";
     }
+    if ($this->_visitedField) {
+      $this->_from .= "
+              LEFT JOIN civicrm_visit_times cvt 
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           cvt.contact_id\n";   
+    }
     //used when log field is selected
     if ($this->_customNRMField) {
       $this->_from .= "
@@ -380,6 +390,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->endPostProcess($rows);
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_a");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_b");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_visit_times");
   }
   
   function createTemp() {
@@ -405,6 +416,22 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_unicode_ci";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS 
+      SELECT wsd.data as contact_id, ws.completed as visit_time
+      FROM {$this->_drupalDatabase}.webform_submitted_data wsd    
+      INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND c.name = 'Contact ID' and wsd.nid = c.nid
+      INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = wsd.nid AND wsd.sid = ws.sid
+      WHERE wsd.data = contact_civireport.id
+      GROUP BY wsd.sid
+      UNION
+      SELECT p.entity_id as contact_id, w.timestamp as visit_time
+      FROM {$this->_drupalDatabase}.watchdog_nrm w
+      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
+      WHERE w.purl <> 'chowan2016.com'
+      AND p.entity_id = contact_civireport.id
+      GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
   
