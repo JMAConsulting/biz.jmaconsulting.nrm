@@ -208,7 +208,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_last_visit') {
               $this->_visitedField = TRUE;
-              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(ws.completed)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(cvt.visit_time)), '%m/%d/%Y') as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
@@ -317,10 +317,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
     if ($this->_visitedField) {
       $this->_from .= "
-              INNER JOIN {$this->_drupalDatabase}.webform_submitted_data wsd
-                        ON wsd.data = {$this->_aliases['civicrm_contact']}.id
-              INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND c.name = 'Contact ID' and wsd.nid = c.nid
-              INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = wsd.nid AND wsd.sid = ws.sid\n";   
+              LEFT JOIN civicrm_visit_times cvt 
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           cvt.contact_id\n";   
     }
     //used when log field is selected
     if ($this->_customNRMField) {
@@ -451,6 +450,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
       WHERE w.purl <> 'chowan2016.com'
+      AND p.entity_id = contact_civireport.id
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
