@@ -145,6 +145,11 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        )
        ) as g
        UNION
+       SELECT 'Application drafts saved but not submitted - yesterday' as description, h.perday_completed as perday_visitor_count FROM
+       ( SELECT COUNT(w.nid) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions w WHERE w.completed = 0 AND DATE(FROM_UNIXTIME(w.modified)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.modified)) <= '{$to}' {$appWhere}
+       ) as h
+       UNION
        SELECT 'Applications submitted - yesterday' as description, i.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(w.nid) as perday_completed
        FROM {$this->_drupalDatabase}.webform_submissions w WHERE DATE(FROM_UNIXTIME(w.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}' {$appWhere}
@@ -165,6 +170,11 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        GROUP BY sub.location ) as loc
        WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
        ) as j
+       UNION
+       SELECT 'Current total application drafts saved but not submitted' as description, k.perday_completed as perday_visitor_count FROM
+       ( SELECT COUNT(w.nid) as perday_completed
+       FROM {$this->_drupalDatabase}.webform_submissions w WHERE (1) {$appWhere} AND w.completed = 0 AND DATE(FROM_UNIXTIME(w.modified)) <= '{$from}'
+       ) as k
        UNION
        SELECT 'Cumulative applications submitted to date' as description, l.perday_completed as perday_visitor_count FROM
        ( SELECT COUNT(w.nid) as perday_completed
