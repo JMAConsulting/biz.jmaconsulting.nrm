@@ -24,6 +24,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->userFrameworkDSN);
     $this->_drupalDatabase = $dsnArray['database'];
+    $this->_microsite = MICROSITE;
     self::getWebforms();
     self::createSurveyResponse();
     self::createInfoRequest();
@@ -448,8 +449,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       UNION
       SELECT p.entity_id as contact_id, w.timestamp as visit_time
       FROM {$this->_drupalDatabase}.watchdog_nrm w
-      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
-      WHERE w.purl <> 'chowan2016.com'
+      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.{$this->_microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
+      WHERE w.purl <> '{$this->_microsite}'
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
