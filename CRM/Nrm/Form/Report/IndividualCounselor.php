@@ -414,6 +414,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
   }
   
   function createTemp() {
+    $microsite = MICROSITE;
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
             SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
@@ -447,8 +448,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       UNION
       SELECT p.entity_id as contact_id, w.timestamp as visit_time
       FROM {$this->_drupalDatabase}.watchdog_nrm w
-      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.chowan2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
-      WHERE w.purl <> 'chowan2016.com'
+      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
+      WHERE w.purl <> '{$microsite}'
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
