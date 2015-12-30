@@ -63,6 +63,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
 
   function select() {
     $select = $this->_columnHeaders = array();
+    $microsite = MICROSITE;
     // Process Date
     $relative = CRM_Utils_Array::value("date_relative", $this->_params);
     $from = CRM_Utils_Array::value("date_from", $this->_params);
@@ -102,20 +103,20 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> 'yoteup2016.com'
+       AND purl <> '{$microsite}'
        ) as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> 'yoteup2016.com'
+       AND purl <> '{$microsite}'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$from}')
        ) as c
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> 'yoteup2016.com'
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> '{$microsite}'
        AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e
        UNION
@@ -132,7 +133,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.watchdog_nrm sub
        WHERE DATE(FROM_UNIXTIME(sub.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(sub.timestamp)) <= '{$to}'
        GROUP BY sub.location ) as loc
-       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
+       WHERE location LIKE '%.{$microsite}%' {$urlWhere}
        AND location NOT IN (SELECT
        SUBSTR(wn.location,
        INSTR(wn.location, '://') + 3,
@@ -168,7 +169,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.watchdog_nrm sub
        WHERE DATE(FROM_UNIXTIME(sub.timestamp)) <= '{$from}'
        GROUP BY sub.location ) as loc
-       WHERE location LIKE '%.yoteup2016.com%' {$urlWhere}
+       WHERE location LIKE '%.{$microsite}%' {$urlWhere}
        ) as j
        UNION
        SELECT 'Current total application drafts saved but not submitted' as description, k.perday_completed as perday_visitor_count FROM
@@ -205,7 +206,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
+       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(wn.timestamp)) <= '{$to}'
        ) as e 
        GROUP BY contact_id
@@ -215,7 +216,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountDaily}) AS visit
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> 'yoteup2016.com'
+       AND purl <> '{$microsite}'
        ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
@@ -230,7 +231,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
+       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        ) as e 
        GROUP BY contact_id
@@ -249,7 +250,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
+       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e 
        GROUP BY contact_id
@@ -258,7 +259,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountCumulative}) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE purl <> 'yoteup2016.com' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
+       WHERE purl <> '{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
@@ -273,7 +274,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
        UNION
        SELECT p.entity_id as download 
        FROM {$this->_drupalDatabase}.watchdog_nrm wn
-       LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.yoteup2016.com', '') COLLATE utf8_unicode_ci = p.purl_145
+       LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e 
        GROUP BY contact_id
