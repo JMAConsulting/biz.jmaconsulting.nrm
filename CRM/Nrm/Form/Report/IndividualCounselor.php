@@ -400,7 +400,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    CRM_Nrm_Form_Report_ManagementSummary::updateWatchdog_nrm($this->_drupalDatabase);
+    CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
     self::createTemp();
     $sql = $this->buildQuery(TRUE);
 

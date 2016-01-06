@@ -317,7 +317,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
     CRM_Core_DAO::executeQuery($wdNrm);
     
-    self::updateWatchdog_nrm($this->_drupalDatabase);
+    CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
     
     $sql = $this->buildQuery(FALSE);
 
@@ -399,23 +399,6 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $statement = implode("%' OR location LIKE '%", $diff);
     $sql = " AND (location LIKE '%{$statement}%')";
     return $sql;
-  }
-  
-  /**
-   * Fill watchdog_nrm with records matching watchdog including calculated purls
-   * 
-   * @return CRM_Core_DAO|object
-   *   object that holds the results of the query, in this case no records
-   */
-  public static function updateWatchdog_nrm($drupalDatabase) {
-    $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
-            SELECT w.wid, w.location, w.timestamp, 
-            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
-            FROM {$drupalDatabase}.watchdog w 
-            LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
-            WHERE n.wid IS NULL;";
-            
-    return CRM_Core_DAO::executeQuery($sql);
   }
   
   function getVisitCount($dateWhere, $appWhere = NULL, $from, $to) {
