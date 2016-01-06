@@ -187,4 +187,25 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       WHERE d.cid = {$cid} AND d.nid IN ({$webFormId}) AND s.nid IN ({$webFormId})
       GROUP BY d.data");
   }
+  
+  /**
+   * Fill watchdog_nrm with records matching watchdog including calculated purls
+   * 
+   * @return CRM_Core_DAO|object
+   *   object that holds the results of the query, in this case no records
+   */
+  function updateWatchdog_nrm() {
+    $config = CRM_Core_Config::singleton();
+    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+    $drupalDatabase = $dsnArray['database'];
+
+    $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
+            SELECT w.wid, w.location, w.timestamp, 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
+            FROM {$drupalDatabase}.watchdog w 
+            LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
+            WHERE n.wid IS NULL";
+            
+    return CRM_Core_DAO::executeQuery($sql);
+  }
 }
