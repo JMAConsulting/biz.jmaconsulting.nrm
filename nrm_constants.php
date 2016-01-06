@@ -9,7 +9,7 @@ define('TERRITORY_COUNSELOR', 459);
 
 $config = CRM_Core_Config::singleton();
 $host = $config->userFrameworkBaseURL;
-preg_match("/[^\.\/]+\.[^\.\/]+$/", $host, $matches);
-define('MICROSITE', $matches[0]);
+$host = preg_replace('#^https?://#', '', $host);
+define('MICROSITE', rtrim($host, "/"));
 
 ?>
