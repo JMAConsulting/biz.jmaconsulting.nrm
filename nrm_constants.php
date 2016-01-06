@@ -7,7 +7,8 @@ define('MAJOR', 'major_interests_149');
 define('PURLS', 'civicrm_value_nrmpurls_5');
 define('TERRITORY_COUNSELOR', 446);
 
-$host = $_SERVER['HTTP_HOST'];
+$config = CRM_Core_Config::singleton();
+$host = $config->userFrameworkBaseURL;
 preg_match("/[^\.\/]+\.[^\.\/]+$/", $host, $matches);
 define('MICROSITE', $matches[0]);
 
