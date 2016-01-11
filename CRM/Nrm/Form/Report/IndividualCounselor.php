@@ -571,33 +571,81 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        // First retrieve all the components used for surveys
-        $where = "form_key LIKE '%cg20%'";
-        $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_survey_response']);
-        $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
-        $entryFound = TRUE;
+        $sql = "SELECT ws.sid from webform_submissions ws
+          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid IN (128,131)
+          GROUP BY ws.sid";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if (!$dao->N) {
+          $rows[$rowNum]['civicrm_contact_survey_response'] = NULL;
+        }
+        else {
+          $where = "form_key LIKE '%cg20%'";
+          $rows[$rowNum]['civicrm_contact_survey_response'] = self::getLabels($where, $separator = '<br/>', $row['civicrm_contact_survey_response']);
+          $rows[$rowNum]['civicrm_contact_survey_response'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_survey_response']);
+          $entryFound = TRUE;
+        }
       }
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
-        $rows[$rowNum]['civicrm_contact_vip_application'] = self::getCustomFieldDataLabels($row['civicrm_contact_vip_application']);
-        $rows[$rowNum]['civicrm_contact_vip_application'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_vip_application']);
-        $entryFound = TRUE;
+        $sql = "SELECT ws.sid from webform_submissions ws
+          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 70
+          GROUP BY ws.sid";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if (!$dao->N) {
+          $rows[$rowNum]['civicrm_contact_vip_application'] = NULL;
+        }
+        else {
+          $rows[$rowNum]['civicrm_contact_vip_application'] = self::getCustomFieldDataLabels($row['civicrm_contact_vip_application']);
+          $rows[$rowNum]['civicrm_contact_vip_application'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_vip_application']);
+          $entryFound = TRUE;
+        }
       }
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
-        $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getCustomFieldDataLabels($row['civicrm_contact_visit_registration']);
-        $rows[$rowNum]['civicrm_contact_visit_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_visit_registration']);
-        $entryFound = TRUE;
+        $sql = "SELECT ws.sid from webform_submissions ws
+          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 89
+          GROUP BY ws.sid";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if (!$dao->N) {
+          $rows[$rowNum]['civicrm_contact_visit_registration'] = NULL;
+        }
+        else {
+          $rows[$rowNum]['civicrm_contact_visit_registration'] = self::getCustomFieldDataLabels($row['civicrm_contact_visit_registration']);
+          $rows[$rowNum]['civicrm_contact_visit_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_visit_registration']);
+          $entryFound = TRUE;
+        }
       }
 
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
-        $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLabels($row['civicrm_contact_info_request']);
+        $sql = "SELECT ws.sid from webform_submissions ws
+          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 72
+          GROUP BY ws.sid";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        if (!$dao->N) {
+          $rows[$rowNum]['civicrm_contact_info_request'] = NULL;
+        }
+        else {
+          $rows[$rowNum]['civicrm_contact_info_request'] = self::getCustomFieldDataLabels($row['civicrm_contact_info_request']);
+        }
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
           $string = '';
-          $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog
-          WHERE location LIKE {$purl}
-          AND location LIKE '%.pdf%'";
+          $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog_nrm
+            WHERE location LIKE {$purl}
+            AND location LIKE '%.pdf%'
+            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
             $string = "<br/><hr><b>Downloads:</b><br/>";
