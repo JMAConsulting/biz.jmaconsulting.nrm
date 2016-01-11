@@ -571,7 +571,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        $validNids = array(128,131,287,288);
+        $validNids = array(103,131);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_survey_response'] = NULL;
@@ -598,7 +598,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
-        $validNids = array(71,89);
+        $validNids = array(89,233);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_visit_registration'] = NULL;
