@@ -571,10 +571,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        $sql = "SELECT ws.sid from webform_submissions ws
-          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
-          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
-          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+        $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
+          LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
           AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid IN (128,131)
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
@@ -590,10 +590,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
-        $sql = "SELECT ws.sid from webform_submissions ws
-          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
-          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
-          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+        $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
+          LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
           AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 70
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
@@ -608,10 +608,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
-        $sql = "SELECT ws.sid from webform_submissions ws
-          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
-          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
-          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+        $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
+          LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
           AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 89
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
@@ -626,10 +626,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       }
 
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
-        $sql = "SELECT ws.sid from webform_submissions ws
-          LEFT JOIN webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
-          LEFT JOIN webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
-          WHERE DATE(FROM_UNIXTIME(completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+        $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
+          LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+          LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+          WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
           AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 72
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
