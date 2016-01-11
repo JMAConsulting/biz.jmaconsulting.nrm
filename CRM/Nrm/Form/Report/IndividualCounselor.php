@@ -575,7 +575,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
           LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
           WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid IN (128,131)
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND ws.nid IN (128,131)
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if (!$dao->N) {
@@ -594,7 +594,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
           LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
           WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 70
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND ws.nid = 70
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if (!$dao->N) {
@@ -612,7 +612,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
           LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
           WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 89
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND ws.nid = 89
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if (!$dao->N) {
@@ -630,7 +630,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
           LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
           WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-          AND wsd.data = {$row['civicrm_contact_contact_id']} AND nid = 72
+          AND wsd.data = {$row['civicrm_contact_contact_id']} AND ws.nid = 72
           GROUP BY ws.sid";
         $dao = CRM_Core_DAO::executeQuery($sql);
         if (!$dao->N) {
