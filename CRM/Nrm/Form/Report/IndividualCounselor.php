@@ -572,7 +572,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         $validNids = array(128,131,287,288);
-        $dao = self::hideInvalidRows($validNids);
+        $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_survey_response'] = NULL;
         }
@@ -586,7 +586,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
         $validNids = array(70);
-        $dao = self::hideInvalidRows($validNids);
+        $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_vip_application'] = NULL;
         }
@@ -599,7 +599,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
         $validNids = array(71,89);
-        $dao = self::hideInvalidRows($validNids);
+        $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_visit_registration'] = NULL;
         }
@@ -612,7 +612,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
 
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
         $validNids = array(72);
-        $dao = self::hideInvalidRows($validNids);
+        $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_info_request'] = NULL;
         }
@@ -645,13 +645,13 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     }
   }
   
-  function hideInvalidRows($validNids) {
+  function hideInvalidRows($cid, $validNids) {
     $validNids = implode(',', $validNids);
     $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
       LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
       WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-      AND wsd.data = {$row['civicrm_contact_contact_id']} AND ws.nid IN ({$validNids})
+      AND wsd.data = {$cid} AND ws.nid IN ({$validNids})
       GROUP BY ws.sid";
         
     return CRM_Core_DAO::executeQuery($sql);
