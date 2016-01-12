@@ -141,7 +141,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Log',
         'fields' => array(
           'completed' => array(
-            'title' => ts('Last Visited'),
+            'title' => ts('Previous Visit'),
             'default' => TRUE,
           ),
         ),
@@ -215,7 +215,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_last_visit') {
               $this->_visitedField = TRUE;
-              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(CASE WHEN DATE(FROM_UNIXTIME(cvt.visit_time)) <> DATE_SUB(DATE(NOW()), INTERVAL 1 day) THEN cvt.visit_time ELSE 0 END)), '%m/%d/%Y')
+              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(CASE WHEN DATE(FROM_UNIXTIME(cvt.visit_time)) <> DATE_SUB(DATE(NOW()), INTERVAL 1 day) THEN cvt.visit_time ELSE NULL END)), '%m/%d/%Y')
                 as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
@@ -260,7 +260,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
     }
     if ($this->_visitedField) {
-      $this->_columnHeaders["civicrm_contact_last_visited"]['title'] = ts('Last Visited');
+      $this->_columnHeaders["civicrm_contact_last_visited"]['title'] = ts('Previous Visit');
     }
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_info_request"]['title'] = ts('Information Requests and Downloads');
