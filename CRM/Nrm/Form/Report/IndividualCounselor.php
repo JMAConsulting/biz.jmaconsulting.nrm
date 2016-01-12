@@ -54,6 +54,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $counsellors,
           ),
+          'is_draft' => array(
+            'title' => ts('Show users who have submitted applications as drafts?'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array('No', 'Yes'),
+          ),
           'id' => array(
             'title' => ts('Contact ID'),
             'name' => 'id',
@@ -344,7 +350,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
           else {
-            if ($fieldName == 'counsellor') {
+            if ($fieldName == 'counsellor' || $fieldName == 'is_draft') {
               continue;
             }
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -401,7 +407,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
-    self::createTemp();
+    self::createTemp($this->_params);
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -415,7 +421,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_visit_times");
   }
   
-  function createTemp() {
+  function createTemp($params) {
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
             SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
@@ -430,35 +436,47 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idx_purl (purl(255)) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
+    
+    if (CRM_Utils_Array::value('is_draft_value', $params)) {
+      $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_c AS
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
               DATE_FORMAT(DATE(FROM_UNIXTIME(MIN(timestamp))),'%m/%d/%Y') as first_visit
               FROM {$this->_drupalDatabase}.watchdog_nrm
               GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_c MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idxc_purl (purl(255)) USING HASH";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    
-    $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
-      SELECT contact_id, purl, first_visit FROM (
-      SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145 as purl, first_visit
-      FROM civicrm_contact {$this->_aliases['civicrm_contact']}
-      INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_unicode_ci
-      UNION
-      SELECT wsd.data as contact_id, pd.purl_145 as purl, first_visit 
-      FROM {$this->_drupalDatabase}.webform_submissions ws
-      LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
-      LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
-      INNER JOIN civicrm_value_nrmpurls_5 pd ON wsd.data = pd.entity_id
-      LEFT JOIN civicrm_watchdog_temp_c wd ON wd.purl = pd.purl_145 COLLATE utf8_unicode_ci
-      WHERE ws.is_draft = 1 AND wsd.data <> '' AND wsd.data IS NOT NULL
-      GROUP BY wsd.data) as t
-      GROUP BY contact_id";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl(255)) USING HASH, ADD INDEX idx_c_id (contact_id(10)) USING HASH";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      $sql = "ALTER TABLE civicrm_watchdog_temp_c MODIFY purl varchar(255) COLLATE utf8_unicode_ci NOT NULL, ADD INDEX idxc_purl (purl(255)) USING HASH";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      
+      $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
+        SELECT contact_id, purl, first_visit FROM (
+        SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145 as purl, first_visit
+        FROM civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
+        INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_unicode_ci
+        UNION
+        SELECT wsd.data as contact_id, pd.purl_145 as purl, first_visit 
+        FROM {$this->_drupalDatabase}.webform_submissions ws
+        LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+        LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
+        INNER JOIN civicrm_value_nrmpurls_5 pd ON wsd.data = pd.entity_id
+        LEFT JOIN civicrm_watchdog_temp_c wd ON wd.purl = pd.purl_145 COLLATE utf8_unicode_ci
+        WHERE ws.is_draft = 1 AND wsd.data <> '' AND wsd.data IS NOT NULL
+        GROUP BY wsd.data) as t
+        GROUP BY contact_id";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl(255)) USING HASH, ADD INDEX idx_c_id (contact_id(10)) USING HASH";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+    }
+    else {
+      $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
+        SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
+        FROM civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
+        INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_general_ci";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+    }
 
     $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS 
       SELECT wsd.data as contact_id, ws.completed as visit_time
