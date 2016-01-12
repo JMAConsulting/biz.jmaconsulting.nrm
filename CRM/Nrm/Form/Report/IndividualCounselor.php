@@ -208,7 +208,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif ($tableName == 'civicrm_last_visit') {
               $this->_visitedField = TRUE;
-              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(cvt.visit_time)), '%m/%d/%Y') as civicrm_contact_last_visited,";
+              $visitedSelect = "DATE_FORMAT(FROM_UNIXTIME(MAX(CASE WHEN DATE(FROM_UNIXTIME(cvt.visit_time)) <> DATE_SUB(DATE(NOW()), INTERVAL 1 day) THEN cvt.visit_time ELSE 0 END)), '%m/%d/%Y')
+                as civicrm_contact_last_visited,";
             }
             elseif (array_key_exists($tableName, $this->surveyColumn)) {
               $this->_surveyField = TRUE;
