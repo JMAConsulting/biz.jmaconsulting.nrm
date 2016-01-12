@@ -457,7 +457,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       GROUP BY wsd.data) as t
       GROUP BY contact_id";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
+    $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl(255)) USING HASH, ADD INDEX idx_c_id (contact_id(10)) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS 
