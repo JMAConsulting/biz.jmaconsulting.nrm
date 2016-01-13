@@ -296,7 +296,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                           {$this->_aliases['civicrm_address']}.contact_id AND
                           {$this->_aliases['civicrm_address']}.is_primary = 1
              LEFT JOIN civicrm_state_province csp
-                       ON {$this->_aliases['civicrm_address']}.id = csp.address_id\n";
+                       ON {$this->_aliases['civicrm_address']}.state_province_id = csp.id\n";
     }
     //used when email field is selected
     if ($this->_emailField) {
