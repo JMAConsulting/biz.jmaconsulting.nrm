@@ -181,7 +181,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                 $c = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
               if ($fieldName == 'state_province_id') {
-                $sp = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
+                $sp = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', csp.abbreviation))";
               }
               if ($fieldName == 'postal_code') {
                 $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
