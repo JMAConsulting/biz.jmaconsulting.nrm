@@ -109,7 +109,7 @@ function nrm_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 
 function nrm_civicrm_alterMailParams(&$params, $context) { 
   if (CRM_Utils_Array::value('groupName', $params) == 'Report Email Sender') {
-    if (CRM_Utils_Request::retrieve('instanceId', 'Int') == 68) {
+    if (CRM_Utils_Request::retrieve('instanceId', 'Int') == 72) {
       $html = "<html><body><table>\n\n";
       $f = fopen($params['attachments'][0]['fullPath'], "r");
       while (($line = fgetcsv($f)) !== FALSE) {
