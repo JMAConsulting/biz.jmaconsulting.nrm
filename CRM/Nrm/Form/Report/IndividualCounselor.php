@@ -180,7 +180,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
                 $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
               }
               if (isset($s) && isset($c) && isset($p) && isset($sp)) {
-                $select[] = "CONCAT($s, '<br/>', $c, $p, '<br/>')";
+                $select[] = "CONCAT($s, '<br/>', $c, $sp, $p, '<br/>')";
               }
             }
             elseif ($tableName == 'civicrm_phone') {
