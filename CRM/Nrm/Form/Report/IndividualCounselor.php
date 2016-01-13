@@ -69,6 +69,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
           'street_address' => array('default' => TRUE),
           'city' => array('default' => TRUE),
           'postal_code' => array('default' => TRUE),
+          'state_province_id' => array('default' => TRUE),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -172,10 +173,13 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               if ($fieldName == 'city') {
                 $c = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', {$field['dbAlias']})";
               }
+              if ($fieldName == 'state_province_id') {
+                $sp = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
+              }
               if ($fieldName == 'postal_code') {
                 $p = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT(', ', {$field['dbAlias']}))";
               }
-              if (isset($s) && isset($c) && isset($p)) {
+              if (isset($s) && isset($c) && isset($p) && isset($sp)) {
                 $select[] = "CONCAT($s, '<br/>', $c, $p, '<br/>')";
               }
             }
@@ -290,7 +294,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
              LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                        ON {$this->_aliases['civicrm_contact']}.id =
                           {$this->_aliases['civicrm_address']}.contact_id AND
-                          {$this->_aliases['civicrm_address']}.is_primary = 1\n";
+                          {$this->_aliases['civicrm_address']}.is_primary = 1
+             LEFT JOIN civicrm_state_province {$this->_aliases['civicrm_state_province']}
+                       ON {$this->_aliases['civicrm_address']}.id = {$this->_aliases['civicrm_state_province']}.address_id\n";
     }
     //used when email field is selected
     if ($this->_emailField) {
@@ -410,8 +416,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_a");
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE civicrm_watchdog_temp_b");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_watchdog_temp_a");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_watchdog_temp_b");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_watchdog_temp_c");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_visit_times");
   }
   
   function createTemp() {
