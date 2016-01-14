@@ -229,7 +229,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif (array_key_exists($tableName, $this->visitColumn)) {
               $this->_visitField = TRUE;
-              $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              if ($field['dbAlias'] == 'wsd.data') {
+                $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+              }
+              else {
+                $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              }
               $this->customVisitField = "CONCAT(" . implode(', ', $visitFields) . ")";
               $visitField = "{$this->customVisitField} as civicrm_contact_visit_registration,";
             }
@@ -287,6 +292,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_from .= "{$this->vipTables}";
 
     $this->_from .= "{$this->visitTables}";
+    
+    if ($this->_params['fields']['wsd.data'] == 1) {
+      $this->_from .= '';
+    }
 
     //used when address field is selected
     if ($this->_addressField) {
@@ -350,7 +359,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
           else {
-            if ($fieldName == 'counsellor') {
+            if ($fieldName == 'counsellor' || $fieldName == 'wsd.data') {
               continue;
             }
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -551,6 +560,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->visitColumn['civicrm_value_visit_day_support_11']['use_accordian_for_field_selection'] = TRUE;
       $this->visitColumn['civicrm_value_visit_day_support_11']['group_title'] = ts('Visit Day Registrations');
     }
+    $this->visitColumn['civicrm_value_visit_day_support_11']['fields']['wsd.data'] = array(
+      'title' => 'Which CU Visit Day will you be attending?',
+      'dbAlias' => 'wsd.data',
+      'default' => TRUE,
+    );
     $this->visitTables = implode(' ', $tables);
   }
 
