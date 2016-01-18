@@ -230,7 +230,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             elseif (array_key_exists($tableName, $this->visitColumn)) {
               $this->_visitField = TRUE;
               if ($field['dbAlias'] == 'wsd.data') {
-                $visitFields[] = "GROUP_CONCAT(DISTINCT(IF(wsd.cid = 22, IF( ISNULL(ce.title), NULL, CONCAT('Which Visit Day will you be attending?: ', ce.title )), NULL)))";
+                $visitFields[] = "GROUP_CONCAT(DISTINCT(IF(wsd.cid = 22, IF( ISNULL(ce.title), NULL, CONCAT('Which Visit Day will you be attending?: ', ce.title, '<br/>')), NULL)))";
               }
               else {
                 $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
