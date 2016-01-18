@@ -236,9 +236,15 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif (array_key_exists($tableName, $this->visitColumn)) {
               $this->_visitField = TRUE;
-              $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              if ($field['dbAlias'] == 'wsd.data') {
+                $visitFields[] = "GROUP_CONCAT(DISTINCT(IF(wsd.cid = 19, IF( ISNULL(ce.title), NULL, CONCAT('Which Coyote Day will you be attending?: ', ce.title )), NULL)))";
+              }
+              else {
+                $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              }
               $this->customVisitField = "CONCAT(" . implode(', ', $visitFields) . ")";
               $visitField = "{$this->customVisitField} as civicrm_contact_visit_registration,";
+
             }
             else {
               $select[] = "{$field['dbAlias']}";
@@ -294,6 +300,15 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_from .= "{$this->vipTables}";
 
     $this->_from .= "{$this->visitTables}";
+    
+    if ($this->_params['fields']['wsd.data'] == 1) {
+      $this->_from .= "
+        LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd1 ON wsd1.data = contact_civireport.id
+        INNER JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = wsd1.nid AND wc.cid = wsd1.cid AND wc.name = 'Contact ID'
+        LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd1.sid = wsd.sid
+        LEFT JOIN civicrm_event ce ON ce.id = SUBSTRING_INDEX(wsd.data, '-', 1)";
+    }
+
 
     //used when address field is selected
     if ($this->_addressField) {
@@ -574,7 +589,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
-      WHERE g.id IN (6,7,11)";
+      WHERE g.id IN (6,7,11,25)";
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     while ($dao->fetch()) {
@@ -590,6 +605,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->visitColumn['civicrm_value_visit_day_support_11']['use_accordian_for_field_selection'] = TRUE;
       $this->visitColumn['civicrm_value_visit_day_support_11']['group_title'] = ts('Visit Day Registrations');
     }
+    $this->visitColumn['civicrm_value_visit_day_support_11']['fields']['wsd.data'] = array(
+      'title' => 'Which Visit Day will you be attending?',
+      'dbAlias' => 'wsd.data',
+      'default' => TRUE,
+    );
+
     $this->visitTables = implode(' ', $tables);
   }
 
