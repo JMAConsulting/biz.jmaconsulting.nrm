@@ -230,7 +230,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             elseif (array_key_exists($tableName, $this->visitColumn)) {
               $this->_visitField = TRUE;
               if ($field['dbAlias'] == 'wsd.data') {
-                $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '<br/>'))";
+                $visitFields[] = "GROUP_CONCAT(DISTINCT(IF(wsd.cid = 50, IF( ISNULL(ce.title), NULL, CONCAT('Which CU Visit Day will you be attending?: ', ce.title, '<br/>')), NULL)))";
               }
               else {
                 $visitFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
@@ -294,7 +294,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     $this->_from .= "{$this->visitTables}";
     
     if ($this->_params['fields']['wsd.data'] == 1) {
-      $this->_from .= '';
+      $this->_from .= "
+        LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd1 ON wsd1.data = contact_civireport.id
+        INNER JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = wsd1.nid AND wc.cid = wsd1.cid AND wc.name = 'Contact ID'
+        LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd1.sid = wsd.sid
+        LEFT JOIN civicrm_event ce ON ce.id = SUBSTRING_INDEX(wsd.data, '-', 1)";
     }
 
     //used when address field is selected
