@@ -54,12 +54,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $counsellors,
           ),
-          'is_draft' => array(
+          /*  'is_draft' => array(
             'title' => ts('Show users who have submitted applications as drafts?'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array('No', 'Yes'),
-          ),
+            ), ?*/
           'id' => array(
             'title' => ts('Contact ID'),
             'name' => 'id',
