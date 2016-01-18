@@ -606,7 +606,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       $this->visitColumn['civicrm_value_visit_day_support_11']['group_title'] = ts('Visit Day Registrations');
     }
     $this->visitColumn['civicrm_value_visit_day_support_11']['fields']['wsd.data'] = array(
-      'title' => 'Which Visit Day will you be attending?',
+      'title' => 'Which Coyote Day will you be attending?',
       'dbAlias' => 'wsd.data',
       'default' => TRUE,
     );
