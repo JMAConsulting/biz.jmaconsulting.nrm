@@ -109,20 +109,6 @@ function nrm_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 
 function nrm_civicrm_alterMailParams(&$params, $context) { 
   if (CRM_Utils_Array::value('groupName', $params) == 'Report Email Sender') {
-    if (0 && CRM_Utils_Request::retrieve('instanceId', 'Int') == 74) {
-      $html = "<html><body><table>\n\n";
-      $f = fopen($params['attachments'][0]['fullPath'], "r");
-      while (($line = fgetcsv($f)) !== FALSE) {
-        $html .= "<tr>";
-        foreach ($line as $cell) {
-          $html .= "<td>" . htmlspecialchars($cell) . "</td>";
-        }
-        $html .= "</tr>\n";
-      }
-      fclose($f);
-      $html .= "\n</table></body></html>";
-      $params['html'] = $html;
-    }
     $email = CRM_Utils_Request::retrieve('email_to_send', 'String', CRM_Core_DAO::$_nullObject);
     if ($email) {
       if (!empty($params['toEmail'])) {
