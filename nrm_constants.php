@@ -6,6 +6,7 @@ define('GRAD_YEAR', 'hs_graddate_153');
 define('MAJOR', 'major_interests_149');
 define('PURLS', 'civicrm_value_nrmpurls_5');
 define('TERRITORY_COUNSELOR', 446);
+define('CID', 19);
 
 $config = CRM_Core_Config::singleton();
 $host = $config->userFrameworkBaseURL;
