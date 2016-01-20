@@ -1,0 +1,1 @@
+<script type="text/javascript" src="https://jmaltd.atlassian.net/s/20c97893cc5652eb1ee84a2b3a967241-T/en_USsxgbqv/71001/4b07fe5146963ed6a907920bbffc4c86/2.0.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=cb156735"></script>

@@ -120,3 +120,27 @@ function nrm_civicrm_alterMailParams(&$params, $context) {
     }
   }  
 }
+
+function insertIssueCollector() {
+  if (user_has_role(3) || user_has_role(8) || user_has_role(9) || user_has_role(12)) {
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/Nrm/Issues.tpl',
+    ));
+  }
+}
+
+/**
+ * Implementation of hook_civicrm_pageRun
+ *
+ */
+function nrm_civicrm_pageRun(&$page) {
+  insertIssueCollector();
+}
+
+/**
+ * Implementation of hook_civicrm_buildForm
+ *
+ */
+function nrm_civicrm_buildForm($formName, &$form) {
+  insertIssueCollector();
+}
