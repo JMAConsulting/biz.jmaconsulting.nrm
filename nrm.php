@@ -122,7 +122,7 @@ function nrm_civicrm_alterMailParams(&$params, $context) {
 }
 
 function insertIssueCollector() {
-  if (user_has_role(3) || user_has_role(8) || user_has_role(9) || user_has_role(12)) {
+  if (user_has_role(3)) {
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Nrm/Issues.tpl',
     ));
