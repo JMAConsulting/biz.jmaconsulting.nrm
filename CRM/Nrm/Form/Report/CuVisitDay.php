@@ -200,13 +200,13 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
         $item = explode('|', $result['items']);
-        $flag = TRUE;
         if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
-          $flag = FALSE;
-          $date = TRUE;
-          $temp = $item;
-          $item = array();
-          $item['dates'] = array_chunk($temp, 2);
+          $newItems = explode(PHP_EOL, $result['items']);
+          foreach ($newItems as $v) {
+            list($k, $v) = explode('|', $v);
+            $i[] = array($k, $v);
+          }
+          $item['dates'] = $i;
         }
       }
       if ($formKey == 'anticipated_academic_enroll_year') {
@@ -240,6 +240,4 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
     }
   }
 
-  function alterDisplay(&$rows) {
-  }
 }

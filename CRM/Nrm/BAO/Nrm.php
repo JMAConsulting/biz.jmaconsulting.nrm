@@ -71,7 +71,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       elseif (!CRM_Utils_Array::value('ignore_group_concat', $column)) {
         $columnName = CRM_Utils_Array::value('columnName', $column, $defaultColumnName);
         $col = (in_array($key, $abr)) ? substr($key, 0, strpos($key, '_')) : $column['title'];
-        $select[] = "GROUP_CONCAT(if(wc.name='{$col}', {$columnName}, NULL)) AS '{$key}'";
+        $select[] = "GROUP_CONCAT(DISTINCT(if(wc.name='{$col}', {$columnName}, NULL))) AS '{$key}'";
       }
     }
     $form->_select .= " SELECT " . implode(',', $select);
