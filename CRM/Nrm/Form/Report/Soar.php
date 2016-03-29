@@ -36,37 +36,26 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
       'First_Name' => array(
         'title' => 'First Name',
       ),
-      'Preferred_Name' => array(
-        'title' => 'Preferred Name',
-      ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
       ),
       'Last_Name' => array(
         'title' => 'Last Name',
       ),
+      'Nickname' => array(
+        'title' => 'Nickname',
+      ),
       'Email' => array(
         'title' => 'Email',
       ),
-      'Primary_Phone_Number' => array(
-        'title' => 'Primary Phone Number',
-      ),
-      'Primary_Phone_Type' => array(
-        'title' => 'Primary Phone Type',
-        'columnName' => 'pt1.label',
-      ),
-      'Secondary_Phone_Number' => array(
-        'title' => 'Secondary Phone Number',
-      ),
-      'Secondary_Phone_Type' => array(
-        'title' => 'Secondary Phone Type',
-        'columnName' => 'pt2.label',
+      'Phone_Number' => array(
+        'title' => 'Phone Number',
       ),
       'Street_Address' => array(
-        'title' => 'Permanent Address',
+        'title' => 'Street Address',
       ),
       'Address_Line_2' => array(
-        'title' => 'Address Line 2',
+        'title' => 'Street Address Line 2',
       ),
       'City' => array(
         'title' => 'City',
@@ -77,41 +66,17 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
       'Postal_Code' => array(
         'title' => 'Postal Code',
       ),
-      'Gender' => array(
-        'title' => 'Gender',
-        'columnName' => 'g.label',
-      ),
-      'Date_of_Birth' => array(
-        'title' => 'Date of Birth',
-      ),
-      'Academics' => array(
-        'title' => 'Academics',
-        'columnName' => 'academics_alias.label',
-      ),
-      'Athletics' => array(
-        'title' => 'Athletics',
-        'columnName' => 'athletics_alias.label',
-      ),
-      'Extra-Curricular' => array(
-        'title' => 'Extra-Curricular',
-        'columnName' => 'extra_alias.label',
-      ),
     );
 
-    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() {
-    $custom = array(
-      171 => 'academics',
-      159 => 'athletics',
-      158 => 'extra',
-    );
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array(), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from);
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 278, 7);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 248, 14);
   }
 
   function groupBy() {

@@ -14,7 +14,7 @@ return array (
       'label' => 'SOAR Report',
       'description' => 'Student Orientation, Advising & Registration Report (biz.jmaconsulting.nrm)',
       'class_name' => 'CRM_Nrm_Form_Report_Soar',
-      'report_url' => 'chowan/soar',
+      'report_url' => 'brevard/soar',
       'component' => '',
     ),
   ),
