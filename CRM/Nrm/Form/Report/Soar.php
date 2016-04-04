@@ -33,6 +33,10 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
+      'Which_SOAR_event_would_you_like_to_attend?' => array(
+        'title' => 'Which SOAR event would you like to attend?',
+        'columnName' => 'civicrm_1_participant_1_participant_event_id_alias.name',
+      ),
       'First_Name' => array(
         'title' => 'First Name',
       ),
@@ -107,7 +111,7 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
       159 => 'athletics',
       158 => 'extra',
     );
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array(), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('civicrm_1_participant_1_participant_event_id'), $custom);
   }
 
   function where() {
@@ -125,6 +129,11 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
+    
+    $formKeys = array(
+      'civicrm_1_participant_1_participant_event_id',
+    );
+    self::createWebformTemp($formKeys);
 
     $sql = $this->buildQuery(FALSE);
 
@@ -134,6 +143,47 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
+  }
+
+  function createWebformTemp($formKeys) {
+    foreach ($formKeys as $formKey) {
+      $item = $vals = array();
+      $config = CRM_Core_Config::singleton();
+      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
+      $drupalDatabase = $dsnArray['database'];
+      $sql = "SELECT extra
+        FROM {$drupalDatabase}.webform_component
+        WHERE form_key = '{$formKey}' AND nid = 278";
+      $result = CRM_Core_DAO::singleValueQuery($sql);
+      $result = unserialize($result);
+      $item = explode('|', $result['items']);
+      $newItems = explode(PHP_EOL, $result['items']);
+      foreach ($newItems as $v) {
+        list($k, $v) = explode('|', $v);
+        $i[] = array($k, $v);
+      }
+      $item['dates'] = $i;
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$formKey}");
+      CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$formKey} (
+        value int(50) NOT NULL,
+        name varchar(64) NOT NULL)");
+      $sql = "INSERT INTO {$formKey} VALUES";
+      foreach ($item as $key => &$items) {
+        if ($flag) {
+          $items = trim(preg_replace('/[0-9]+/', NULL, $items));
+        }
+        if ($key != 'dates' && $key != 0) {
+          $vals[] = " ('{$key}', '{$items}')";
+        }
+        if ($key == 'dates') {
+          foreach ($items as $k => $v) {
+            $vals[] = " ('{$v[0]}', '{$v[1]}')";
+          } 
+        }
+      }
+      $sql .= implode(',', $vals);
+      CRM_Core_DAO::executeQuery($sql);
+    }
   }
 
   function alterDisplay(&$rows) {
