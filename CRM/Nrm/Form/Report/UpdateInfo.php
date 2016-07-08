@@ -7,9 +7,7 @@ class CRM_Nrm_Form_Report_UpdateInfo extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE; 
 
   function __construct() {
-    $config = CRM_Core_Config::singleton();
-    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-    $this->_drupalDatabase = $dsnArray['database'];
+    $this->_drupalDatabase = 'chowan_drupal';
     
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -106,7 +104,7 @@ class CRM_Nrm_Form_Report_UpdateInfo extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 67);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 301);
   }
 
   function groupBy() {
