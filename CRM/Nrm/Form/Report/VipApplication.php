@@ -55,8 +55,11 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 1,
         'cid' => 156,
       ),
-      'Middle_Name' => array(
+      'Middle_Name_1' => array(
         'title' => 'Middle Name',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 158,
       ),
       'Last_Name_1' => array(
         'title' => 'Last Name',
@@ -68,10 +71,10 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Preferred Name',
       ),
       'Enrollment_Year' => array(
-        'title' => 'Anticipated Academic Enroll Year',
+        'title' => 'Enrollment Year',
       ),
       'Enrollment_Term' => array(
-        'title' => 'Anticipated Academic Enroll Term',
+        'title' => 'Enrollment Term',
       ),
       'Enrollment_Classification' => array(
         'title' => 'Enrollment Classification',
@@ -125,6 +128,8 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       ),
       'Secondary_Phone_Number' => array(
         'title' => 'Secondary Phone',
+        'is_alias' => TRUE,
+        'alias_new' => 'Secondary Phone Number',
       ),
       'Secondary_Phone_Type' => array(
         'title' => 'Secondary Phone Type',
@@ -194,9 +199,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'cid' => 45,
       ),
       'Degree(s)_Earned_1' => array(
-        'title' => 'Degree Earned',
-        'is_alias' => TRUE,
-        'alias_new' => 'Degree(s) Earned',
+        'title' => 'Degree(s) Earned',
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 46,
@@ -204,97 +207,94 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       'School_Name_2' => array(
         'title' => 'School Name',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 57,
       ),
       'School_City_&_State_2' => array(
         'title' => 'School City & State',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 58,
       ),
       'Dates_Attended_2' => array(
         'title' => 'Dates Attended',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 59,
       ),
       'Graduation_Date_2' => array(
         'title' => 'Graduation Date',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 60,
       ),
       'Degree(s)_Earned_2' => array(
-        'title' => 'Degree Earned',
-        'is_alias' => TRUE,
+        'title' => 'Degree(s) Earned',
         'alias_new' => 'Degree(s) Earned',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 61,
       ),
       'School_Name_3' => array(
         'title' => 'School Name',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 52,
       ),
       'School_City_&_State_3' => array(
         'title' => 'School City & State',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 53,
       ),
       'Dates_Attended_3' => array(
         'title' => 'Dates Attended',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 54,
       ),
       'Graduation_Date_3' => array(
         'title' => 'Graduation Date',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 55,
       ),
-      'Degree(s)_Earned_3' => array(
-        'title' => 'Degree Earned',
-        'is_alias' => TRUE,
+      'Degrees_Earned_3' => array(
+        'title' => 'Degrees Earned',
         'alias_new' => 'Degree(s) Earned',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 56,
       ),
       'School_Name_4' => array(
         'title' => 'School Name',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 4,
         'cid' => 47,
       ),
       'School_City_&_State_4' => array(
         'title' => 'School City & State',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 4,
         'cid' => 48,
       ),
       'Dates_Attended_4' => array(
         'title' => 'Dates Attended',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 4,
         'cid' => 49,
       ),
       'Graduation_Date_4' => array(
         'title' => 'Graduation Date',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 4,
         'cid' => 50,
       ),
-      'Degree(s)_Earned_4' => array(
-        'title' => 'Degree Earned',
-        'is_alias' => TRUE,
+      'Degrees_Earned_4' => array(
+        'title' => 'Degrees Earned',
         'alias_new' => 'Degree(s) Earned',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 4,
         'cid' => 51,
       ),
       'SAT_1_Date_Taken_(or_planned)' => array(
@@ -383,11 +383,8 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'is_alias' => TRUE,
         'alias_new' => 'If yes, please explain:',
       ),
-      'Relationship_1' => array(
+      'Relationship' => array(
         'title' => 'Relationship',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 181,
       ),
       'First_Name_2' => array(
         'title' => 'First Name',
@@ -420,12 +417,10 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'cid' => 240,
       ),
       'Home_Phone_1' => array(
-        'title' => 'Phone (H)',
+        'title' => 'Home Phone',
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 125,
-        'is_alias' => TRUE,
-        'alias_new' => 'Home Phone',
       ),
       'Email_2' => array(
         'title' => 'Email',
@@ -434,12 +429,10 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'cid' => 126,
       ),
       'Work_Phone_1' => array(
-        'title' => '(W)',
+        'title' => 'Work Phone',
         'same_alias' => TRUE,
         'alias' => 1,
         'cid' => 225,
-        'is_alias' => TRUE,
-        'alias_new' => 'Work Phone',
       ),
       'Employer_1' => array(
         'title' => 'Employer',
@@ -462,98 +455,91 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias_new' => 'College(s) Attended',
       ),
       'Degree(s)_Earned_5' => array(
-        'title' => 'Degree Earned',
+        'title' => 'Degree(s) Earned',
         'is_alias' => TRUE,
         'alias_new' => 'Degree(s) Earned',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 5,
         'cid' => 223,
       ),
-      'Relationship_2' => array(
-        'title' => 'Relationship',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 183,
+      'Relationship_to_Applicant' => array(
+        'title' => 'Relationship to Applicant',
       ),
       'First_Name_3' => array(
         'title' => 'First Name',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 3,
         'cid' => 128,
       ),
       'Last_Name_3' => array(
         'title' => 'Last Name',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 3,
         'cid' => 187,
       ),
       'Address_2' => array(
         'title' => 'Address',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 210,
       ),
       'City_2' => array(
         'title' => 'City',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 211,
       ),
       'State_2' => array(
         'title' => 'State',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 2,
         'cid' => 239,
       ),
       'Home_Phone_2' => array(
-        'title' => 'Phone (H)',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 129,
-        'is_alias' => TRUE,
-        'alias_new' => 'Home Phone',
-      ),
-      'Work_Phone_2' => array(
-        'title' => '(W)',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 224,
-        'is_alias' => TRUE,
-        'alias_new' => 'Work Phone',
-      ),
-      'Email_2' => array(
-        'title' => 'Email',
+        'title' => 'Home Phone',
         'same_alias' => TRUE,
         'alias' => 2,
+        'cid' => 129,
+      ),
+      'Work_Phone_2' => array(
+        'title' => 'Work Phone',
+        'same_alias' => TRUE,
+        'alias' => 2,
+        'cid' => 224,
+      ),
+      'Email_3' => array(
+        'title' => 'Email',
+        'same_alias' => TRUE,
+        'alias' => 3,
         'cid' => 130,
       ),
-      'Employer_2' => array(
+      'Employer_3' => array(
         'title' => 'Employer',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 213,
       ),
-      'Position_2' => array(
+      'Position_3' => array(
         'title' => 'Position',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 214,
       ),
-      'College_Attended_2' => array(
+      'College_Attended_3' => array(
         'title' => 'College Attended',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 3,
         'cid' => 215,
         'is_alias' => TRUE,
         'alias_new' => 'College(s) Attended',
       ),
-      'Degree(s)_Earned_6' => array(
-        'title' => 'Degree Earned',
-        'is_alias' => TRUE,
-        'alias_new' => 'Degree(s) Earned',
+      'Degree(s_)Earned_6' => array(
+        'title' => 'Degree(s )Earned',
         'same_alias' => TRUE,
-        'alias' => 1,
+        'alias' => 6,
         'cid' => 216,
+        'is_alias' => TRUE,
+        'alias_new' => 'Degree(s )Earned',
       ),
       'hear_about_Chowan_University' => array(
         'title' => 'How did you hear about Chowan University?',
@@ -649,8 +635,6 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
     $this->beginPostProcess();
 
     $sql = $this->buildQuery(FALSE);
-    CRM_Core_Error::debug( '$sql', $sql );
-    exit;
 
     $rows = array();
     $this->buildRows($sql, $rows);
