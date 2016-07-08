@@ -56,6 +56,7 @@ class CRM_Nrm_Form_Report_UpdateInfo extends CRM_Report_Form {
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
+        'columnName' => 'suffixes_alias.label',
       ),
       'Nickname' => array(
         'title' => 'Nickname',
@@ -99,8 +100,11 @@ class CRM_Nrm_Form_Report_UpdateInfo extends CRM_Report_Form {
     CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
-  function from() { 
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from);
+  function from() {
+    $custom = array(
+      7 => 'suffixes',
+    );
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array(), $custom);
   }
 
   function where() {
