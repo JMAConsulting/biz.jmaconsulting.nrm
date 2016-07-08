@@ -8,8 +8,7 @@ define('PURLS', 'civicrm_value_nrmpurls_5');
 define('TERRITORY_COUNSELOR', 459);
 define('CID', 50);
 
-$config = CRM_Core_Config::singleton();
-$host = $config->userFrameworkBaseURL;
+$host = "https://chowan2017.com/";
 $host = preg_replace('#^https?://#', '', $host);
 define('MICROSITE', rtrim($host, "/"));
 

@@ -9,9 +9,7 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE; 
 
   function __construct() {
-    $config = CRM_Core_Config::singleton();
-    $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-    $this->_drupalDatabase = $dsnArray['database'];
+    $this->_drupalDatabase = 'chowan_drupal';
 
     self::getWebforms();
     
@@ -432,32 +430,5 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
   }
   
   function alterDisplay(&$rows) {
-    // custom code to alter rows
-    $entryFound = FALSE;
-    $checkList = array();
-    foreach ($rows as $rowNum => $row) {
-
-      if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
-        // not repeat contact display names if it matches with the one
-        // in previous row
-        $repeatFound = FALSE;
-        foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
-          ) {
-            $rows[$rowNum][$colName] = "";
-            $repeatFound = TRUE;
-          }
-          if (in_array($colName, $this->_noRepeats)) {
-            $checkList[$colName][] = $colVal;
-          }
-        }
-      }
-
-      if (!$entryFound) {
-        break;
-      }
-    }
   }
 }
