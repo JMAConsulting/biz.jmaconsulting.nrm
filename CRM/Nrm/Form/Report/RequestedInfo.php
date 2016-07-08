@@ -88,12 +88,12 @@ class CRM_Nrm_Form_Report_RequestedInfo extends CRM_Report_Form {
         'title' => 'Primary Phone Type',
         'columnName' => 'pt1.label',
       ),
-      'Secondary_Phone_Number' => array(
-        'title' => 'Secondary Phone Number',
-      ),
       'Secondary_Phone_Type' => array(
         'title' => 'Secondary Phone Type',
         'columnName' => 'pt2.label',
+      ),
+      'Secondary_Phone_Number' => array(
+        'title' => 'Secondary Phone Number',
       ),
       'Date_of_Birth' => array(
         'title' => 'Date of Birth',
@@ -101,6 +101,10 @@ class CRM_Nrm_Form_Report_RequestedInfo extends CRM_Report_Form {
       'Gender' => array(
         'title' => 'Gender',
         'columnName' => 'g.label',
+      ),
+      'Intended_Major' => array(
+        'title' => 'Intended Major',
+        'columnName' => 'major_alias.label',
       ),
       'High_School_Attended' => array(
         'title' => 'High School Attended',
@@ -111,17 +115,24 @@ class CRM_Nrm_Form_Report_RequestedInfo extends CRM_Report_Form {
       'College_Attended_(if_any)' => array(
         'title' => 'College Attended (if any)',
       ),
+      'Comments/Questions' => array(
+        'title' => 'Comments/Questions',
+      ),
     );
 
     CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE);
   }
 
-  function from() { 
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('inquiry'));
+  function from() {
+    $custom = array(
+      0 => 'inquiry',
+      171 => 'major',
+    );
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array(), $custom);
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 72);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 300);
   }
 
   function groupBy() {
