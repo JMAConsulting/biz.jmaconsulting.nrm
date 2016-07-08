@@ -67,13 +67,11 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       'Preferred_Name' => array(
         'title' => 'Preferred Name',
       ),
-      'Anticipated_Academic_Enroll_Year' => array(
+      'Enrollment_Year' => array(
         'title' => 'Anticipated Academic Enroll Year',
       ),
-      'Anticipated_Academic_Enrollment_Term' => array(
+      'Enrollment_Term' => array(
         'title' => 'Anticipated Academic Enroll Term',
-        'is_alias' => TRUE,
-        'alias_new' => 'Anticipated Academic Enrollment Term',
       ),
       'Enrollment_Classification' => array(
         'title' => 'Enrollment Classification',
@@ -104,8 +102,11 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 3,
         'cid' => 153,
       ),
-      'Zip' => array(
+      'Zip_3' => array(
         'title' => 'Zip',
+        'same_alias' => TRUE,
+        'alias' => 3,
+        'cid' => 150,
       ),
       'Email_1' => array(
         'title' => 'Email',
@@ -142,6 +143,9 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Gender',
         'columnName' => 'g.label',
       ),
+      'Marital_Status' => array(
+        'title' => 'Marital Status',
+      ),
       'Social_Security_Number' => array(
         'title' => 'Social Security Number',
       ),
@@ -164,112 +168,6 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'title' => 'Current US Visa Status',
         'is_alias' => TRUE,
         'alias_new' => 'Visa Classification',
-      ),
-      'Marital_Status' => array(
-        'title' => 'Marital Status',
-      ),
-      'hear_about_Chowan_University' => array(
-        'title' => 'How did you hear about Chowan University?',
-        'columnName' => 'hear_chowan_alias.label',
-      ),
-      'Race' => array(
-        'title' => 'Ethnicity',
-        'is_alias' => TRUE,
-        'alias_new' => 'Race',
-        'columnName' => 'race_alias.label',
-      ),
-      'If_other,_please_specify:' => array(
-        'title' => 'If other, please specify',
-        'is_alias' => TRUE,
-        'alias_new' => 'If other, please specify:',
-      ),
-      'Are_you_of_Hispanic_or_Latino_descent' => array(
-        'title' => 'Hispanic or Latino descent?',
-        'is_alias' => TRUE,
-        'alias_new' => 'Are you of Hispanic or Latino descent',
-        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
-      ),
-      'Church_Affiliation/Denomination' => array(
-        'title' => 'Religion',
-        'is_alias' => TRUE,
-        'alias_new' => 'Church Affiliation/Denomination',
-      ),
-      'Church_Affiliation/Denomination' => array(
-        'title' => 'Church Affiliation / Denomination',
-        'is_alias' => TRUE,
-        'alias_new' => 'Church Affiliation/Denomination',
-      ),
-      'Are_you_an_active_member?' => array(
-        'title' => 'Active member?',
-        'is_alias' => TRUE,
-        'alias_new' => 'Are you an active member?',
-        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
-      ),
-      'Church_City' => array(
-        'title' => 'Church City',
-      ),
-      'Church_State' => array(
-        'title' => 'Church State',
-      ),
-      'Church_Zip' => array(
-        'title' => 'Church Zip',
-      ),
-      'Have_you_visited_Chowan_University?' => array(
-        'title' => 'Visited Chowan?',
-        'is_alias' => TRUE,
-        'alias_new' => 'Have you visited Chowan University?',
-        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
-      ),
-      'How_did_you_become_interested_in_Chowan_University_and_why_are_you_applying_for_admission?' => array(
-        'title' => 'How did you become interested into Chowan University and why are you applying for admission?',
-        'is_alias' => TRUE,
-        'alias_new' => 'How did you become interested in Chowan University and why are you applying for admission?',
-      ),
-      'If_any_of_your_relatives_have_attended_Chowan_University,_please_give_their_names_and_relationship:' => array(
-        'title' => 'If any of your relatives have attended Chowan University, please give their names and relationship',
-        'is_alias' => TRUE,
-        'alias_new' => 'If any of your relatives have attended Chowan University, please give their names and relationship:',
-      ),
-      'SAT_1_Date_Taken_(or_planned)' => array(
-        'title' => 'SAT Test Date',
-        'is_alias' => TRUE,
-        'alias_new' => 'SAT 1 Date Taken (or planned)',
-      ),
-      'ACT_Date_Taken_(or_planned)' => array(
-        'title' => 'ACT Test Date',
-        'is_alias' => TRUE,
-        'alias_new' => 'ACT Date Taken (or planned)',
-      ),
-      'Critical_Reading_Score' => array(
-        'title' => 'SAT CR',
-        'is_alias' => TRUE,
-        'alias_new' => 'Critical Reading Score',
-      ),
-      'Composite_Score' => array(
-        'title' => 'ACT Composite',
-        'is_alias' => TRUE,
-        'alias_new' => 'Composite Score',
-      ),
-      'Math_Score' => array(
-        'title' => 'SAT M',
-        'is_alias' => TRUE,
-        'alias_new' => 'Math Score',
-      ),
-      'Writing_Score' => array(
-        'title' => 'SAT W',
-        'is_alias' => TRUE,
-        'alias_new' => 'Writing Score',
-      ),
-      'TOEFL_Date' => array(
-        'title' => 'TOEFL Date',
-      ),
-      'Score' => array(
-        'title' => 'TOEFL Score',
-        'is_alias' => TRUE,
-        'alias_new' => 'Score',
-      ),
-      'GPA' => array(
-        'title' => 'GPA',
       ),
       'School_Name_1' => array(
         'title' => 'School Name',
@@ -295,25 +193,167 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 1,
         'cid' => 45,
       ),
+      'Degree(s)_Earned_1' => array(
+        'title' => 'Degree Earned',
+        'is_alias' => TRUE,
+        'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 46,
+      ),
+      'School_Name_2' => array(
+        'title' => 'School Name',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 57,
+      ),
+      'School_City_&_State_2' => array(
+        'title' => 'School City & State',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 58,
+      ),
+      'Dates_Attended_2' => array(
+        'title' => 'Dates Attended',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 59,
+      ),
+      'Graduation_Date_2' => array(
+        'title' => 'Graduation Date',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 60,
+      ),
+      'Degree(s)_Earned_2' => array(
+        'title' => 'Degree Earned',
+        'is_alias' => TRUE,
+        'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 61,
+      ),
+      'School_Name_3' => array(
+        'title' => 'School Name',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 52,
+      ),
+      'School_City_&_State_3' => array(
+        'title' => 'School City & State',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 53,
+      ),
+      'Dates_Attended_3' => array(
+        'title' => 'Dates Attended',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 54,
+      ),
+      'Graduation_Date_3' => array(
+        'title' => 'Graduation Date',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 55,
+      ),
+      'Degree(s)_Earned_3' => array(
+        'title' => 'Degree Earned',
+        'is_alias' => TRUE,
+        'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 56,
+      ),
+      'School_Name_4' => array(
+        'title' => 'School Name',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 47,
+      ),
+      'School_City_&_State_4' => array(
+        'title' => 'School City & State',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 48,
+      ),
+      'Dates_Attended_4' => array(
+        'title' => 'Dates Attended',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 49,
+      ),
+      'Graduation_Date_4' => array(
+        'title' => 'Graduation Date',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 50,
+      ),
+      'Degree(s)_Earned_4' => array(
+        'title' => 'Degree Earned',
+        'is_alias' => TRUE,
+        'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 51,
+      ),
+      'SAT_1_Date_Taken_(or_planned)' => array(
+        'title' => 'SAT Test Date',
+        'is_alias' => TRUE,
+        'alias_new' => 'SAT 1 Date Taken (or planned)',
+      ),
+      'Critical_Reading_Score' => array(
+        'title' => 'SAT CR',
+        'is_alias' => TRUE,
+        'alias_new' => 'Critical Reading Score',
+      ),
+      'Math_Score' => array(
+        'title' => 'SAT M',
+        'is_alias' => TRUE,
+        'alias_new' => 'Math Score',
+      ),
+      'Writing_Score' => array(
+        'title' => 'SAT W',
+        'is_alias' => TRUE,
+        'alias_new' => 'Writing Score',
+      ),
+      'ACT_Date_Taken_(or_planned)' => array(
+        'title' => 'ACT Test Date',
+        'is_alias' => TRUE,
+        'alias_new' => 'ACT Date Taken (or planned)',
+      ),
+      'Composite_Score' => array(
+        'title' => 'ACT Composite',
+        'is_alias' => TRUE,
+        'alias_new' => 'Composite Score',
+      ),
+      'TOEFL_Date' => array(
+        'title' => 'TOEFL Date',
+      ),
+      'Score' => array(
+        'title' => 'TOEFL Score',
+        'is_alias' => TRUE,
+        'alias_new' => 'Score',
+      ),
+      'GPA' => array(
+        'title' => 'GPA',
+      ),
       'Are_you_enrolled_in_a_Teacher_Cadet_Program?' => array(
         'title' => 'Are you enrolled in Teacher Cadet?',
         'is_alias' => TRUE,
         'alias_new' => 'Are you enrolled in a Teacher Cadet Program?',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
-      'Have_you_ever_been_suspended_or_expelled?' => array(
-        'title' => 'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?',
+      'Have_you_visited_Chowan_University?' => array(
+        'title' => 'Visited Chowan?',
         'is_alias' => TRUE,
-        'alias_new' => 'Have you ever been suspended or expelled?',
+        'alias_new' => 'Have you visited Chowan University?',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
-      'Explanation_1' => array(
-        'title' => 'Explanation',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 142,
+      'How_did_you_become_interested_in_Chowan_University_and_why_are_you_applying_for_admission?' => array(
+        'title' => 'How did you become interested into Chowan University and why are you applying for admission?',
         'is_alias' => TRUE,
-        'alias_new' => 'If yes, please explain:',
+        'alias_new' => 'How did you become interested in Chowan University and why are you applying for admission?',
       ),
       'Have_you_ever_been_convicted_of_a_crime,_other_than_a_minor_traffic_violation?' => array(
         'title' => 'Have you ever been convicted of a crime other than a minor traffic violation?',
@@ -321,18 +361,33 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias_new' => 'Have you ever been convicted of a crime, other than a minor traffic violation?',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
-      'Explanation_2' => array(
+      'Explanation_1' => array(
         'title' => 'Explanation',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 143,
         'is_alias' => TRUE,
         'alias_new' => 'If yes, please explain:',
       ),
-      'To_what_other_colleges/universities_are_you_applying?' => array(
-        'title' => 'What other colleges or universities are you applying to?',
+      'Have_you_ever_been_suspended_or_expelled?' => array(
+        'title' => 'Have you ever been dismissed for academic or disciplinary reasons from a secondary school or college?',
         'is_alias' => TRUE,
-        'alias_new' => 'To what other colleges/universities are you applying?',
+        'alias_new' => 'Have you ever been suspended or expelled?',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
+      ),
+      'Explanation_2' => array(
+        'title' => 'Explanation',
+        'same_alias' => TRUE,
+        'alias' => 2,
+        'cid' => 142,
+        'is_alias' => TRUE,
+        'alias_new' => 'If yes, please explain:',
+      ),
+      'Relationship_1' => array(
+        'title' => 'Relationship',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 181,
       ),
       'First_Name_2' => array(
         'title' => 'First Name',
@@ -345,12 +400,6 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'same_alias' => TRUE,
         'alias' => 2,
         'cid' => 180,
-      ),
-      'Relationship_1' => array(
-        'title' => 'Relationship',
-        'same_alias' => TRUE,
-        'alias' => 1,
-        'cid' => 181,
       ),
       'Address_1' => array(
         'title' => 'Address',
@@ -370,12 +419,6 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 1,
         'cid' => 240,
       ),
-      'Email_2' => array(
-        'title' => 'Email',
-        'same_alias' => TRUE,
-        'alias' => 2,
-        'cid' => 126,
-      ),
       'Home_Phone_1' => array(
         'title' => 'Phone (H)',
         'same_alias' => TRUE,
@@ -383,6 +426,12 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'cid' => 125,
         'is_alias' => TRUE,
         'alias_new' => 'Home Phone',
+      ),
+      'Email_2' => array(
+        'title' => 'Email',
+        'same_alias' => TRUE,
+        'alias' => 2,
+        'cid' => 126,
       ),
       'Work_Phone_1' => array(
         'title' => '(W)',
@@ -412,7 +461,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'is_alias' => TRUE,
         'alias_new' => 'College(s) Attended',
       ),
-      'Degree(s)_Earned' => array(
+      'Degree(s)_Earned_5' => array(
         'title' => 'Degree Earned',
         'is_alias' => TRUE,
         'alias_new' => 'Degree(s) Earned',
@@ -420,87 +469,142 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
         'alias' => 1,
         'cid' => 223,
       ),
+      'Relationship_2' => array(
+        'title' => 'Relationship',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 183,
+      ),
       'First_Name_3' => array(
         'title' => 'First Name',
         'same_alias' => TRUE,
-        'alias' => 3,
+        'alias' => 2,
         'cid' => 128,
       ),
       'Last_Name_3' => array(
         'title' => 'Last Name',
         'same_alias' => TRUE,
-        'alias' => 3,
+        'alias' => 2,
         'cid' => 187,
-      ),
-      'Relationship_to_Applicant' => array(
-        'title' => 'Relationship',
-        'is_alias' => TRUE,
-        'alias_new' => 'Relationship to Applicant',
       ),
       'Address_2' => array(
         'title' => 'Address',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 210,
       ),
       'City_2' => array(
         'title' => 'City',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 211,
       ),
       'State_2' => array(
         'title' => 'State',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 239,
       ),
-      'Email_3' => array(
-        'title' => 'Email',
-        'same_alias' => TRUE,
-        'alias' => 3,
-        'cid' => 130,
-      ),
-      'Phone_(H)_2' => array(
+      'Home_Phone_2' => array(
         'title' => 'Phone (H)',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 129,
         'is_alias' => TRUE,
         'alias_new' => 'Home Phone',
       ),
-      '(W)_2' => array(
+      'Work_Phone_2' => array(
         'title' => '(W)',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 224,
         'is_alias' => TRUE,
         'alias_new' => 'Work Phone',
       ),
+      'Email_2' => array(
+        'title' => 'Email',
+        'same_alias' => TRUE,
+        'alias' => 2,
+        'cid' => 130,
+      ),
       'Employer_2' => array(
         'title' => 'Employer',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 213,
       ),
       'Position_2' => array(
         'title' => 'Position',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 214,
       ),
       'College_Attended_2' => array(
         'title' => 'College Attended',
         'same_alias' => TRUE,
-        'alias' => 2,
+        'alias' => 1,
         'cid' => 215,
         'is_alias' => TRUE,
         'alias_new' => 'College(s) Attended',
       ),
-      'Degree(s_)Earned' => array(
+      'Degree(s)_Earned_6' => array(
         'title' => 'Degree Earned',
         'is_alias' => TRUE,
-        'alias_new' => 'Degree(s )Earned',
+        'alias_new' => 'Degree(s) Earned',
+        'same_alias' => TRUE,
+        'alias' => 1,
+        'cid' => 216,
+      ),
+      'hear_about_Chowan_University' => array(
+        'title' => 'How did you hear about Chowan University?',
+        'columnName' => 'hear_chowan_alias.label',
+      ),
+      'To_what_other_colleges/universities_are_you_applying?' => array(
+        'title' => 'What other colleges or universities are you applying to?',
+        'is_alias' => TRUE,
+        'alias_new' => 'To what other colleges/universities are you applying?',
+      ),
+      'Race' => array(
+        'title' => 'Ethnicity',
+        'is_alias' => TRUE,
+        'alias_new' => 'Race',
+        'columnName' => 'race_alias.label',
+      ),
+      'If_other,_please_specify:' => array(
+        'title' => 'If other, please specify',
+        'is_alias' => TRUE,
+        'alias_new' => 'If other, please specify:',
+      ),
+      'Are_you_of_Hispanic_or_Latino_descent' => array(
+        'title' => 'Hispanic or Latino descent?',
+        'is_alias' => TRUE,
+        'alias_new' => 'Are you of Hispanic or Latino descent',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
+      ),
+      'Church_Affiliation/Denomination' => array(
+        'title' => 'Church Affiliation / Denomination',
+        'is_alias' => TRUE,
+        'alias_new' => 'Church Affiliation/Denomination',
+      ),
+      'Church_City' => array(
+        'title' => 'Church City',
+      ),
+      'Church_State' => array(
+        'title' => 'Church State',
+      ),
+      'Church_Zip' => array(
+        'title' => 'Church Zip',
+      ),
+      'Are_you_an_active_member?' => array(
+        'title' => 'Active member?',
+        'is_alias' => TRUE,
+        'alias_new' => 'Are you an active member?',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
+      ),
+      'If_any_of_your_relatives_have_attended_Chowan_University,_please_give_their_names_and_relationship:' => array(
+        'title' => 'If any of your relatives have attended Chowan University, please give their names and relationship',
+        'is_alias' => TRUE,
+        'alias_new' => 'If any of your relatives have attended Chowan University, please give their names and relationship:',
       ),
       'Condition_of_Admission' => array(
         'title' => 'Condition of Admission Initials',
@@ -514,7 +618,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
       ),
     );
 
-    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }
 
   function from() {
@@ -529,7 +633,7 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 70);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 296);
   }
 
   function groupBy() {
@@ -545,6 +649,8 @@ class CRM_Nrm_Form_Report_VipApplication extends CRM_Report_Form {
     $this->beginPostProcess();
 
     $sql = $this->buildQuery(FALSE);
+    CRM_Core_Error::debug( '$sql', $sql );
+    exit;
 
     $rows = array();
     $this->buildRows($sql, $rows);
