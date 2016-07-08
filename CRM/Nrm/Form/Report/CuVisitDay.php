@@ -153,7 +153,7 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 71);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 299);
   }
 
   function groupBy() {
@@ -190,12 +190,10 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $config = CRM_Core_Config::singleton();
-      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-      $drupalDatabase = $dsnArray['database'];
+      $drupalDatabase = 'chowan_drupal';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 71";
+        WHERE form_key = '{$formKey}' AND nid = 299";
       if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id', 'how_did_you_hear_about_chowan', 'anticipated_academic_enroll_term', 'how_did_you_hear_about_cu_visit_day'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
