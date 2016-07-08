@@ -145,7 +145,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $drupalDatabase = 'chowan_drupal';
     $sql = "SELECT extra
       FROM {$drupalDatabase}.webform_component
-      WHERE form_key = 'type_of_inquiry' AND nid = 72";
+      WHERE form_key = 'type_of_inquiry' AND nid = 300";
     $result = CRM_Core_DAO::singleValueQuery($sql);
     $result = unserialize($result);
     $inquiry = explode('|', $result['items']);

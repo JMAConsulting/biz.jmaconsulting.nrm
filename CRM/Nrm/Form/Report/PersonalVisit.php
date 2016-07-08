@@ -163,7 +163,7 @@ class CRM_Nrm_Form_Report_PersonalVisit extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 89);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 302);
   }
 
   function groupBy() {
