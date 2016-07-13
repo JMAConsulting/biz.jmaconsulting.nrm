@@ -227,7 +227,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
               $this->_cuvdField = TRUE;
               if ($field['is_alias'] == TRUE) {
                 if ($field['is_select'] == TRUE) {
-                  $cuvdFields[] = "CONCAT('{$field['title']}', ': ', {$field['field_name']}, 'cuvd{$field['cid']}<br/>')";
+                  $cuvdFields[] = "CONCAT('{$field['title']}', ': ', {$field['field_name']}, '>>>>{$field['cid']}<br/>')";
                 }
                 $cuvdFields[] = "CONCAT('{$field['title']}', ': ', {$field['field_name']}, '<br/>')";
               }
@@ -245,7 +245,16 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
             }
             elseif (array_key_exists($tableName, $this->soarColumn)) {
               $this->_soarField = TRUE;
-              $soarFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              if ($field['is_alias'] == TRUE) {
+                if ($field['is_select'] == TRUE) {
+                  $soarFields[] = "CONCAT('{$field['title']}', ': ', {$field['field_name']}, '>>>>{$field['cid']}<br/>')";
+                }
+                $soarFields[] = "CONCAT('{$field['title']}', ': ', {$field['field_name']}, '<br/>')";
+              }
+              }
+              else {
+                $soarFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              }
               $this->customSOARField = "CONCAT(" . implode(', ', $soarFields) . ")";
               $soarField = "{$this->customSOARField} as civicrm_contact_soar_registration,";
             }
@@ -335,6 +344,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
     if ($this->_params['fields']['wsd6.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd6
         ON wsd6.sid = wsd.sid and wsd4.cid = 43";
+    } 
+
+    if ($this->_params['fields']['wsd7.data'] == 1) {
+      $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd7
+        ON wsd7.sid = wsd.sid and wsd7.cid = 26 
+        LEFT JOIN civicrm_event ce2 ON ce2.id = SUBSTRING_INDEX(wsd7.data, '-', 1)";
     }
     
     //used when address field is selected
@@ -666,41 +681,15 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       );
       $this->soarColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
       $this->soarColumn[$dao->table_name]['group_title'] = ts('SOAR Registrations');
-      $this->soarColumn[$dao->table_name]['fields']['wsd.data'] = array(
+      $this->cuvdColumn[$dao->table_name]['fields']['wsd7.data'] = array(
         'title' => 'Which SOAR event would you like to attend?',
-        'dbAlias' => 'wsd.data',
+        'dbAlias' => 'wsd7.data',
+        'is_alias' => TRUE,
         'default' => TRUE,
+        'field_name' => 'ce2.title',
       );
     }
     $this->soarTables = implode(' ', $tables);
-  }
-
-  function createVisitDay() {
-    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
-      WHERE g.id IN (6,11,8)";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    
-    while ($dao->fetch()) {
-      $fieldAlias = 'vgroup_' . $dao->group_id;
-      $field =  $fieldAlias . '.' . $dao->column_name;
-      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
-      $this->visitColumn['civicrm_value_visit_day_support_11']['fields'][$fieldAlias . $dao->column_name] = array(
-        'title' => $dao->label,
-        'dbAlias' => $fieldAlias . '.' . $dao->column_name,
-        'field_id' => $dao->field_id,
-        'default' => TRUE,
-      );
-      $this->visitColumn['civicrm_value_visit_day_support_11']['use_accordian_for_field_selection'] = TRUE;
-      $this->visitColumn['civicrm_value_visit_day_support_11']['group_title'] = ts('Visit Day Registrations');
-    }
-    $this->visitColumn['civicrm_value_visit_day_support_11']['fields']['wsd.data'] = array(
-      'title' => 'Which CU Visit Day will you be attending?',
-      'dbAlias' => 'wsd.data',
-      'default' => TRUE,
-    );
-    $this->visitTables = implode(' ', $tables);
   }
 
   function getWebforms() {
@@ -920,7 +909,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor extends CRM_Report_Form {
       if (empty($value)) {
         continue;
       }
-      $select = explode('cuvd', $value);
+      $select = explode('>>>>', $value);
       if (CRM_Utils_Array::value(1, $select)) {
         if ($select[1] == 38) {
           $extra = array(1 => 'Fall', 2 => 'Spring', 3 => 'Summer');
