@@ -129,7 +129,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 367, 16);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 383, 16);
   }
 
   function groupBy() {
@@ -167,7 +167,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       $drupalDatabase = $dsnArray['database'];
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 367";
+        WHERE form_key = '{$formKey}' AND nid = 383";
       if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
