@@ -1,0 +1,13 @@
+<?php
+
+//-----------------------------------------------------------------------------
+// This hook is run at the beginning of the page request.
+function nrm_custom_init() { 
+  $arg = arg();
+  $webform = webform_menu_load($arg[1]);
+  if (isset($webform) && $webform->type == 'webform') {
+    civicrm_initialize(); 
+    watchdog('visit', 'visit', array(), WATCHDOG_INFO);
+    CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
+  } 
+}

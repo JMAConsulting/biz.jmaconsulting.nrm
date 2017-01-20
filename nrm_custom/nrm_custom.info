@@ -1,0 +1,9 @@
+name = "NRM Custom"
+description = "Custom routines for tweaking Drupal for this particular site."
+package = New Reach Media
+core = 7.x
+
+version = "7.x"
+core = "7.x"
+project = "nrm_custom"
+files[] = nrm_custom.module
