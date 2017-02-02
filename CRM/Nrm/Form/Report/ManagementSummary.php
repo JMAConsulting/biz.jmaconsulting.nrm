@@ -89,11 +89,11 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
     $this->_columnHeaders["description"]['title'] = "Daily Activity Statistics";
     $this->_columnHeaders["perday_visitor_count"]['title'] = " ";
 
-    $visitCountDaily = $this->getVisitCount('yesterday', NULL, $from, $to);
-    $visitCountUnique = $this->getVisitCount('unique_yesterday', NULL, $from, $to);
-    $visitCountCumulative = $this->getVisitCount('cumulative', NULL, $from, $to);
-    $applicationCountDaily = $this->getVisitCount('yesterday', $appWhere, $from, $to);
-    $applicationCountCumulative = $this->getVisitCount('cumulative', $appWhere, $from, $to);
+    $visitCountDaily = 0; //$this->getVisitCount('yesterday', NULL, $from, $to);
+    $visitCountUnique = 0; //$this->getVisitCount('unique_yesterday', NULL, $from, $to);
+    $visitCountCumulative = 0; //$this->getVisitCount('cumulative', NULL, $from, $to);
+    $applicationCountDaily = 0; //$this->getVisitCount('yesterday', $appWhere, $from, $to);
+    $applicationCountCumulative = 0; //$this->getVisitCount('cumulative', $appWhere, $from, $to);
 
     $this->_select = "
        SELECT '{$dateName}' as description, '' as perday_visitor_count
