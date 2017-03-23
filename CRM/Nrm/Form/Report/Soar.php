@@ -115,7 +115,7 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 278, 7);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 298, 7);
   }
 
   function groupBy() {
@@ -146,14 +146,12 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
   }
 
   function createWebformTemp($formKeys) {
+    $drupalDatabase = 'chowan_drupal';
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $config = CRM_Core_Config::singleton();
-      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-      $drupalDatabase = $dsnArray['database'];
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 278";
+        WHERE form_key = '{$formKey}' AND nid = 298";
       $result = CRM_Core_DAO::singleValueQuery($sql);
       $result = unserialize($result);
       $item = explode('|', $result['items']);
