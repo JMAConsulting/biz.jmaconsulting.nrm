@@ -36,10 +36,10 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportSelectClause(&$form, $columns, $addTemp = FALSE, $addWSID = TRUE) {
+  public static function reportSelectClause(&$form, $columns, $addTemp = FALSE, $addWSID = TRUE, $inq = 300) {
     CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = 204800');
     if ($addTemp) {
-      self::createInquiry();
+      self::createInquiry($inq);
     }
     $form->_columnHeaders = $select = array();
     if ($addWSID) {
@@ -141,11 +141,11 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    *
    */ 
-  public static function createInquiry() {
+  public static function createInquiry($inq) {
     $drupalDatabase = 'chowan_drupal';
     $sql = "SELECT extra
       FROM {$drupalDatabase}.webform_component
-      WHERE form_key = 'type_of_inquiry' AND nid = 300";
+      WHERE form_key = 'type_of_inquiry' AND nid = {$inq}";
     $result = CRM_Core_DAO::singleValueQuery($sql);
     $result = unserialize($result);
     $inquiry = explode('|', $result['items']);

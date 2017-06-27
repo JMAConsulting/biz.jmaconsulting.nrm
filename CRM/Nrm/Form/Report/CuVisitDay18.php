@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_CuVisitDay18 extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -27,14 +27,24 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Chowan Scholarship Day Report'));
+    $this->assign('reportTitle', ts('CU Visit Day Report for 2018'));
     parent::preProcess();
   }
 
   function select() {
     $columns =  array(
-      'Which_Scholarship_Day_will_you_be_attending?' => array(
-        'title' => 'Which Scholarship Day will you be attending?',
+      'Submitted_Time' => array(
+        'title' => 'Submitted Time',
+        'ignore_group_concat' => TRUE,
+        'columnName' => "DATE_FORMAT(FROM_UNIXTIME(ws.completed), '%m-%d-%Y %r')",
+      ),
+      'Chowan_ID' => array(
+        'title' => 'Chowan ID',
+        'ignore_group_concat' => TRUE,
+        'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
+      ),
+      'Which_CU_Visit_Day_will_you_be_attending?' => array(
+        'title' => 'Which CU Visit Day will you be attending?',
         'columnName' => 'civicrm_1_participant_1_participant_event_id_alias.name',
       ),
       'First_Name' => array(
@@ -48,9 +58,6 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       ),
       'Preferred_Name' => array(
         'title' => 'Preferred Name',
-      ),
-      'Email' => array(
-        'title' => 'Email',
       ),
       'Primary_Phone_Number' => array(
         'title' => 'Primary Phone Number',
@@ -66,20 +73,27 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
         'title' => 'Secondary Phone Type',
         'columnName' => 'pt2.label',
       ),
-      'Street_Address' => array(
-        'title' => 'Street Address',
+      'Email' => array(
+        'title' => 'Email',
       ),
-      'Street_Address_Line_2' => array(
-        'title' => 'Street Address Line 2',
+      'Permanent_Address_Line_1' => array(
+        'title' => 'Permanent Address Line 1',
+      ),
+      'Permanent_Address_Line_2' => array(
+        'title' => 'Permanent Address Line 2',
       ),
       'City' => array(
         'title' => 'City',
       ),
-      'State/Province' => array(
-        'title' => 'State/Province',
+      'State' => array(
+        'title' => 'State',
       ),
-      'Postal_Code' => array(
-        'title' => 'Postal Code',
+      'Zip_Code' => array(
+        'title' => 'Zip Code',
+      ),
+      'Country' => array(
+        'title' => 'Country',
+        'columnName' => 'c.name',
       ),
       'Date_of_Birth' => array(
         'title' => 'Date of Birth',
@@ -88,11 +102,19 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
         'title' => 'Gender',
         'columnName' => 'g.label',
       ),
-      'High_School_Name' => array(
-        'title' => 'High School Name',
+      'Anticipated_Academic_Enroll_Term' => array(
+        'title' => 'Anticipated Academic Enroll Term',
+        'columnName' => 'anticipated_academic_enroll_term_alias.name',
       ),
-      'HS_Grad_Date' => array(
-        'title' => 'HS Grad Date',
+      'Anticipated_Academic_Enroll_Year' => array(
+        'title' => 'Anticipated Academic Enroll Year',
+        'columnName' => 'anticipated_academic_enroll_year_alias.name',
+      ),
+      'High_School_Attended' => array(
+        'title' => 'High School Attended',
+      ),
+      'High_School_Graduation_Date' => array(
+        'title' => 'High School Graduation Date',
       ),
       'Academics' => array(
         'title' => 'Academics',
@@ -106,13 +128,13 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
         'title' => 'Extra-Curricular',
         'columnName' => 'extra_alias.label',
       ),
-      'Leadership_Qualities' => array(
-        'title' => 'Leadership Qualities',
-        'is_alias' => TRUE,
-        'alias_new' => 'Leadership_Qualities',
+      'How_did_you_hear_about_Chowan?' => array(
+        'title' => 'How did you hear about Chowan?',
+        'columnName' => 'how_did_you_hear_about_chowan_alias.name',
       ),
-      'How_will_your_experiences_as_a_leader_help_you_fulfill_the_mission_statement_of_Chowan_University?' => array(
-        'title' => 'How will your experiences as a leader help you fulfill the mission statement of Chowan University?',
+      'How_did_you_hear_about_CU_Visit_Day?' => array(
+        'title' => 'How did you hear about CU Visit Day?',
+        'columnName' => 'how_did_you_hear_about_cu_visit_day_alias.name',
       ),
     );
 
@@ -125,11 +147,13 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       159 => 'athletics',
       158 => 'extra',
     );
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('civicrm_1_participant_1_participant_event_id'), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array( 'how_did_you_hear_about_chowan', 
+      'anticipated_academic_enroll_year', 'anticipated_academic_enroll_term',
+      'how_did_you_hear_about_cu_visit_day', 'civicrm_1_participant_1_participant_event_id'), $custom);
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 383);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 428);
   }
 
   function groupBy() {
@@ -143,8 +167,12 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-    
+
     $formKeys = array(
+      'how_did_you_hear_about_chowan',
+      'anticipated_academic_enroll_year',
+      'anticipated_academic_enroll_term',
+      'how_did_you_hear_about_cu_visit_day',
       'civicrm_1_participant_1_participant_event_id',
     );
     self::createWebformTemp($formKeys);
@@ -162,24 +190,31 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $config = CRM_Core_Config::singleton();
-      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-      $drupalDatabase = $dsnArray['database'];
+      $drupalDatabase = 'chowan_drupal';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 383";
-      if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
+        WHERE form_key = '{$formKey}' AND nid = 428";
+      if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id', 'how_did_you_hear_about_chowan', 'anticipated_academic_enroll_term', 'how_did_you_hear_about_cu_visit_day'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
         $item = explode('|', $result['items']);
-        $flag = TRUE;
         if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
-          $flag = FALSE;
-          $date = TRUE;
-          $temp = $item;
-          $item = array();
-          $item['dates'] = array_chunk($temp, 2);
+          $newItems = explode(PHP_EOL, $result['items']);
+          foreach ($newItems as $v) {
+            list($k, $v) = explode('|', $v);
+            $i[] = array($k, $v);
+          }
+          $item['dates'] = $i;
         }
+      }
+      if ($formKey == 'anticipated_academic_enroll_year') {
+        $item = array(
+          1 => 2015,
+          2 => 2016,
+          3 => 2017,
+          4 => 2018,
+        );
+        $flag = FALSE;
       }
       CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$formKey}");
       CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$formKey} (
@@ -204,6 +239,4 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
     }
   }
 
-  function alterDisplay(&$rows) {
-  }
 }

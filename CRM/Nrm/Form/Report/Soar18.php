@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_Soar18 extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -27,27 +27,27 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Chowan Scholarship Day Report'));
+    $this->assign('reportTitle', ts('SOAR Report for 2018'));
     parent::preProcess();
   }
 
   function select() {
     $columns =  array(
-      'Which_Scholarship_Day_will_you_be_attending?' => array(
-        'title' => 'Which Scholarship Day will you be attending?',
+      'Which_SOAR_event_would_you_like_to_attend?' => array(
+        'title' => 'Which SOAR event would you like to attend?',
         'columnName' => 'civicrm_1_participant_1_participant_event_id_alias.name',
       ),
       'First_Name' => array(
         'title' => 'First Name',
+      ),
+      'Preferred_Name' => array(
+        'title' => 'Preferred Name',
       ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
       ),
       'Last_Name' => array(
         'title' => 'Last Name',
-      ),
-      'Preferred_Name' => array(
-        'title' => 'Preferred Name',
       ),
       'Email' => array(
         'title' => 'Email',
@@ -67,10 +67,10 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
         'columnName' => 'pt2.label',
       ),
       'Street_Address' => array(
-        'title' => 'Street Address',
+        'title' => 'Permanent Address',
       ),
-      'Street_Address_Line_2' => array(
-        'title' => 'Street Address Line 2',
+      'Address_Line_2' => array(
+        'title' => 'Address Line 2',
       ),
       'City' => array(
         'title' => 'City',
@@ -81,18 +81,12 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       'Postal_Code' => array(
         'title' => 'Postal Code',
       ),
-      'Date_of_Birth' => array(
-        'title' => 'Date of Birth',
-      ),
       'Gender' => array(
         'title' => 'Gender',
         'columnName' => 'g.label',
       ),
-      'High_School_Name' => array(
-        'title' => 'High School Name',
-      ),
-      'HS_Grad_Date' => array(
-        'title' => 'HS Grad Date',
+      'Date_of_Birth' => array(
+        'title' => 'Date of Birth',
       ),
       'Academics' => array(
         'title' => 'Academics',
@@ -105,14 +99,6 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       'Extra-Curricular' => array(
         'title' => 'Extra-Curricular',
         'columnName' => 'extra_alias.label',
-      ),
-      'Leadership_Qualities' => array(
-        'title' => 'Leadership Qualities',
-        'is_alias' => TRUE,
-        'alias_new' => 'Leadership_Qualities',
-      ),
-      'How_will_your_experiences_as_a_leader_help_you_fulfill_the_mission_statement_of_Chowan_University?' => array(
-        'title' => 'How will your experiences as a leader help you fulfill the mission statement of Chowan University?',
       ),
     );
 
@@ -129,7 +115,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 383);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 431, 7);
   }
 
   function groupBy() {
@@ -157,30 +143,24 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
-  } 
+  }
 
   function createWebformTemp($formKeys) {
+    $drupalDatabase = 'chowan_drupal';
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $config = CRM_Core_Config::singleton();
-      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-      $drupalDatabase = $dsnArray['database'];
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 383";
-      if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
-        $result = CRM_Core_DAO::singleValueQuery($sql);
-        $result = unserialize($result);
-        $item = explode('|', $result['items']);
-        $flag = TRUE;
-        if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
-          $flag = FALSE;
-          $date = TRUE;
-          $temp = $item;
-          $item = array();
-          $item['dates'] = array_chunk($temp, 2);
-        }
+        WHERE form_key = '{$formKey}' AND nid = 431";
+      $result = CRM_Core_DAO::singleValueQuery($sql);
+      $result = unserialize($result);
+      $item = explode('|', $result['items']);
+      $newItems = explode(PHP_EOL, $result['items']);
+      foreach ($newItems as $v) {
+        list($k, $v) = explode('|', $v);
+        $i[] = array($k, $v);
       }
+      $item['dates'] = $i;
       CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$formKey}");
       CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$formKey} (
         value int(50) NOT NULL,

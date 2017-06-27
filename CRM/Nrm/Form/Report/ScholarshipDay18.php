@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
+class CRM_Nrm_Form_Report_ScholarshipDay18 extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -27,7 +27,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Chowan Scholarship Day Report'));
+    $this->assign('reportTitle', ts('Chowan Scholarship Day Report for 2018'));
     parent::preProcess();
   }
 
@@ -129,7 +129,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 383);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 430);
   }
 
   function groupBy() {
@@ -167,7 +167,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
       $drupalDatabase = $dsnArray['database'];
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 383";
+        WHERE form_key = '{$formKey}' AND nid = 430";
       if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
