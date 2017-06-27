@@ -119,7 +119,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    */
   public static function reportWhereClause(&$where, $webFormId, $cid = 2) {
     self::createUniqueSid($webFormId, $cid);
-    $where = "WHERE wc.nid IN ({$webFormId}) AND wsd.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.sid IN (SELECT sids FROM validsids)";
+    $where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
   
   /*

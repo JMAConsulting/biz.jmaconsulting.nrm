@@ -15,8 +15,8 @@ function civicrm_api3_nrm_processcounselor($params) {
   $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
   $counselorParams = array(
     'contact_sub_type' => 'Counselors',
-    'return.email' => 1,
-    'return.custom_' . TERRITORY_COUNSELOR => 1,
+    'sequential' => 1,
+    'return' => array("email", "custom_459", "display_name"),
     'rowCount' => $counsellorCount,
   );
   $counselors = civicrm_api3('Contact', 'get', $counselorParams);

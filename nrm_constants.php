@@ -8,8 +8,7 @@ define('PURLS', 'civicrm_value_nrmpurls_5');
 define('TERRITORY_COUNSELOR', 459);
 define('CID', 50);
 
-$host = "https://chowan2017.com/";
-$host = preg_replace('#^https?://#', '', $host);
+$host = "chowan2017.com/";
 define('MICROSITE', rtrim($host, "/"));
 
 ?>

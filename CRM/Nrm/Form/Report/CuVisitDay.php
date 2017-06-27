@@ -209,7 +209,6 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
       }
       if ($formKey == 'anticipated_academic_enroll_year') {
         $item = array(
-          1 => 2015,
           2 => 2016,
           3 => 2017,
         );
@@ -228,9 +227,11 @@ class CRM_Nrm_Form_Report_CuVisitDay extends CRM_Report_Form {
           $vals[] = " ('{$key}', '{$items}')";
         }
         if ($key == 'dates') {
-          foreach ($items as $k => $v) {
-            $vals[] = " ('{$v[0]}', '{$v[1]}')";
-          } 
+          if (is_array($items)) {
+            foreach ($items as $k => $v) {
+              $vals[] = " ('{$v[0]}', '{$v[1]}')";
+            }
+          }
         }
       }
       $sql .= implode(',', $vals);

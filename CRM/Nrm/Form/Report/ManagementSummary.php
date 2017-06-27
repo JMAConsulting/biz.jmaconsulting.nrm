@@ -431,4 +431,5 @@ class CRM_Nrm_Form_Report_ManagementSummary extends CRM_Report_Form {
   
   function alterDisplay(&$rows) {
   }
+
 }

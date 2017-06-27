@@ -162,9 +162,7 @@ class CRM_Nrm_Form_Report_ScholarshipDay extends CRM_Report_Form {
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $config = CRM_Core_Config::singleton();
-      $dsnArray = DB::parseDSN($config->userFrameworkDSN);
-      $drupalDatabase = $dsnArray['database'];
+      $drupalDatabase = 'chowan_drupal';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
         WHERE form_key = '{$formKey}' AND nid = 383";
