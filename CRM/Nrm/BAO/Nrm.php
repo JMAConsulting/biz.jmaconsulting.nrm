@@ -200,4 +200,32 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
             
     return CRM_Core_DAO::executeQuery($sql);
   }
+
+  /**
+   * Filter out the IPs used for testing from the count.
+   *
+   * @return CRM_Core_DAO|object
+   *   object that holds the results of the query, in this case no records
+   */
+  function filterIP() {
+    $drupalDatabase = 'chowan_drupal';
+
+    $options = civicrm_api3('OptionValue', 'get', array(
+      'sequential' => 1,
+      'return' => array("label"),
+      'option_group_id' => "exclude_ip",
+    ));
+
+    if ($options['count'] > 0) {
+      foreach ($options['values'] as $value) {
+        $ips[] = "'" . trim($value['label']) . "'";
+      }
+
+      $ipList = implode(', ', $ips);
+
+      $sql = "DELETE FROM {$drupalDatabase}.watchdog WHERE hostname IN ({$ipList})";
+
+      return CRM_Core_DAO::executeQuery($sql);
+    }
+  }
 }
