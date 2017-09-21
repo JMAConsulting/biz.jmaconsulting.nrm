@@ -120,6 +120,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
   public static function reportWhereClause(&$where, $webFormId, $cid = 2) {
     self::createUniqueSid($webFormId, $cid);
     $where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
+    //$where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = '2017-08-05' AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
   
   /*
@@ -200,10 +201,10 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
             
     return CRM_Core_DAO::executeQuery($sql);
   }
-
+  
   /**
    * Filter out the IPs used for testing from the count.
-   *
+   * 
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query, in this case no records
    */
@@ -224,7 +225,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       $ipList = implode(', ', $ips);
 
       $sql = "DELETE FROM {$drupalDatabase}.watchdog WHERE hostname IN ({$ipList})";
-
+            
       return CRM_Core_DAO::executeQuery($sql);
     }
   }

@@ -59,8 +59,8 @@ class CRM_Nrm_Form_Report_RequestedInfo18 extends CRM_Report_Form {
       'Last_Name' => array(
         'title' => 'Last Name',
       ),
-      'Permanent_Address_Line_1' => array(
-        'title' => 'Permanent Address Line 1',
+      'Permanent_Address' => array(
+        'title' => 'Permanent Address',
       ),
       'Permanent_Address_Line_2' => array(
         'title' => 'Permanent Address Line 2',
@@ -125,10 +125,10 @@ class CRM_Nrm_Form_Report_RequestedInfo18 extends CRM_Report_Form {
 
   function from() {
     $custom = array(
-      0 => 'inquiry',
+      //0 => 'inquiry',
       171 => 'major',
     );
-    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array(), $custom);
+    CRM_Nrm_BAO_Nrm::reportFromClause($this->_from, TRUE, array('inquiry'), $custom);
   }
 
   function where() {
