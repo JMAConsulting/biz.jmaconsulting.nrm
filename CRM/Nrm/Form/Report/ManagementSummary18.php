@@ -102,20 +102,20 @@ class CRM_Nrm_Form_Report_ManagementSummary18 extends CRM_Report_Form {
        SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> '{$microsite}' AND purl NOT LIKE '%{$micrositeold}%'
+       AND purl <> '{$microsite}'
        ) as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> '{$microsite}' AND purl NOT LIKE '%{$micrositeold}%'
+       AND purl <> '{$microsite}'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$from}')
        ) as c
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> '{$microsite}' AND purl NOT LIKE '%{$micrositeold}%'
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> '{$microsite}'
        AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) as e
        UNION
@@ -205,7 +205,7 @@ class CRM_Nrm_Form_Report_ManagementSummary18 extends CRM_Report_Form {
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountDaily}) AS visit
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       AND purl <> '{$microsite}' AND purl NOT LIKE '%{$micrositeold}%'
+       AND purl <> '{$microsite}'
        ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 
@@ -248,7 +248,7 @@ class CRM_Nrm_Form_Report_ManagementSummary18 extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND(num.ecount * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountCumulative}) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE purl <> '{$microsite}' AND purl NOT LIKE '%{$micrositeold}%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
+       WHERE purl <> '{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
        ) AS denom
        JOIN 
        (SELECT COUNT(*) as ecount FROM 

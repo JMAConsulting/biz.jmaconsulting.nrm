@@ -226,7 +226,42 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
 
       $sql = "DELETE FROM {$drupalDatabase}.watchdog WHERE hostname IN ({$ipList})";
             
-      return CRM_Core_DAO::executeQuery($sql);
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    // Delete accidental visits and old PURL visits.
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%chowan2017.com%'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%.com/oops%'");
+
+    // Delete test visits.
+    $testPurls = array(
+      'michaellearch',
+      'chernan',
+      'florreyescortez',
+      'kaylahill15',
+      'valarie',
+      'mattleonard',
+      'michaellerch',
+      'nykiyahanthony',
+      '2018prospect',
+      'prospect',
+      'aniyagregory',
+      'antonioscott',
+      'ginohernandez',
+      'johnfricke',
+      'keynishakelson',
+      'kimbailey',
+      'outlooktest',
+      'thomaswells',
+      'xavierstewart',
+      'yahootest',
+      'www',
+      'elizabethhixon',
+      'edsellopez',
+    );
+
+    foreach ($testPurls as $purl) {
+      CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%{$purl}%'");
     }
   }
 }
