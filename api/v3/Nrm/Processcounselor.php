@@ -11,6 +11,11 @@ require_once 'nrm_constants.php';
  * @throws API_Exception
  */
 function civicrm_api3_nrm_processcounselor($params) {
+
+  // Filter the table once since the report will be run multiple times.
+  CRM_Nrm_BAO_Nrm::filterIP();
+  CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
+  
   // Get list of counselors
   $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
   $counselorParams = array(

@@ -232,7 +232,12 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     // Delete accidental visits and old PURL visits.
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%chowan2017.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%.com/oops%'");
-
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
+    
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%chowan2017.com%'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%.com/oops%'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
+    
     // Delete test visits.
     $testPurls = array(
       'michaellearch',
@@ -258,10 +263,16 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       'www',
       'elizabethhixon',
       'edsellopez',
+      'chowan.server282.com',
+      'chowan.server288.com',
     );
 
     foreach ($testPurls as $purl) {
       CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%{$purl}%'");
+      CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$purl}%'");
     }
+    
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2018.com'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2018.com.'");
   }
 }

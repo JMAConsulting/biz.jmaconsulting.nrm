@@ -542,9 +542,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor18 extends CRM_Report_Form {
     $microsite = "chowan2018.com";
     $micrositeOld = "chowan2017.com";
     
-    CRM_Nrm_BAO_Nrm::filterIP();
-    
-    CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
             SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 

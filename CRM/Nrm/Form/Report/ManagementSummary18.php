@@ -95,7 +95,15 @@ class CRM_Nrm_Form_Report_ManagementSummary18 extends CRM_Report_Form {
     $visitCountCumulative = 0; //$this->getVisitCount('cumulative', NULL, $from, $to);
     $applicationCountDaily = 0; //$this->getVisitCount('yesterday', $appWhere, $from, $to);
     $applicationCountCumulative = 0; //$this->getVisitCount('cumulative', $appWhere, $from, $to);
-
+    /* $sql = CRM_Core_DAO::executeQuery("SELECT DISTINCT(purl) as purl_perday_visitor  
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       AND purl <> '{$microsite}'");
+    $visitors = array();
+    while ($sql->fetch()) {
+      $visitors[] = $sql->purl_perday_visitor;
+    }
+    CRM_Core_Error::debug('af', $visitors);
+    exit; */
     $this->_select = "
        SELECT '{$dateName}' as description, '' as perday_visitor_count
        UNION
