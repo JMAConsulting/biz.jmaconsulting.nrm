@@ -344,6 +344,12 @@ class CRM_Nrm_Form_Report_VipApplication18 extends CRM_Report_Form {
         'alias_new' => 'Are you enrolled in a Teacher Cadet Program?',
         'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
       ),
+      'Is_there_a_possibility_that_you_may_use_VA_Benefits_towards_your_tuition?' => array(
+        'title' => 'VA Benefits',
+        'is_alias' => TRUE,
+        'alias_new' => 'Is there a possibility that you may use VA Benefits towards your tuition?',
+        'columnName' => "IF(wsd.data=0, 'No', 'Yes')",
+      ),
       'Have_you_visited_Chowan_University?' => array(
         'title' => 'Visited Chowan?',
         'is_alias' => TRUE,
