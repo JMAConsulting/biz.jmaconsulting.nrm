@@ -146,7 +146,7 @@ class CRM_Nrm_Form_Report_Soar extends CRM_Report_Form {
   }
 
   function createWebformTemp($formKeys) {
-    $drupalDatabase = 'chowan_drupal';
+    $drupalDatabase = 'chowan_dru';
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
       $sql = "SELECT extra

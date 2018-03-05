@@ -21,7 +21,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor18 extends CRM_Report_Form {
   public static $_fieldLabels = array();
  
   function __construct() {
-    $this->_drupalDatabase = 'chowan_drupal';
+    $this->_drupalDatabase = 'chowan_dru';
     self::getWebforms();
     self::createSurveyResponse();
     self::createCUVDRegistration();
@@ -335,7 +335,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor18 extends CRM_Report_Form {
   }
 
   function from() {
-    $this->_drupalDatabase = 'chowan_drupal';
+    $this->_drupalDatabase = 'chowan_dru';
 
     $this->_from = NULL;
 
@@ -494,7 +494,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor18 extends CRM_Report_Form {
       }
       $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admissions_territory_459, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
         FROM civicrm_value_territory_26 t26 WHERE t26.entity_id IN (" . $counsellor . ")");
-      $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
+      if ($sql) {
+        $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
+      }
+      else {
+        $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN (0))";
+      }
     }
 
     if (empty($clauses)) {

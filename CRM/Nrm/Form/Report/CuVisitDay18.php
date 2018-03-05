@@ -190,7 +190,7 @@ class CRM_Nrm_Form_Report_CuVisitDay18 extends CRM_Report_Form {
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $drupalDatabase = 'chowan_drupal';
+      $drupalDatabase = 'chowan_dru';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
         WHERE form_key = '{$formKey}' AND nid = 428";
