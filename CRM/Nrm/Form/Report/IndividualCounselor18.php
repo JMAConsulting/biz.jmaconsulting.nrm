@@ -492,9 +492,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor18 extends CRM_Report_Form {
       if (is_array($counsellor)) {
         $counsellor = implode(',', $counsellor);
       }
-      $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admissions_territory_459, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
-        FROM civicrm_value_territory_26 t26 WHERE t26.entity_id IN (" . $counsellor . ")");
-      if ($sql) {
+   /*   $sql = CRM_Core_DAO::singleValueQuery("SELECT TRIM(TRAILING \",'\" FROM (TRIM(LEADING \"',\" FROM (REPLACE(t26.admissions_territory_459, '" . CRM_Core_DAO::VALUE_SEPARATOR . "', \"','\")))))
+        FROM civicrm_value_territory_26 t26 WHERE t26.entity_id IN (" . $counsellor . ")"); */
+      $sql = "SELECT t26.admissions_territory_459 FROM civicrm_value_territory_26 t26 WHERE t26.entity_id IN (" . $counsellor . ") AND t26.admissions_territory_459 <> '' AND t26.admissions_territory_459 IS NOT NULL GROUP BY entity_id";
+      if (CRM_Core_DAO::singleValueQuery($sql)) {
         $clauses[] = " (value_nrmlayer_6_civireport.territory_147 IN ({$sql}))";
       }
       else {
