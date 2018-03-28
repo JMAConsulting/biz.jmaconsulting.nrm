@@ -265,6 +265,15 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       'edsellopez',
       'chowan.server282.com',
       'chowan.server288.com',
+      'staging',
+      'nancyaltstatt',
+      'blog',
+      'test',
+      'wp',
+      'sandbox',
+      'prod',
+      'digett',
+      'pradeepnayak',
     );
 
     foreach ($testPurls as $purl) {
