@@ -86,7 +86,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    */
   public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array(), $ov = array()) {
-    $drupalDb = 'chowan_dru';
+    $drupalDb = 'chowan2019_dru';
     $from = "FROM {$drupalDb}.webform_submitted_data wsd 
       LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid AND wc.nid = wsd.nid
@@ -143,7 +143,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    */ 
   public static function createInquiry($inq) {
-    $drupalDatabase = 'chowan_dru';
+    $drupalDatabase = 'chowan2019_dru';
     $sql = "SELECT extra
       FROM {$drupalDatabase}.webform_component
       WHERE form_key = 'type_of_inquiry' AND nid = {$inq}";
@@ -174,7 +174,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    */ 
   public static function createUniqueSid($webFormId, $cid = 2) {
-    $drupalDatabase = 'chowan_dru';
+    $drupalDatabase = 'chowan2019_dru';
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS validsids");
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE validsids AS
       SELECT MAX(d.sid) as sids from {$drupalDatabase}.webform_submitted_data d
@@ -190,7 +190,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *   object that holds the results of the query, in this case no records
    */
   function updateWatchdog_nrm() {
-    $drupalDatabase = 'chowan_dru';
+    $drupalDatabase = 'chowan2019_dru';
 
     $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
             SELECT w.wid, w.location, w.timestamp, 
@@ -209,7 +209,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *   object that holds the results of the query, in this case no records
    */
   function filterIP() {
-    $drupalDatabase = 'chowan_dru';
+    $drupalDatabase = 'chowan2019_dru';
 
     $options = civicrm_api3('OptionValue', 'get', array(
       'sequential' => 1,
@@ -230,11 +230,11 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     }
 
     // Delete accidental visits and old PURL visits.
-    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%chowan2017.com%'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%chowan2018.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%.com/oops%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
     
-    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%chowan2017.com%'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%chowan2018.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%.com/oops%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
     
@@ -281,7 +281,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$purl}%'");
     }
     
-    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2018.com'");
-    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2018.com.'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com.'");
   }
 }

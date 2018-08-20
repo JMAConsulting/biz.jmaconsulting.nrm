@@ -13,16 +13,16 @@ require_once 'nrm_constants.php';
 function civicrm_api3_nrm_processcounselor($params) {
 
   // Filter the table once since the report will be run multiple times.
-  CRM_Nrm_BAO_Nrm::filterIP();
-  CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
+  //CRM_Nrm_BAO_Nrm::filterIP();
+  //CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
   
   // Get list of counselors
-  $counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
+  //$counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
   $counselorParams = array(
     'contact_sub_type' => 'Counselors',
     'sequential' => 1,
     'return' => array("email", "custom_459", "display_name"),
-    'rowCount' => $counsellorCount,
+    // 'rowCount' => $counsellorCount,
   );
   $counselors = civicrm_api3('Contact', 'get', $counselorParams);
   $ind = array();
