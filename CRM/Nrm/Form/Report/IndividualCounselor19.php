@@ -798,7 +798,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
         'default' => TRUE,
       );
       $this->vipColumn['civicrm_contact_vip_application']['use_accordian_for_field_selection'] = TRUE;
-      $this->vipColumn['civicrm_contact_vip_application']['group_title'] = ts('Visit Day Registrations');
+      $this->vipColumn['civicrm_contact_vip_application']['group_title'] = ts('VIP Applications');
     }
     $this->vipTables = implode(' ', $tables);
   }
