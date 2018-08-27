@@ -30,6 +30,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     self::createInfoRequest();
     self::createVIPApplication();
     self::createCSD();
+    self::createUpdateInfo();
     $counsellors = self::getCounsellors();
 
     $this->_columns = array(
@@ -150,6 +151,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $this->_columns = array_merge($this->_columns, $this->infoColumn);
     $this->_columns = array_merge($this->_columns, $this->vipColumn);
     $this->_columns = array_merge($this->_columns, $this->csdColumn);
+    $this->_columns = array_merge($this->_columns, $this->updateColumn);
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_aliases['civicrm_contact'] = 'contact_civireport';
@@ -249,6 +251,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
               $this->customPVDField = "CONCAT(" . implode(', ', $pvdFields) . ")";
               $pvdField = "{$this->customPVDField} as civicrm_contact_pvd_registration,";
             }
+            elseif (array_key_exists($tableName, $this->updateColumn)) {
+              $this->_updateField = TRUE;
+              $updateFields[] = "IF({$field['dbAlias']} IS NULL or {$field['dbAlias']} = '', '', CONCAT({$field['dbAlias']}, '::::{$field['field_id']}<br/>'))";
+              $this->customUpdateField = "CONCAT(" . implode(', ', $updateFields) . ")";
+              $updateField = "{$this->customUpdateField} as civicrm_contact_update_information,";
+            }
             elseif (array_key_exists($tableName, $this->soarColumn)) {
               $this->_soarField = TRUE;
               if ($field['is_alias'] == TRUE) {
@@ -316,7 +324,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       {$soarField}
       {$vipField}
       {$csdField}
-      {$nrmField}";
+      {$nrmField}
+      {$updateField}";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
@@ -332,6 +341,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_soar_registration"]['title'] = ts('SOAR Registrations');
     $this->_columnHeaders["civicrm_contact_vip_application"]['title'] = ts('VIP Applications');
     $this->_columnHeaders["civicrm_contact_csd_application"]['title'] = ts('CSD Registrations');
+    $this->_columnHeaders["civicrm_contact_update_information"]['title'] = ts('Update Information');
   }
 
   function from() {
@@ -360,6 +370,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $this->_from .= "{$this->vipTables}";
 
     $this->_from .= "{$this->csdTables}";
+
+    $this->_from .= "{$this->updateTables}";
     
 
     $this->_from .= "
@@ -612,7 +624,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
       FROM civicrm_custom_group g 
       LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
-      WHERE title LIKE '%NRM%'";
+      WHERE title LIKE '%NRM%' OR g.id IN (8)";
     $dao = CRM_Core_DAO::executeQuery($sql);
     
     while ($dao->fetch()) {
@@ -720,6 +732,29 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       $this->pvdColumn[$dao->table_name]['group_title'] = ts('Personal Visit Day Registrations');
     }
     $this->pvdTables = implode(' ', $tables);
+  }
+
+  function createUpdateInfo() {
+    $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
+      FROM civicrm_custom_group g 
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      WHERE g.id IN (7)";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    
+    while ($dao->fetch()) {
+      $fieldAlias = 'ugroup_' . $dao->group_id;
+      $field =  $fieldAlias . '.' . $dao->column_name;
+      $tables[$dao->group_id] = " LEFT JOIN {$dao->table_name} {$fieldAlias} ON {$fieldAlias}.entity_id = contact_civireport.id ";
+      $this->updateColumn[$dao->table_name]['fields'][$fieldAlias . $dao->column_name] = array(
+        'title' => $dao->label,
+        'dbAlias' => $fieldAlias . '.' . $dao->column_name,
+        'field_id' => $dao->field_id,
+        'default' => TRUE,
+      );
+      $this->updateColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
+      $this->updateColumn[$dao->table_name]['group_title'] = ts('Update Information');
+    }
+    $this->updateTables = implode(' ', $tables);
   }
 
   function createSOARRegistration() {
@@ -860,7 +895,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
-        $validNids = array(308,425);
+        //$validNids = array(308,425);
+        $validNids = array(304,305,307,373,374,375,400,475,476,490,491,501,503,504);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_survey_response'] = NULL;
@@ -925,6 +961,19 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
         }
       }
       
+      if (array_key_exists('civicrm_contact_update_information', $row)) {
+        $validNids = array(552);
+        $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
+        if (!$dao->N) {
+          $rows[$rowNum]['civicrm_contact_pvd_registration'] = NULL;
+        }
+        else {
+          $rows[$rowNum]['civicrm_contact_pvd_registration'] = self::getCustomFieldDataLabels($row['civicrm_contact_pvd_registration']);
+          $rows[$rowNum]['civicrm_contact_pvd_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_pvd_registration']);
+          $entryFound = TRUE;
+        }
+      }
+      
       if (array_key_exists('civicrm_contact_csd_registration', $row)) {
         $validNids = array(430);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -952,7 +1001,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       }
 
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
-        $validNids = array(427);
+        $validNids = array(427,551);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_info_request'] = NULL;
