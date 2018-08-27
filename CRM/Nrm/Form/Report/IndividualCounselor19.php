@@ -147,11 +147,11 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $this->_columns = array_merge($this->_columns, $this->surveyColumn);
     $this->_columns = array_merge($this->_columns, $this->cuvdColumn);
     $this->_columns = array_merge($this->_columns, $this->pvdColumn);
+    $this->_columns = array_merge($this->_columns, $this->updateColumn);
     $this->_columns = array_merge($this->_columns, $this->soarColumn);
     $this->_columns = array_merge($this->_columns, $this->infoColumn);
     $this->_columns = array_merge($this->_columns, $this->vipColumn);
     $this->_columns = array_merge($this->_columns, $this->csdColumn);
-    $this->_columns = array_merge($this->_columns, $this->updateColumn);
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_aliases['civicrm_contact'] = 'contact_civireport';
@@ -321,11 +321,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       {$surveyField}
       {$cuvdField}
       {$pvdField}
+      {$updateField}
       {$soarField}
       {$vipField}
       {$csdField}
       {$nrmField}
-      {$updateField}";
+      ";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
@@ -338,10 +339,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
     $this->_columnHeaders["civicrm_contact_survey_response"]['title'] = ts('Survey Responses');
     $this->_columnHeaders["civicrm_contact_cuvd_registration"]['title'] = ts('CUVD Registrations');
     $this->_columnHeaders["civicrm_contact_pvd_registration"]['title'] = ts('PVD Registrations');
+    $this->_columnHeaders["civicrm_contact_update_information"]['title'] = ts('Update Information');
     $this->_columnHeaders["civicrm_contact_soar_registration"]['title'] = ts('SOAR Registrations');
     $this->_columnHeaders["civicrm_contact_vip_application"]['title'] = ts('VIP Applications');
     $this->_columnHeaders["civicrm_contact_csd_application"]['title'] = ts('CSD Registrations');
-    $this->_columnHeaders["civicrm_contact_update_information"]['title'] = ts('Update Information');
   }
 
   function from() {
@@ -640,7 +641,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
         $this->infoColumn[$dao->table_name]['fields'][$dao->column_name]['default'] = TRUE;
       }
       $this->infoColumn[$dao->table_name]['use_accordian_for_field_selection'] = TRUE;
-      $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests & Downloads');
+      if ($dao->table_name == 'civicrm_value_nrmlayer_6') {
+        $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests & Downloads');
+      }
+      elseif ($dao->table_name == 'civicrm_value_schoolhistory_8') {
+        $this->infoColumn[$dao->table_name]['group_title'] = ts('Information Requests (High School Information)');
+      }
     }
     $this->nrmTables = implode(' ', $tables);
   }
