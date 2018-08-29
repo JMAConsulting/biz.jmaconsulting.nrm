@@ -43,6 +43,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
+          'sort_name' => array(
+            'title' => ts('Visits'),
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
         ),
         'filters' => array(
           'display_name' => array(
@@ -899,6 +905,31 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_display_name'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_display_name']);
         $entryFound = TRUE;
       }
+
+      if (array_key_exists('civicrm_contact_sort_name', $row)) {
+        $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
+        if ($purl) {
+          $string = '';
+          // Visits. 
+          $sql = "SELECT DISTINCT(location) FROM {$this->_drupalDatabase}.watchdog_nrm
+            WHERE location LIKE {$purl}
+            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+            AND (location LIKE '%vip-application-admission%' OR location LIKE '%update-information%' OR location LIKE '%request-information%'
+            OR location LIKE '%soar%' OR location LIKE '%chowan-scholarship-day%' OR location LIKE '%personal-visit-day%'
+            OR location LIKE '%cu-visit-day%' OR location LIKE '%survey%')
+            ";
+          $dao = CRM_Core_DAO::executeQuery($sql);
+          if ($dao->N) {
+            $string = "<br/><hr><b>Visits:</b><br/>";
+          }
+          while ($dao->fetch()) {
+            $string .= urldecode(basename($dao->location)) . "<br/>";
+          }
+          $rows[$rowNum]['civicrm_contact_sort_name'] = $rows[$rowNum]['civicrm_contact_sort_name'] . $string;
+          $rows[$rowNum]['civicrm_contact_sort_name'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_sort_name']);
+          $entryFound = TRUE;
+        }
+      }
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         //$validNids = array(308,425);
@@ -1026,21 +1057,6 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
             $string = "<br/><hr><b>Downloads:</b><br/>";
-          }
-          while ($dao->fetch()) {
-            $string .= urldecode(basename($dao->location)) . "<br/>";
-          }
-          // Visits. 
-          $sql = "SELECT DISTINCT(location) FROM {$this->_drupalDatabase}.watchdog_nrm
-            WHERE location LIKE {$purl}
-            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-            AND (location LIKE '%vip-application-admission%' OR location LIKE '%update-information%' OR location LIKE '%request-information%'
-            OR location LIKE '%soar%' OR location LIKE '%chowan-scholarship-day%' OR location LIKE '%personal-visit-day%'
-            OR location LIKE '%cu-visit-day%' OR location LIKE '%survey%')
-            ";
-          $dao = CRM_Core_DAO::executeQuery($sql);
-          if ($dao->N) {
-            $string .= "<br/><hr><b>Visits:</b><br/>";
           }
           while ($dao->fetch()) {
             $string .= urldecode(basename($dao->location)) . "<br/>";
