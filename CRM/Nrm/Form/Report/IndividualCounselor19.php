@@ -1031,7 +1031,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
             $string .= urldecode(basename($dao->location)) . "<br/>";
           }
           // Visits. 
-          $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog_nrm
+          $sql = "SELECT DISTINCT(location) FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
             AND (location LIKE '%vip-application-admission%' OR location LIKE '%update-information%' OR location LIKE '%request-information%'
