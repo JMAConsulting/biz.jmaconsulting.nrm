@@ -1020,11 +1020,27 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
           $string = '';
           $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
+            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day) 
             AND location LIKE '%.pdf%'
-            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)";
+            ";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
             $string = "<br/><hr><b>Downloads:</b><br/>";
+          }
+          while ($dao->fetch()) {
+            $string .= urldecode(basename($dao->location)) . "<br/>";
+          }
+          // Visits. 
+          $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog_nrm
+            WHERE location LIKE {$purl}
+            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
+            AND (location LIKE '%vip-application-admission%' OR location LIKE '%update-information%' OR location LIKE '%request-information%'
+            OR location LIKE '%soar%' OR location LIKE '%chowan-scholarship-day%' OR location LIKE '%personal-visit-day%'
+            OR location LIKE '%cu-visit-day%' OR location LIKE '%survey%')
+            ";
+          $dao = CRM_Core_DAO::executeQuery($sql);
+          if ($dao->N) {
+            $string .= "<br/><hr><b>Visits:</b><br/>";
           }
           while ($dao->fetch()) {
             $string .= urldecode(basename($dao->location)) . "<br/>";
