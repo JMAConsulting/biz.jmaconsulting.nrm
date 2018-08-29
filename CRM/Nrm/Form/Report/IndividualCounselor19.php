@@ -335,6 +335,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       ";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
+    $this->_columnHeaders["civicrm_contact_sort_name"]['title'] = ts('Visits');
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     if ($this->_logField) {
       $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
