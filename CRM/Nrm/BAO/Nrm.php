@@ -150,6 +150,9 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $result = CRM_Core_DAO::singleValueQuery($sql);
     $result = unserialize($result);
     $inquiry = explode('|', $result['items']);
+    if (count($inquiry) > 0) {
+      return;
+    }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
     CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS inquiry (
       value int(50) NOT NULL,
@@ -237,7 +240,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%chowan2018.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%.com/oops%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
-    
+
     // Delete test visits.
     $testPurls = array(
       'michaellearch',

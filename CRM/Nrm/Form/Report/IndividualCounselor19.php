@@ -45,8 +45,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
           ),
           'sort_name' => array(
             'title' => ts('Visits'),
-            'required' => TRUE,
-            'default' => TRUE,
+           // 'required' => TRUE,
+            //'default' => TRUE,
             'no_repeat' => TRUE,
           ),
         ),

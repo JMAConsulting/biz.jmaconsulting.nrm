@@ -45,14 +45,20 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
         'ignore_group_concat' => TRUE,
         'columnName' => 'DATE(FROM_UNIXTIME(ws.completed))',
       ),
-      'First_Name' => array(
+      'First_Name_1' => array(
         'title' => 'First Name',
+        'cid' => 3,
+        'same_alias' => TRUE,
+        'alias' => 1,
       ),
       'Middle_Name' => array(
         'title' => 'Middle Name',
       ),
-      'Last_Name' => array(
+      'Last_Name_1' => array(
         'title' => 'Last Name',
+        'cid' => 5,
+        'same_alias' => TRUE,
+        'alias' => 1,
       ),
       'Name_Suffix' => array(
         'title' => 'Name Suffix',
@@ -68,8 +74,11 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
       'Birth_Date' => array(
         'title' => 'Birth Date',
       ),
-      'Email' => array(
+      'Email_1' => array(
         'title' => 'Email',
+        'cid' => 13,
+        'same_alias' => TRUE,
+        'alias' => 1,
       ),
       'Street_Address' => array(
         'title' => 'Street Address',
@@ -108,7 +117,7 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 426);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 552);
   }
 
   function groupBy() {
