@@ -99,6 +99,10 @@ class CRM_Nrm_Form_Report_VipApplication19 extends CRM_Report_Form {
         'alias' => 3,
         'cid' => 149,
       ),
+      'county_of_residence' => array(
+        'title' => 'County of Residence',
+        'cid' => 266,
+      ),
       'State_3' => array(
         'title' => 'State',
         'same_alias' => TRUE,
