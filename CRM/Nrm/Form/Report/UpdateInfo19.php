@@ -105,6 +105,10 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
         'title' => 'Phone Type',
         'columnName' => 'pt1.label',
       ),
+      'HS_Grad_Year' => array(
+        'title' => 'HS Grad Year',
+        'cid' => 43,
+      ),
     );
     CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns);
   }

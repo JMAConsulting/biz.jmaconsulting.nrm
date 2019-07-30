@@ -118,9 +118,12 @@ class CRM_Nrm_Form_Report_RequestedInfo19 extends CRM_Report_Form {
       'Comments/Questions' => array(
         'title' => 'Comments/Questions',
       ),
+      'HS_Grad_Year' => array(
+        'title' => 'HS Grad Year',
+      ),
     );
 
-    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE, TRUE, 427);
+    CRM_Nrm_BAO_Nrm::reportSelectClause($this, $columns, TRUE, TRUE, 551);
   }
 
   function from() {
@@ -132,7 +135,7 @@ class CRM_Nrm_Form_Report_RequestedInfo19 extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 427);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 551);
   }
 
   function groupBy() {
@@ -146,6 +149,7 @@ class CRM_Nrm_Form_Report_RequestedInfo19 extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
+    CRM_Nrm_BAO_Nrm::createInquiry(551);
 
     $sql = $this->buildQuery(FALSE);
 

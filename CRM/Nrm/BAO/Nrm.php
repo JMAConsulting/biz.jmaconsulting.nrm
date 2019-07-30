@@ -120,7 +120,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
   public static function reportWhereClause(&$where, $webFormId, $cid = 2) {
     self::createUniqueSid($webFormId, $cid);
     $where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
-    //$where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = '2017-08-05' AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
+    //$where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = '2019-06-25' AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
   
   /*
@@ -150,7 +150,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $result = CRM_Core_DAO::singleValueQuery($sql);
     $result = unserialize($result);
     $inquiry = explode('|', $result['items']);
-    if (count($inquiry) > 0) {
+    if (count($inquiry) < 0) {
       return;
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
