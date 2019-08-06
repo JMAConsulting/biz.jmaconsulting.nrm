@@ -286,5 +286,8 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com.'");
+    
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2020.com'");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2020.com.'");
   }
 }
