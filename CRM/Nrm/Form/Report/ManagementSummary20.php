@@ -118,13 +118,13 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$from}')
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')
        ) as c
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
        ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
-       AND DATE(FROM_UNIXTIME(timestamp)) <= '{$from}'
+       AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        ) as e
        UNION
        SELECT 'Application page visits - yesterday' as description, (g.purl_perday_start + {$applicationCountDaily}) as perday_visitor_count FROM
