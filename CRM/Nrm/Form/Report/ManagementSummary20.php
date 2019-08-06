@@ -288,7 +288,12 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}') 
        GROUP BY contact_id
        ) as ue
-       ) AS num";
+       ) AS num
+       UNION
+       SELECT 'Cumulative Unsubscribes' as description, COUNT(*) as perday_visitor_count FROM
+       webform_submitted_data wsd WHERE wsd.cid = 2 AND wsd.sid IN
+       (SELECT sid FROM {$this->_drupalDatabase}.webform_submitted_data WHERE nid = 434 AND cid = 17 AND data = 2020) 
+       GROUP BY wsd.data";
   }
 
   function from() {
