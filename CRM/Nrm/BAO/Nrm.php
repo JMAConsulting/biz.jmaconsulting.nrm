@@ -150,7 +150,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $result = CRM_Core_DAO::singleValueQuery($sql);
     $result = unserialize($result);
     $inquiry = explode('|', $result['items']);
-    if (count($inquiry) < 0) {
+    if (count(array_filter($inquiry)) <= 0) {
       return;
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS inquiry");
