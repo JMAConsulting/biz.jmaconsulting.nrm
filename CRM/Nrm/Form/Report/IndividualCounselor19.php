@@ -165,7 +165,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Daily Counselor Report for 2018'));
+    $this->assign('reportTitle', ts('Daily Counselor Report for 2019'));
     parent::preProcess();
   }
 
@@ -572,12 +572,12 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
             SELECT DISTINCT w.* FROM (
               SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
               DATE_FORMAT(DATE(FROM_UNIXTIME(MIN(timestamp))),'%m/%d/%Y') as first_visit
-              FROM {$this->_drupalDatabase}.watchdog_nrm
+              FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$microsite}%'
               GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)
               ) AS w INNER JOIN (
               SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl 
-              FROM {$this->_drupalDatabase}.watchdog_nrm
-              WHERE DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
+              FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$microsite}%'
+              AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
             ON w.purl=wy.purl";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl(255)) USING HASH";
@@ -602,7 +602,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
       SELECT p.entity_id as contact_id, w.timestamp as visit_time
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
-      WHERE w.purl <> '{$microsite}'
+      WHERE w.purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
