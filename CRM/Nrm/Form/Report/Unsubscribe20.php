@@ -18,6 +18,14 @@ class CRM_Nrm_Form_Report_Unsubscribe20 extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ),
         ),
+        'filters' => array(
+          'grad_year' => array(
+            'title' => ts('HS Grad Year'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => [2019 => 2019, 2020 => 2020],
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
     );
@@ -75,10 +83,14 @@ class CRM_Nrm_Form_Report_Unsubscribe20 extends CRM_Report_Form {
   }
 
   function postProcess() {
-
+    $grad = 2020;
+    if (!empty($this->_submitValues['grad_year_value'])) {
+      $grad = $this->_submitValues['grad_year_value'];
+    }
     $this->beginPostProcess();
 
     $sql = $this->buildQuery(FALSE);
+    $sql = "SELECT * FROM (" . $sql . ") as a GROUP BY a.sid HAVING a.HS_Grad_Year={$grad}";
 
     $rows = array();
     $this->buildRows($sql, $rows);
@@ -89,6 +101,16 @@ class CRM_Nrm_Form_Report_Unsubscribe20 extends CRM_Report_Form {
   }
 
   function alterDisplay(&$rows) {
+    if (!empty($rows)) {
+      foreach ($rows as &$row) {
+        if (!empty($row['Unsubscribe'])) {
+          $row['Unsubscribe'] = "Yes";
+        }
+        else {
+          $row['Unsubscribe'] = "No";
+        }
+      }
+    }
   }
 
 }
