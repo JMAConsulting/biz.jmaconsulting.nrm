@@ -71,7 +71,7 @@ class CRM_Nrm_Form_Report_Unsubscribe20 extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 434);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 703);
   }
 
   function groupBy() {
