@@ -105,6 +105,48 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
         'title' => 'Phone Type',
         'columnName' => 'pt1.label',
       ),
+      'First_Name_2' => array(
+        'title' => 'First Name',
+        'cid' => 27,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'Phone_2' => array(
+        'title' => 'Phone',
+        'cid' => 28,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'Email_2' => array(
+        'title' => 'Email',
+        'cid' => 29,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'Last_Name_2' => array(
+        'title' => 'Last Name',
+        'cid' => 36,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'Address_2' => array(
+        'title' => 'Address',
+        'cid' => 37,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'City_2' => array(
+        'title' => 'City',
+        'cid' => 38,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
+      'Zip_2' => array(
+        'title' => 'Zip',
+        'cid' => 41,
+        'same_alias' => TRUE,
+        'alias' => 2,
+      ),
       'HS_Grad_Year' => array(
         'title' => 'HS Grad Year',
         'cid' => 43,
