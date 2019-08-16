@@ -208,7 +208,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
 	     WHERE p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
        ) AS num
@@ -290,10 +290,11 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ) as ue
        ) AS num
        UNION
-       SELECT 'Cumulative Unsubscribes' as description, COUNT(*) as perday_visitor_count FROM
-       webform_submitted_data wsd WHERE wsd.cid = 2 AND wsd.sid IN
+       SELECT 'Cumulative Unsubscribes' as description, COUNT(num.contact_id) as perday_visitor_count FROM
+       ( SELECT 1 as contact_id FROM 
+       {$this->_drupalDatabase}.webform_submitted_data wsd WHERE wsd.cid = 2 AND wsd.sid IN
        (SELECT sid FROM {$this->_drupalDatabase}.webform_submitted_data WHERE nid = 434 AND cid = 17 AND data = 2020) 
-       GROUP BY wsd.data";
+       GROUP BY wsd.data) as num";
   }
 
   function from() {
