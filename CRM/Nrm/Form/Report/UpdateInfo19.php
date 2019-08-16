@@ -7,7 +7,7 @@ class CRM_Nrm_Form_Report_UpdateInfo19 extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE; 
 
   function __construct() {
-    $this->_drupalDatabase = 'chowan2019_dru';
+    $this->_drupalDatabase = 'upikebears2020_dru';
     
     $this->_columns = array(
       'civicrm_contact' => array(

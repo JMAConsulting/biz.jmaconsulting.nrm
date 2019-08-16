@@ -21,7 +21,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
   public static $_fieldLabels = array();
  
   function __construct() {
-    $this->_drupalDatabase = 'chowan2019_dru';
+    $this->_drupalDatabase = 'upikebears2020_dru';
     self::getWebforms();
     self::createSurveyResponse();
     self::createCUVDRegistration();
@@ -353,7 +353,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor19 extends CRM_Report_Form {
   }
 
   function from() {
-    $this->_drupalDatabase = 'chowan2019_dru';
+    $this->_drupalDatabase = 'upikebears2020_dru';
 
     $this->_from = NULL;
 
