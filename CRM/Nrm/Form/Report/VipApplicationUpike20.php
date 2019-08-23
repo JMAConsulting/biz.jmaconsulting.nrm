@@ -143,15 +143,15 @@ class CRM_Nrm_Form_Report_VipApplicationUpike20 extends CRM_Report_Form {
       ),
       'US_Military/Veteran_Status' => array(
         'title' => 'US Military/Veteran Status',
-        'columnName' => 'veteran.label',
+        'columnName' => 'veteran_alias.label',
       ),
       'Admit_Status' => array(
         'title' => 'Admit Status',
-        'columnName' => 'admit.label',
+        'columnName' => 'admit_alias.label',
       ),
       'Beginning_Term' => array(
         'title' => 'Beginning Term',
-        'columnName' => 'term.label',
+        'columnName' => 'term_alias.label',
       ),
       'Do_you_plan_to_live_on_campus?' => array(
         'title' => 'Do you plan to live on campus?',
@@ -188,11 +188,11 @@ class CRM_Nrm_Form_Report_VipApplicationUpike20 extends CRM_Report_Form {
       ),
       'Major_Course_of_Study' => array(
         'title' => 'Major Course of Study',
-        'columnName' => 'majorcourse.label',
+        'columnName' => 'majorcourse_alias.label',
       ),
       'Activity_1.' => array(
         'title' => 'Activity 1.',
-        'columnName' => 'activity1.label',
+        'columnName' => 'activity1_alias.label',
       ),
       'ACT_Composite' => array(
         'title' => 'ACT Composite',
@@ -211,19 +211,19 @@ class CRM_Nrm_Form_Report_VipApplicationUpike20 extends CRM_Report_Form {
       ),
       'Activity_2.' => array(
         'title' => 'Activity 2.',
-        'columnName' => 'activity1.label',
+        'columnName' => 'activity1_alias.label',
       ),
       'Activity_3.' => array(
         'title' => 'Activity 3.',
-        'columnName' => 'activity1.label',
+        'columnName' => 'activity1_alias.label',
       ),
       'Activity_4.' => array(
         'title' => 'Activity 4.',
-        'columnName' => 'activity1.label',
+        'columnName' => 'activity1_alias.label',
       ),
       'Activity_5.' => array(
         'title' => 'Activity 5.',
-        'columnName' => 'activity1.label',
+        'columnName' => 'activity1_alias.label',
       ),
       'US_Social_Security_Number' => array(
         'title' => 'US Social Security Number',
