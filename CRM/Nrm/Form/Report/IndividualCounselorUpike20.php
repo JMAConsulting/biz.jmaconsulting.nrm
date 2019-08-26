@@ -353,7 +353,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
   }
 
   function from() {
-    $this->_drupalDatabase = 'chowan2019_dru';
+    $this->_drupalDatabase = 'upikebears2020_dru';
 
     $this->_from = NULL;
 
