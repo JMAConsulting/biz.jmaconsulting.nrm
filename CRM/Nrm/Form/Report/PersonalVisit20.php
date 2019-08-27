@@ -43,7 +43,11 @@ class CRM_Nrm_Form_Report_PersonalVisit20 extends CRM_Report_Form {
       ),
       'Preferred_Visit_Time' => array(
         'title' => 'Preferred Visit Time',
-        'columnName' => 'visit_alias.label',
+        'columnName' => 'CASE
+          WHEN wsd.data = 1 THEN "10.00 AM"
+          WHEN wsd.data = 2 THEN "2:00 PM (except Saturdays)"
+          ELSE NULL
+          END',
       ),
       'First_Name' => array(
         'title' => 'First Name',
