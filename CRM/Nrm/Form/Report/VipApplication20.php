@@ -339,6 +339,9 @@ class CRM_Nrm_Form_Report_VipApplication20 extends CRM_Report_Form {
         'is_alias' => TRUE,
         'alias_new' => 'Score',
       ),
+      'Classical_Learning_Test_(CLT)_Score' => array(
+        'title' => 'Classical Learning Test (CLT) Score',
+      ),
       'GPA' => array(
         'title' => 'GPA',
       ),
