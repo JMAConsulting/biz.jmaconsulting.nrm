@@ -33,8 +33,8 @@ class CRM_Nrm_Form_Report_RequestedInfoUpike20 extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
+      'Upike_ID' => array(
+        'title' => 'Upike ID',
         'ignore_group_concat' => TRUE,
         'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
       ),
@@ -77,6 +77,10 @@ class CRM_Nrm_Form_Report_RequestedInfoUpike20 extends CRM_Report_Form {
       'Zip_Code' => array(
         'title' => 'Zip Code',
       ),
+      'Country' => array(
+        'title' => 'Country',
+        'columnName' => 'c.name',
+      ),
       'State' => array(
         'title' => 'State',
       ),
@@ -104,10 +108,6 @@ class CRM_Nrm_Form_Report_RequestedInfoUpike20 extends CRM_Report_Form {
       ),
       'Would_you_like_to_add_another_Parent/Guardian?' => array(
         'title' => 'Would you like to add another Parent/Guardian?',
-      ),
-      'Country' => array(
-        'title' => 'Country',
-        'columnName' => 'c.name',
       ),
     );
 

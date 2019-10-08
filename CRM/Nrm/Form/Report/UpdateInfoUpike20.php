@@ -35,8 +35,8 @@ class CRM_Nrm_Form_Report_UpdateInfoUpike20 extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
+      'Upike_ID' => array(
+        'title' => 'Upike ID',
         'ignore_group_concat' => TRUE,
         'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
       ),

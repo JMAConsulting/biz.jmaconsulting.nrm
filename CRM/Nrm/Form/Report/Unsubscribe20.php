@@ -41,8 +41,8 @@ class CRM_Nrm_Form_Report_Unsubscribe20 extends CRM_Report_Form {
 
   function select() {
     $columns =  array(
-      'Chowan_ID' => array(
-        'title' => 'Chowan ID',
+      'UPIKE_ID' => array(
+        'title' => 'UPIKE ID',
         'ignore_group_concat' => TRUE,
         'columnName' => 'GROUP_CONCAT(contact_civireport.external_identifier)',
       ),
