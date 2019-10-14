@@ -1,28 +1,28 @@
 <?php
 /**
  * NRM extension integrates CiviCRM's reports
- * 
+ *
  * Copyright (C) 2015 JMA Consulting
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Support: https://github.com/JMAConsulting/biz.jmaconsulting.nrm/issues
- * 
+ *
  * Contact: info@jmaconsulting.biz
  *          JMA Consulting
  *          215 Spadina Ave, Ste 400
- *          Toronto, ON  
+ *          Toronto, ON
  *          Canada   M5T 2C7
  */
 
@@ -87,7 +87,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    */
   public static function reportFromClause(&$from, $tempTable = FALSE, $tempName = array(), $ov = array()) {
     $drupalDb = 'chowan2019_dru';
-    $from = "FROM {$drupalDb}.webform_submitted_data wsd 
+    $from = "FROM {$drupalDb}.webform_submitted_data wsd
       LEFT JOIN civicrm_contact contact_civireport ON wsd.data = contact_civireport.id AND wsd.cid = 2
       LEFT JOIN {$drupalDb}.webform_component wc ON wc.cid = wsd.cid AND wc.nid = wsd.nid
       LEFT JOIN {$drupalDb}.webform_submissions ws ON ws.sid = wsd.sid AND ws.nid=wsd.nid
@@ -108,7 +108,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       }
     }
   }
-  
+
   /*
    * function to build where clause for reports
    *
@@ -122,7 +122,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = DATE(NOW() - INTERVAL 1 DAY) AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
     //$where = "WHERE wc.nid IN ({$webFormId}) AND DATE(FROM_UNIXTIME(ws.completed)) = '2019-06-25' AND wsd.nid IN ({$webFormId}) AND wsd.sid IN (SELECT sids FROM validsids)";
   }
-  
+
   /*
    * function to build groub by clause for reports
    *
@@ -131,7 +131,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *
    *
    */
-  public static function reportGroupByClause(&$form, $columns) {    
+  public static function reportGroupByClause(&$form, $columns) {
   }
 
   /*
@@ -141,7 +141,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    * @static
    *
    *
-   */ 
+   */
   public static function createInquiry($inq) {
     $drupalDatabase = 'chowan2019_dru';
     $sql = "SELECT extra
@@ -175,7 +175,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    * @static
    *
    *
-   */ 
+   */
   public static function createUniqueSid($webFormId, $cid = 2) {
     $drupalDatabase = 'chowan2019_dru';
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS validsids");
@@ -185,10 +185,10 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       WHERE d.cid = {$cid} AND d.nid IN ({$webFormId}) AND s.nid IN ({$webFormId})
       GROUP BY d.data");
   }
-  
+
   /**
    * Fill watchdog_nrm with records matching watchdog including calculated purls
-   * 
+   *
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query, in this case no records
    */
@@ -196,23 +196,23 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     $drupalDatabase = 'chowan2019_dru';
 
     $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
-            SELECT w.wid, w.location, w.timestamp, 
-            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
-            FROM {$drupalDatabase}.watchdog w 
-            LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
+            SELECT w.wid, w.location, w.timestamp,
+            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl
+            FROM {$drupalDatabase}.watchdog w
+            LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid
             WHERE n.wid IS NULL";
-            
+
     return CRM_Core_DAO::executeQuery($sql);
   }
-  
+
   /**
    * Filter out the IPs used for testing from the count.
-   * 
+   *
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query, in this case no records
    */
   function filterIP() {
-    $drupalDatabase = 'chowan2019_dru';
+    $drupalDatabase = 'upikebears2020_dru';
 
     $options = civicrm_api3('OptionValue', 'get', array(
       'sequential' => 1,
@@ -228,7 +228,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       $ipList = implode(', ', $ips);
 
       $sql = "DELETE FROM {$drupalDatabase}.watchdog WHERE hostname IN ({$ipList})";
-            
+
       CRM_Core_DAO::executeQuery($sql);
     }
 
@@ -236,7 +236,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%chowan2018.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%.com/oops%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
-    
+
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%chowan2018.com%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%.com/oops%'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%/sites/all/modules/civicrm/bin/cron.php%'");
@@ -283,10 +283,10 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
       CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog WHERE location LIKE '%{$purl}%'");
       CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$purl}%'");
     }
-    
+
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2019.com.'");
-    
+
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2020.com'");
     CRM_Core_DAO::executeQuery("DELETE FROM {$drupalDatabase}.watchdog_nrm WHERE purl = 'chowan2020.com.'");
   }
