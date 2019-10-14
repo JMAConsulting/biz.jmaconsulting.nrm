@@ -193,7 +193,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *   object that holds the results of the query, in this case no records
    */
   function updateWatchdog_nrm() {
-    $drupalDatabase = 'chowan2019_dru';
+    $drupalDatabase = 'upikebears2020_dru';
 
     $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
             SELECT w.wid, w.location, w.timestamp,
