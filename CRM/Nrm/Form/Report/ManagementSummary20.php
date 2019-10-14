@@ -6,13 +6,13 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupGroupBy = FALSE; 
+  protected $_customGroupGroupBy = FALSE;
 
   function __construct() {
     $this->_drupalDatabase = 'chowan2019_dru';
 
     self::getWebforms();
-    
+
     $this->_columns = array(
       'watchdog' => array(
         'fields' => array(
@@ -61,7 +61,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
   function select() {
     $select = $this->_columnHeaders = array();
-    $microsite = "chowan2020.com";
+    $microsite = "upikebears2020.com";
     $micrositeold = "chowan2019.com";
     // Process Date
     $relative = CRM_Utils_Array::value("date_relative", $this->_params);
@@ -69,7 +69,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $to = CRM_Utils_Array::value("date_to", $this->_params);
     if (empty($relative) && empty($from) && empty($to)) {
       // Set date to yesterday if no filter selected.
-      $from = $to = date('Y-m-d', strtotime("-1 days")); 
+      $from = $to = date('Y-m-d', strtotime("-1 days"));
     }
     else {
       list($from, $to) = CRM_Report_Form::getFromTo($relative, $from, $to);
@@ -95,7 +95,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $visitCountCumulative = 0; //$this->getVisitCount('cumulative', NULL, $from, $to);
     $applicationCountDaily = 0; //$this->getVisitCount('yesterday', $appWhere, $from, $to);
     $applicationCountCumulative = 0; //$this->getVisitCount('cumulative', $appWhere, $from, $to);
-    /* $sql = CRM_Core_DAO::executeQuery("SELECT DISTINCT(purl) as purl_perday_visitor  
+    /* $sql = CRM_Core_DAO::executeQuery("SELECT DISTINCT(purl) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        AND purl <> '{$microsite}'");
     $visitors = array();
@@ -108,13 +108,13 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        SELECT '{$dateName}' as description, '' as perday_visitor_count
        UNION
        SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
        ) as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor  
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
        AND (purl) NOT IN (SELECT DISTINCT(purl)
@@ -131,12 +131,12 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
        ( SELECT
-       SUBSTR(sub.location, 
-       INSTR(sub.location, '://') + 3, 
-       IF(INSTR(sub.location,'?')>0, 
-        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+       SUBSTR(sub.location,
+       INSTR(sub.location, '://') + 3,
+       IF(INSTR(sub.location,'?')>0,
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3,
         LENGTH(sub.location)
-        )) as location, timestamp 
+        )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm sub
        WHERE DATE(FROM_UNIXTIME(sub.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(sub.timestamp)) <= '{$to}'
        GROUP BY sub.location ) as loc
@@ -162,10 +162,10 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ( SELECT COUNT(DISTINCT(location)) as purl_perday_start
        FROM
        ( SELECT
-       SUBSTR(sub.location, 
-       INSTR(sub.location, '://') + 3, 
-       IF(INSTR(sub.location,'?')>0, 
-        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3, 
+       SUBSTR(sub.location,
+       INSTR(sub.location, '://') + 3,
+       IF(INSTR(sub.location,'?')>0,
+        INSTR(sub.location,'?') - INSTR(sub.location, '://') - 3,
         LENGTH(sub.location)
         )) as location, timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm sub
@@ -190,18 +190,18 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ) as n
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount as perday_visitor_count FROM
-       (SELECT COUNT(*) as ecount FROM 
-       (SELECT contact_id FROM 
-       (SELECT w.data as contact_id 
-       FROM {$this->_drupalDatabase}.webform_submitted_data w 
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid     
+       (SELECT COUNT(*) as ecount FROM
+       (SELECT contact_id FROM
+       (SELECT w.data as contact_id
+       FROM {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1) {$engageWhere}
-       AND data IS NOT NULL and data <> '' 
+       AND data IS NOT NULL and data <> ''
        AND DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
        GROUP BY w.sid
        UNION
-       SELECT p.entity_id as download 
+       SELECT p.entity_id as download
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
        ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(wn.timestamp)) <= '{$to}'
@@ -218,12 +218,12 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}'
        ) AS denom
-       JOIN 
-       (SELECT COUNT(*) as ecount FROM 
-       (SELECT contact_id FROM 
-       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid     
+       JOIN
+       (SELECT COUNT(*) as ecount FROM
+       (SELECT contact_id FROM
+       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> ''
        AND DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
@@ -242,16 +242,16 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ) AS num
        UNION
        SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount as perday_visitor_count FROM
-       (SELECT COUNT(*) as ecount FROM 
-       (SELECT contact_id FROM 
-       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid   
+       (SELECT COUNT(*) as ecount FROM
+       (SELECT contact_id FROM
+       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
        GROUP BY w.sid
        UNION
-       SELECT p.entity_id as download 
+       SELECT p.entity_id as download
        FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
        ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
@@ -267,33 +267,33 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountCumulative}) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
        WHERE purl <> '{$microsite}'  AND purl LIKE '%{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        ) AS denom
-       JOIN 
-       (SELECT COUNT(*) as ecount FROM 
-       (SELECT contact_id FROM 
-       (SELECT w.data as contact_id FROM 
-       {$this->_drupalDatabase}.webform_submitted_data w 
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid  
+       JOIN
+       (SELECT COUNT(*) as ecount FROM
+       (SELECT contact_id FROM
+       (SELECT w.data as contact_id FROM
+       {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1) {$engageWhere}
        AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
        GROUP BY w.sid
        UNION
-       SELECT p.entity_id as download 
+       SELECT p.entity_id as download
        FROM {$this->_drupalDatabase}.watchdog_nrm wn
        LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
        WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
 	     WHERE p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}') 
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
        ) AS num
        UNION
        SELECT 'Cumulative Unsubscribes' as description, COUNT(num.contact_id) as perday_visitor_count FROM
-       ( SELECT 1 as contact_id FROM 
+       ( SELECT 1 as contact_id FROM
        {$this->_drupalDatabase}.webform_submitted_data wsd WHERE wsd.cid = 2 AND wsd.sid IN
-       (SELECT sid FROM {$this->_drupalDatabase}.webform_submitted_data WHERE nid = 434 AND cid = 17 AND data = 2020) 
+       (SELECT sid FROM {$this->_drupalDatabase}.webform_submitted_data WHERE nid = 434 AND cid = 17 AND data = 2020)
        GROUP BY wsd.data) as num";
   }
 
@@ -304,7 +304,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
   function where() {
     $clauses = array();
-    
+
     if (!empty($clauses)) {
       $this->_where = "WHERE " . implode(' AND ', $clauses);
     }
@@ -331,11 +331,11 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
       KEY `purl` (`purl`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table that contains purls of all system events.'";
     CRM_Core_DAO::executeQuery($wdNrm);
-    
+
     CRM_Nrm_BAO_Nrm::filterIP();
-    
+
     CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
-    
+
     $sql = $this->buildQuery(FALSE);
 
     $rows = array();
@@ -345,19 +345,19 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
   }
-  
+
   function getWebforms() {
     $this->webForms = array();
 
     $sql = "SELECT w.nid, n.title
-      FROM {$this->_drupalDatabase}.webform w 
+      FROM {$this->_drupalDatabase}.webform w
       INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $this->webForms[$dao->nid] = $dao->title;
     }
   }
-  
+
   function getDefaultWebforms() {
     $appWhere = self::getWhereCondition('webforms_applications', 'w.');
     $defaults = $urls = $this->urls = array();
@@ -393,7 +393,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $sql = " AND {$alias}nid {$op} {$statement}";
     return $sql;
   }
-  
+
   function createURLCondition() {
     // First get submitted params from webform
     $webformOP = $this->_params['webforms_applications_op'];
@@ -402,7 +402,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
       return '';
     }
     $urls = $this->urls;
-    
+
     // Compute the intersection
     if ($webformOP == 'in') {
       $diff = array_flip(array_intersect(array_flip($urls), $webformParams));
@@ -417,7 +417,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $sql = " AND (location LIKE '%{$statement}%')";
     return $sql;
   }
-  
+
   function getVisitCount($dateWhere, $appWhere = NULL, $from, $to) {
     $subQuery = NULL;
     switch ($dateWhere) {
@@ -426,38 +426,38 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
         break;
       case 'unique_yesterday':
         $date = " DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}' ";
-        $subQuery = " AND w.data NOT IN (SELECT DISTINCT(wsub.data) from {$this->_drupalDatabase}.webform_submitted_data wsub 
-          INNER JOIN {$this->_drupalDatabase}.webform_component csub ON csub.cid = wsub.cid AND csub.name = 'Contact ID' AND wsub.nid = csub.nid 
-          INNER JOIN {$this->_drupalDatabase}.webform_submissions wssub ON wssub.nid = wsub.nid AND wsub.sid = wssub.sid   
+        $subQuery = " AND w.data NOT IN (SELECT DISTINCT(wsub.data) from {$this->_drupalDatabase}.webform_submitted_data wsub
+          INNER JOIN {$this->_drupalDatabase}.webform_component csub ON csub.cid = wsub.cid AND csub.name = 'Contact ID' AND wsub.nid = csub.nid
+          INNER JOIN {$this->_drupalDatabase}.webform_submissions wssub ON wssub.nid = wsub.nid AND wsub.sid = wssub.sid
           WHERE wsub.data IS NOT NULL and wsub.data <> '' AND DATE(FROM_UNIXTIME(wssub.completed)) < '{$from}'
           GROUP BY wsub.sid) ";
         break;
       case 'cumulative':
         $date = " DATE(FROM_UNIXTIME(ws.completed)) <= '{$from}' ";
         break;
-        
+
     default:
         break;
     }
-    // Number of non purl visits 
-    $sql = "SELECT COUNT(*) as visitcount FROM 
-       (SELECT contact_id FROM 
-       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w 
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid 
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid   
+    // Number of non purl visits
+    $sql = "SELECT COUNT(*) as visitcount FROM
+       (SELECT contact_id FROM
+       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
        WHERE (1)
-       AND w.data IS NOT NULL and w.data <> '' AND {$date} 
+       AND w.data IS NOT NULL and w.data <> '' AND {$date}
        {$subQuery}
        {$appWhere}
        GROUP BY w.sid
-       ) as e 
+       ) as e
        LEFT JOIN civicrm_value_nrmpurls_5 cp ON cp.entity_id = contact_id
        WHERE cp.entity_id IS NULL
        GROUP BY contact_id
        ) as ue";
     return CRM_Core_DAO::singleValueQuery($sql);
   }
-  
+
   function alterDisplay(&$rows) {
   }
 
