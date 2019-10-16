@@ -83,7 +83,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'street_address' => array('default' => TRUE. 'title' => ts('Street Address')),
+          'street_address' => array('default' => TRUE, 'title' => ts('Street Address')),
           'city' => array('default' => TRUE, 'title' => ts('City')),
           'postal_code' => array('default' => TRUE, 'title' => ts('Postal Code')),
           'state_province_id' => array('default' => TRUE, 'title' => ts('State/Province')),
@@ -350,6 +350,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       {$csdField}
       {$nrmField}
       ";
+
+      $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
     foreach ([
       'exposed_id',
       'first_name',
