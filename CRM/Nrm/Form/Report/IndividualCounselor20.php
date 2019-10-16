@@ -375,7 +375,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
         elseif ($field == 'exposed_id') {
           continue;
         }
-        $this->_columnHeaders["{$table}_{$field}"]['title'] = $this->_columns["civicrm_contact"]['fields'][$field]['title'];
+        $this->_columnHeaders["{$table}_{$field}"]['title'] = $this->_columns[$table]['fields'][$field]['title'];
       }
     }
 
