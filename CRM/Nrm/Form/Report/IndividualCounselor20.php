@@ -83,10 +83,10 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'street_address' => array('default' => TRUE),
-          'city' => array('default' => TRUE),
-          'postal_code' => array('default' => TRUE),
-          'state_province_id' => array('default' => TRUE),
+          'street_address' => array('default' => TRUE. 'title' => ts('Street Address')),
+          'city' => array('default' => TRUE, 'title' => ts('City')),
+          'postal_code' => array('default' => TRUE, 'title' => ts('Postal Code')),
+          'state_province_id' => array('default' => TRUE, 'title' => ts('State/Province')),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -134,7 +134,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
-          'email' => array('default' => TRUE)
+          'email' => array('default' => TRUE, 'title' => ts('Email'))
         ),
         'grouping' => 'contact-fields',
       ),
@@ -350,17 +350,33 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       {$csdField}
       {$nrmField}
       ";
-    $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
-    $this->_columnHeaders["civicrm_contact_first_name"]['title'] = ts('First Name');
-    $this->_columnHeaders["civicrm_contact_last_name"]['title'] = ts('Last Name');
-    $this->_columnHeaders["civicrm_address_street_address"]['title'] = ts('Street Address');
-    $this->_columnHeaders["civicrm_address_city"]['title'] = ts('City');
-    $this->_columnHeaders["civicrm_address_state_province_id"]['title'] = ts('State/Province');
-    $this->_columnHeaders["civicrm_address_postal_code"]['title'] = ts('Postal Code');
-    $this->_columnHeaders["civicrm_email_email"]['title'] = ts('Email');
+    foreach ([
+      'exposed_id',
+      'first_name',
+      'last_name',
+      'street_address',
+      'city',
+      'state_province_id',
+      'postal_code',
+      'email',
+      'display_name',
+      'sort_name',
+    ] as $field) {
+      if (!empty($this->_params['fields'][$field])) {
+        $table = 'civicrm_contact';
+        if (in_array($field, ['street_address', 'city', 'state_province_id', 'postal_code'])) {
+          $table = 'civicrm_address';
+        }
+        elseif ($field == 'email') {
+          $table = 'civicrm_email';
+        }
+        elseif ($field == 'exposed_id') {
+          continue;
+        }
+        $this->_columnHeaders["{$table}_{$field}"]['title'] = $this->_columns["civicrm_contact"]['fields'][$field]['title'];
+      }
+    }
 
-    $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
-    $this->_columnHeaders["civicrm_contact_sort_name"]['title'] = ts('Visits');
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
     if ($this->_logField) {
       $this->_columnHeaders["civicrm_contact_last_update"]['title'] = ts('Last Update');
