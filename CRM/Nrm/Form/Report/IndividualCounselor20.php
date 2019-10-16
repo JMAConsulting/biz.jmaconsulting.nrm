@@ -39,7 +39,16 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
         'fields' => array(
           'display_name' => array(
             'title' => ts('Student Info'),
-            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'first_name' => array(
+            'title' => ts('First name'),
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'last_name' => array(
+            'title' => ts('Last name'),
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
@@ -320,7 +329,15 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+    $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id,
+     {$this->_aliases['civicrm_contact']}.first_name as civicrm_contact_first_name,
+     {$this->_aliases['civicrm_contact']}.last_name as civicrm_contact_last_name,
+     {$this->_aliases['civicrm_address']}.street_address as civicrm_address_street_address,
+     {$this->_aliases['civicrm_address']}.city as civicrm_address_city,
+     csp.name as civicrm_address_state_province_id,
+     {$this->_aliases['civicrm_address']}.postal_code as civicrm_address_postal_code,
+     {$this->_aliases['civicrm_email']}.email as civicrm_email_email,
+     CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$visitedSelect}
@@ -334,6 +351,14 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       {$nrmField}
       ";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
+    $this->_columnHeaders["civicrm_contact_first_name"]['title'] = ts('First Name');
+    $this->_columnHeaders["civicrm_contact_last_name"]['title'] = ts('Last Name');
+    $this->_columnHeaders["civicrm_address_street_address"]['title'] = ts('Street Address');
+    $this->_columnHeaders["civicrm_address_city"]['title'] = ts('City');
+    $this->_columnHeaders["civicrm_address_state_province_id"]['title'] = ts('State/Province');
+    $this->_columnHeaders["civicrm_address_postal_code"]['title'] = ts('Postal Code');
+    $this->_columnHeaders["civicrm_email_email"]['title'] = ts('Email');
+
     $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
     $this->_columnHeaders["civicrm_contact_sort_name"]['title'] = ts('Visits');
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
