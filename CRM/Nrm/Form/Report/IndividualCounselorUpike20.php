@@ -15,11 +15,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
   protected $_summary = NULL;
 
   protected $_customGroupGroupBy = FALSE;
-  
+
   public static $_customFieldOptions = array();
-  
+
   public static $_fieldLabels = array();
- 
+
   function __construct() {
     $this->_drupalDatabase = 'upikebears2020_dru';
     self::getWebforms();
@@ -40,7 +40,16 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         'fields' => array(
           'display_name' => array(
             'title' => ts('Student Info'),
-            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'first_name' => array(
+            'title' => ts('First name'),
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'last_name' => array(
+            'title' => ts('Last name'),
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
@@ -85,10 +94,10 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'street_address' => array('default' => TRUE),
-          'city' => array('default' => TRUE),
-          'postal_code' => array('default' => TRUE),
-          'state_province_id' => array('default' => TRUE),
+          'street_address' => array('default' => TRUE, 'title' => ts('Street Address')),
+          'city' => array('default' => TRUE, 'title' => ts('City')),
+          'postal_code' => array('default' => TRUE, 'title' => ts('Postal Code')),
+          'state_province_id' => array('default' => TRUE, 'title' => ts('State')),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -113,7 +122,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
             'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
-          ) , */ 
+          ) , */
           MAJOR => array(
             'title' => ts('Major Interests'),
             'required' => TRUE,
@@ -132,11 +141,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'contact-fields',
-      ), 
+      ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
-          'email' => array('default' => TRUE)
+          'email' => array('default' => TRUE, 'title' => ts('Email'))
         ),
         'grouping' => 'contact-fields',
       ),
@@ -360,7 +369,15 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       {$csdField}
       {$nrmField}
       "; */
-    $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+    $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id,
+      {$this->_aliases['civicrm_contact']}.first_name as civicrm_contact_first_name,
+      {$this->_aliases['civicrm_contact']}.last_name as civicrm_contact_last_name,
+      {$this->_aliases['civicrm_address']}.street_address as civicrm_address_street_address,
+      {$this->_aliases['civicrm_address']}.city as civicrm_address_city,
+      csp.name as civicrm_address_state_province_id,
+      {$this->_aliases['civicrm_address']}.postal_code as civicrm_address_postal_code,
+      {$this->_aliases['civicrm_email']}.email as civicrm_email_email,
+      CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
       t.first_visit as civicrm_contact_first_visit,
       {$visitorField}
       {$visitAppField}
@@ -372,8 +389,33 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       {$requestField}
     ";
     $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
-    $this->_columnHeaders["civicrm_contact_display_name"]['title'] = $this->_columns["civicrm_contact"]['fields']['display_name']['title'];
-    $this->_columnHeaders["civicrm_contact_sort_name"]['title'] = ts('Visits');
+    $this->_columnHeaders["civicrm_contact_contact_id"]['title'] = ts('Contact ID');
+    foreach ([
+      'exposed_id',
+      'first_name',
+      'last_name',
+      'street_address',
+      'city',
+      'state_province_id',
+      'postal_code',
+      'email',
+      'display_name',
+      'sort_name',
+    ] as $field) {
+      if (!empty($this->_params['fields'][$field])) {
+        $table = 'civicrm_contact';
+        if (in_array($field, ['street_address', 'city', 'state_province_id', 'postal_code'])) {
+          $table = 'civicrm_address';
+        }
+        elseif ($field == 'email') {
+          $table = 'civicrm_email';
+        }
+        elseif ($field == 'exposed_id') {
+          continue;
+        }
+        $this->_columnHeaders["{$table}_{$field}"]['title'] = $this->_columns[$table]['fields'][$field]['title'];
+      }
+    }
     $this->_columnHeaders["civicrm_contact_visit_application"]['title'] = ts('Visited Application?');
     $this->_columnHeaders["civicrm_contact_visit_form"]['title'] = ts('Visited Plan your visit form?');
     $this->_columnHeaders["civicrm_contact_first_visit"]['title'] = ts('First Visit');
@@ -423,7 +465,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     $this->_from .= "{$this->updateTables}";
 
     $this->_from .= "{$this->requestTables}";
-    
+
 
     $this->_from .= "
         LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd1 ON wsd1.data = contact_civireport.id
@@ -432,7 +474,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
     if ($this->_params['fields']['wsd2.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd2
-        ON wsd2.sid = wsd.sid and wsd2.cid = 34 
+        ON wsd2.sid = wsd.sid and wsd2.cid = 34
         LEFT JOIN civicrm_event ce ON ce.id = SUBSTRING_INDEX(wsd2.data, '-', 1)";
     }
 
@@ -440,31 +482,31 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd3
         ON wsd3.sid = wsd.sid and wsd3.cid = 38";
     }
-    
+
     if ($this->_params['fields']['wsd4.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd4
         ON wsd4.sid = wsd.sid and wsd4.cid = 39";
     }
-    
+
     if ($this->_params['fields']['wsd5.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd5
         ON wsd5.sid = wsd.sid and wsd5.cid = 42";
     }
-    
+
     if ($this->_params['fields']['wsd6.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd6
         ON wsd6.sid = wsd.sid and wsd6.cid = 43";
-    } 
+    }
 
     if ($this->_params['fields']['wsd7.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd7
-        ON wsd7.sid = wsd.sid and wsd7.cid = 26 
+        ON wsd7.sid = wsd.sid and wsd7.cid = 26
         LEFT JOIN civicrm_event ce2 ON ce2.id = SUBSTRING_INDEX(wsd7.data, '-', 1)";
     }
 
     if ($this->_params['fields']['wsd8.data'] == 1) {
       $this->_from .= " LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd8
-        ON wsd8.sid = wsd.sid and wsd7.cid = 32 
+        ON wsd8.sid = wsd.sid and wsd7.cid = 32
         LEFT JOIN civicrm_event ce3 ON ce3.id = SUBSTRING_INDEX(wsd8.data, '-', 1)";
     }
 
@@ -504,9 +546,9 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     }
     if ($this->_visitedField) {
       $this->_from .= "
-              LEFT JOIN civicrm_visit_times cvt 
+              LEFT JOIN civicrm_visit_times cvt
                         ON {$this->_aliases['civicrm_contact']}.id =
-                           cvt.contact_id\n";   
+                           cvt.contact_id\n";
     }
     //used when log field is selected
     if ($this->_customNRMField) {
@@ -550,7 +592,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         }
       }
     }
-    
+
     if (($counsellor = CRM_Utils_Array::value("counsellor_value", $this->_params)) || $counsellor = $_GET['counsellor_id_value']) {
       if (is_array($counsellor)) {
         $counsellor = implode(',', $counsellor);
@@ -606,26 +648,26 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_watchdog_temp_c");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_visit_times");
   }
-  
+
   function createTemp() {
     $microsite = "upikebears2020.com";
     $micrositeOld = "upikebears2019.com";
-    
+
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_a AS
             SELECT DISTINCT w.* FROM (
-              SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl, 
+              SELECT wid, SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl,
               DATE_FORMAT(DATE(FROM_UNIXTIME(MIN(timestamp))),'%m/%d/%Y') as first_visit
               FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$microsite}%'
               GROUP BY SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1)
               ) AS w INNER JOIN (
-              SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl 
+              SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(location, '://', -1), '.', 1) as purl
               FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$microsite}%'
-              AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
+              AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy
             ON w.purl=wy.purl";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl(255)) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
       SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -636,9 +678,9 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS 
+    $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS
       SELECT wsd.data as contact_id, ws.completed as visit_time
-      FROM {$this->_drupalDatabase}.webform_submitted_data wsd    
+      FROM {$this->_drupalDatabase}.webform_submitted_data wsd
       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND c.name = 'Contact ID' and wsd.nid = c.nid
       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = wsd.nid AND wsd.sid = ws.sid
       GROUP BY wsd.sid
@@ -650,11 +692,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
-  
+
   function createSurveyResponse() {
     $sql = "SELECT g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE title LIKE '%Survey%'";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
@@ -674,11 +716,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createInfoRequest() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE title LIKE '%NRM%' OR g.id IN (8)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'group_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -704,11 +746,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createCUVDRegistration() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (8,6)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'cgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -770,11 +812,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createPVDRegistration() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (11,6)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'vgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -793,11 +835,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createUpdateInfo() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (7)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'ugroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -816,8 +858,8 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createRequestInfo() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (6)";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -839,11 +881,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createSOARRegistration() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (6)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'sgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -869,11 +911,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createVisitDay() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (6,11,8)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'vgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -897,11 +939,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createVIPApplication() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (6,7,8)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'vipgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -920,11 +962,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
 
   function createCSD() {
     $sql = "SELECT c.id as field_id, g.id as group_id, g.table_name, c.column_name, c.label
-      FROM civicrm_custom_group g 
-      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id 
+      FROM civicrm_custom_group g
+      LEFT JOIN civicrm_custom_field c ON c.custom_group_id = g.id
       WHERE g.id IN (6,11)";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     while ($dao->fetch()) {
       $fieldAlias = 'csdgroup_' . $dao->group_id;
       $field =  $fieldAlias . '.' . $dao->column_name;
@@ -954,7 +996,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     $this->webForms = array();
 
     $sql = "SELECT w.nid, n.title
-      FROM {$this->_drupalDatabase}.webform w 
+      FROM {$this->_drupalDatabase}.webform w
       INNER JOIN {$this->_drupalDatabase}.node n ON n.nid = w.nid";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
@@ -979,11 +1021,11 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
           $string = '';
-          // Visits. 
+          // Visits.
           $sql = "SELECT COUNT(DISTINCT(location)) as location FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-            AND location LIKE '%{$microsite}%' 
+            AND location LIKE '%{$microsite}%'
             ";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
@@ -1002,7 +1044,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
           $string = '';
-          // Visits. 
+          // Visits.
           $sql = "SELECT DISTINCT(1) as location FROM {$this->_drupalDatabase}.nrm_visit_log
             WHERE purl LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
@@ -1021,7 +1063,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         $purl = CRM_Core_DAO::singleValueQuery("SELECT CONCAT(\"'%\", purl_145 ,\".%'\") FROM civicrm_value_nrmpurls_5 WHERE entity_id = {$row['civicrm_contact_contact_id']}");
         if ($purl) {
           $string = '';
-          // Visits. 
+          // Visits.
           $sql = "SELECT DISTINCT(1) as location FROM {$this->_drupalDatabase}.nrm_visit_log
             WHERE purl LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
@@ -1035,7 +1077,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         //$validNids = array(308,425);
         $validNids = array(564);
@@ -1050,7 +1092,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_vip_application', $row)) {
         $validNids = array(417);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1063,7 +1105,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_visit_registration', $row)) {
         $validNids = array(670);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1076,7 +1118,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_cuvd_registration', $row)) {
         $validNids = array(680);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1089,7 +1131,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_pvd_registration', $row)) {
         $validNids = array(670);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1102,7 +1144,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_update_information', $row)) {
         $validNids = array(552);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1128,7 +1170,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_csd_registration', $row)) {
         $validNids = array(671);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1141,7 +1183,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
+
       if (array_key_exists('civicrm_contact_soar_registration', $row)) {
         $validNids = array(431);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
@@ -1169,7 +1211,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
           $string = '';
           $sql = "SELECT location FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
-            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day) 
+            AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
             AND location LIKE '%.pdf%' AND location LIKE '%{$microsite}%'
             ";
           $dao = CRM_Core_DAO::executeQuery($sql);
@@ -1190,7 +1232,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       }
     }
   }
-  
+
   function hideInvalidRows($cid, $validNids) {
     $validNids = implode(',', $validNids);
     $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
@@ -1199,7 +1241,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
       AND wsd.data = {$cid} AND ws.nid IN ({$validNids})
       GROUP BY ws.sid";
-        
+
     return CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -1237,7 +1279,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     }
     return implode('<br/>', $newArray);
   }
-  
+
   public static function getCounsellors() {
     $counsellors = array();
     //$counsellorCount = civicrm_api3('Contact', 'getCount', array('contact_sub_type' => 'Counselors'));
@@ -1258,7 +1300,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
     }
     return $counsellors;
   }
-  
+
   public static function getCustomFieldDataLabels($data) {
     if (empty($data)) {
       return $data;
