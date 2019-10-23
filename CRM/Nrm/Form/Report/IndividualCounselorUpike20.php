@@ -369,6 +369,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       {$csdField}
       {$nrmField}
       "; */
+      $requestField = $requestField ?: '1';
     $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id,
       {$this->_aliases['civicrm_contact']}.first_name as civicrm_contact_first_name,
       {$this->_aliases['civicrm_contact']}.last_name as civicrm_contact_last_name,
@@ -1149,26 +1150,34 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
         $validNids = array(552);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
-          $rows[$rowNum]['civicrm_contact_update_information'] = NULL;
+          $rows[$rowNum]['civicrm_contact_update_information'] = 'No';
         }
         else {
-          $rows[$rowNum]['civicrm_contact_update_information'] = self::getCustomFieldDataLabels($row['civicrm_contact_update_information']);
-          $rows[$rowNum]['civicrm_contact_update_information'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_update_information']);
+          //$rows[$rowNum]['civicrm_contact_update_information'] = self::getCustomFieldDataLabels($row['civicrm_contact_update_information']);
+          //$rows[$rowNum]['civicrm_contact_update_information'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_update_information']);
+          $rows[$rowNum]['civicrm_contact_update_information'] = 'Yes';
           $entryFound = TRUE;
         }
+      }
+      else {
+        $rows[$rowNum]['civicrm_contact_update_information'] = 'No';
       }
 
       if (array_key_exists('civicrm_contact_request_information', $row)) {
         $validNids = array(702);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
-          $rows[$rowNum]['civicrm_contact_request_information'] = NULL;
+          $rows[$rowNum]['civicrm_contact_request_information'] = 'No';
         }
         else {
-          $rows[$rowNum]['civicrm_contact_request_information'] = self::getCustomFieldDataLabels($row['civicrm_contact_request_information']);
-          $rows[$rowNum]['civicrm_contact_request_information'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_request_information']);
+          //$rows[$rowNum]['civicrm_contact_request_information'] = self::getCustomFieldDataLabels($row['civicrm_contact_request_information']);
+          //$rows[$rowNum]['civicrm_contact_request_information'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_request_information']);
+          $rows[$rowNum]['civicrm_contact_request_information'] = 'Yes';
           $entryFound = TRUE;
         }
+      }
+      else {
+        $rows[$rowNum]['civicrm_contact_request_information'] = 'No';
       }
 
       if (array_key_exists('civicrm_contact_csd_registration', $row)) {
