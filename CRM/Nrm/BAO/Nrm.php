@@ -195,9 +195,10 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
   function updateWatchdog_nrm() {
     $drupalDatabase = 'chowan2019_dru';
 
-    $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl)
+    $sql = "INSERT INTO {$drupalDatabase}.watchdog_nrm (wid, location, timestamp, purl, hostname)
             SELECT w.wid, w.location, w.timestamp, 
-            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(w.location, '://', -1), '/', 1) as purl,
+            w.hostname
             FROM {$drupalDatabase}.watchdog w 
             LEFT JOIN {$drupalDatabase}.watchdog_nrm n ON w.wid=n.wid 
             WHERE n.wid IS NULL";
@@ -212,6 +213,7 @@ class CRM_Nrm_BAO_Nrm extends CRM_Core_DAO {
    *   object that holds the results of the query, in this case no records
    */
   function filterIP() {
+return;
     $drupalDatabase = 'chowan2019_dru';
 
     $options = civicrm_api3('OptionValue', 'get', array(

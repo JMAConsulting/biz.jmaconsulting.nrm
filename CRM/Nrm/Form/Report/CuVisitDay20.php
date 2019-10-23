@@ -153,7 +153,7 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
   }
 
   function where() {
-    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 680);
+    CRM_Nrm_BAO_Nrm::reportWhereClause($this->_where, 428);
   }
 
   function groupBy() {
@@ -193,7 +193,7 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
       $drupalDatabase = 'chowan2019_dru';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
-        WHERE form_key = '{$formKey}' AND nid = 680";
+        WHERE form_key = '{$formKey}' AND nid = 428";
       if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id', 'how_did_you_hear_about_chowan', 'anticipated_academic_enroll_term', 'how_did_you_hear_about_cu_visit_day'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
@@ -222,6 +222,7 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
         value int(50) NOT NULL,
         name varchar(64) NOT NULL)");
       $sql = "INSERT INTO {$formKey} VALUES";
+      if (!empty($item)) {
       foreach ($item as $key => &$items) {
         if ($flag) {
           $items = trim(preg_replace('/[0-9]+/', NULL, $items));
@@ -237,6 +238,7 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
       }
       $sql .= implode(',', $vals);
       CRM_Core_DAO::executeQuery($sql);
+      }
     }
   }
 
