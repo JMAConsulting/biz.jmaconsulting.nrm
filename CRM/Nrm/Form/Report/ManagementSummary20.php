@@ -119,12 +119,13 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = w.purl_clean
       WHERE w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
-      AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+      AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND w.purl_clean <> '' AND w.purl_clean IS NOT NULL 
     ";
     CRM_Core_DAO::executeQuery($tempSql);
 
     // Create Visit log temporary table.
-    $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT p.purl_145 AS purl, p.entity_id as contact_id, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
+    $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT p.purl_145 AS purl, p.entity_id as contact_id, n.location as location,
+      DATE(FROM_UNIXTIME(timestamp)) AS timestamp
       FROM {$this->_drupalDatabase}.nrm_visit_log n
       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
       WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
@@ -159,75 +160,65 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        WHERE p.reporting_502 = 1 AND wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'";
     CRM_Core_DAO::executeQuery($downloadSql);
 
-    // Number of visitors in a day - TODO.
-    $visitorSql = "CREATE TEMPORARY TABLE civicrm_visitor_log AS SELECT ue.contact_id, ue.timestamp FROM
-       (SELECT e.contact_id, e.timestamp FROM
-       (SELECT contact_id, timestamp FROM civicrm_webform_visit w
+    // Number of visitors - cumulative.
+    $visitorSql = "SELECT COUNT(*) FROM
+       (SELECT contact_id FROM
+       (SELECT contact_id FROM civicrm_webform_visit w
        WHERE (1) {$engageWhere}
        UNION
-       SELECT contact_id, timestamp FROM civicrm_micro_log
+       SELECT contact_id FROM civicrm_micro_log
        UNION
-       SELECT contact_id, timestamp FROM civicrm_survey_log
+       SELECT contact_id FROM civicrm_survey_log
        UNION
-       SELECT contact_id, timestamp FROM civicrm_download_log
+       SELECT contact_id FROM civicrm_download_log
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
        WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL AND purl LIKE '%{$microsite}')
        GROUP BY e.contact_id
-       ) as ue";
-    CRM_Core_DAO::executeQuery($visitorSql);
+       ) as ue
+       ) AS num";
+    $cumulativeEngagement = CRM_Core_DAO::singleValueQuery($visitorSql);
 
-    $this->_select = "
-       SELECT '{$dateName}' as description, '' as perday_visitor_count
-       UNION
-       SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
-       (SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+    // Do each individual union operation here, since we cannot reopen MySQL temporary tables in the same query.
+
+    // Total unique visitors for the day.
+    $uniqueVisitors = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
         FROM civicrm_micro_visit
-        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-       ) as a
-       UNION
-       SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'");
+
+    // Total unique new visitors for the day.
+    $newVisitors = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM civicrm_micro_visit
        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        AND purl NOT IN (SELECT DISTINCT(purl)
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')
-       ) as c
-       UNION
-       SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
-       FROM civicrm_micro_visit
-       ) as e
-       UNION
-       SELECT 'Application page visits - yesterday' as description, COUNT(DISTINCT(g.purl)) as perday_visitor_count FROM
-       (
-         SELECT purl FROM civicrm_micro_log
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')");
+
+    // Cumulative unique visitors to date.
+    $cumulativeUniqueVisitors = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+       FROM civicrm_micro_visit");
+
+    // Application page visits - yesterday.
+    $appPageVisits = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) FROM civicrm_micro_log
          WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-         AND location LIKE '%apply.upike.edu%'
-       ) as g
-       UNION
-       SELECT 'Cumulative application page visits to date' as description, COUNT(DISTINCT(j.purl)) as perday_visitor_count FROM
-       (
-        SELECT purl FROM civicrm_micro_log
-         WHERE location LIKE '%apply.upike.edu%'
-       ) as j
-       UNION
-       SELECT 'Total Schedule a Visit page visits - yesterday' as description, COUNT(DISTINCT(m.purl)) as perday_visitor_count FROM
-       (
-         SELECT purl FROM civicrm_micro_log
+         AND location LIKE '%apply.upike.edu%'");
+
+    // Cumulative application page visits to date.
+    $cumulativeAppPageVisits = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) FROM civicrm_micro_log
          WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-         AND location LIKE '%upike-uga.edu%'
-       ) as m
-       UNION
-       SELECT 'Cumulative Schedule a Visit page visits to date' as description, COUNT(DISTINCT(n.purl)) as perday_visitor_count FROM
-       (
-         SELECT purl FROM civicrm_micro_log
-         WHERE location LIKE '%upike-uga.edu%'
-       ) as n
-       UNION
-       SELECT 'Unique visitors engaging for the day' as description, num.ecount + {$surveyCountDaily} as perday_visitor_count FROM
-       (SELECT COUNT(*) as ecount FROM
+         AND location LIKE '%apply.upike.edu%'");
+
+    // Total Schedule a Visit page visits - yesterday.
+    $scheduleVisits = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) FROM civicrm_micro_log
+         WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
+         AND location LIKE '%upike-uga.edu%'");
+
+    // Cumulative Schedule a Visit page visits to date.
+    $cumulativeScheduleVisits = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) FROM civicrm_micro_log
+         WHERE location LIKE '%upike-uga.edu%'");
+
+    // Unique visitors engaging for the day.
+    $uniqueVisitorEngage = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM
        (SELECT contact_id FROM
        (SELECT contact_id
        FROM civicrm_webform_visit w 
@@ -249,54 +240,34 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 	     AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
-       ) AS num
+       ) AS num");
+
+    $this->_select = "
+       SELECT '{$dateName}' as description, '' as perday_visitor_count
+       UNION
+       SELECT 'Total unique visitors for the day' as description, ({$uniqueVisitors} + {$visitCountDaily}) as perday_visitor_count
+       UNION
+       SELECT 'Total unique new visitors for the day' as description, ({$newVisitors} + {$visitCountUnique}) as perday_visitor_count
+       UNION
+       SELECT 'Cumulative unique visitors to date' as description, ({$cumulativeUniqueVisitors} + {$visitCountCumulative}) as perday_visitor_count
+       UNION
+       SELECT 'Application page visits - yesterday' as description, {$appPageVisits} as perday_visitor_count
+       UNION
+       SELECT 'Cumulative application page visits to date' as description, {$cumulativeAppPageVisits} as perday_visitor_count
+       UNION
+       SELECT 'Total Schedule a Visit page visits - yesterday' as description, {$scheduleVisits} as perday_visitor_count
+       UNION
+       SELECT 'Cumulative Schedule a Visit page visits to date' as description, {$cumulativeScheduleVisits} as perday_visitor_count
+       UNION
+       SELECT 'Unique visitors engaging for the day' as description, ({$uniqueVisitorEngage} + {$surveyCountDaily}) as perday_visitor_count
        UNION
        SELECT 'Daily engagement rate' as description,
-       IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountDaily}) * 100/denom.visit, 2),'%')) as perday_visitor_count
-       FROM
-       (SELECT (COUNT(DISTINCT(purl)) + {$visitCountDaily}) AS visit
-       FROM civicrm_micro_visit
-       WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-       ) AS denom
-       JOIN
-       (SELECT COUNT(*) as ecount FROM
-       (SELECT contact_id FROM
-       (SELECT contact_id FROM civicrm_webform_visit w
-       WHERE (1) {$engageWhere}
-       AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
+       IF({$uniqueVisitors} IS NULL OR {$uniqueVisitors} = 0, '0%', CONCAT(ROUND(({$uniqueVisitorEngage} + {$surveyCountDaily}) * 100/{$uniqueVisitors}, 2),'%')) as perday_visitor_count
        UNION
-       SELECT contact_id FROM civicrm_micro_log
-            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
+       SELECT 'Cumulative unique visitors that have engaged' as description, ({$cumulativeEngagement} + {$surveyCountCumulative}) as perday_visitor_count
        UNION
-       SELECT contact_id FROM civicrm_survey_log
-            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-       UNION
-       SELECT contact_id FROM civicrm_download_log
-            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-       ) as e
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL
-	     AND purl LIKE '%{$microsite}')
-       GROUP BY contact_id
-       ) as ue
-       ) AS num
-       UNION
-       SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount + {$surveyCountCumulative} as perday_visitor_count FROM
-       (SELECT COUNT(*) as ecount FROM
-       (SELECT contact_id FROM civicrm_visitor_sql
-       ) as ue
-       ) AS num
-       UNION
-       SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountCumulative}) * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT (COUNT(DISTINCT(purl)) + {$visitCountCumulative}) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE purl_clean <> '' AND purl_clean IS NOT NULL AND purl LIKE '%{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       ) AS denom
-       JOIN
-       (SELECT COUNT(*) as ecount FROM
-       (SELECT contact_id FROM civicrm_visitor_sql
-       ) as ue
-       ) AS num
+       SELECT 'Cumulative engagement rate' as description,
+       IF({$cumulativeUniqueVisitors} IS NULL OR {$cumulativeUniqueVisitors} = 0, '0%', CONCAT(ROUND(({$cumulativeEngagement} + {$surveyCountCumulative}) * 100/{$cumulativeUniqueVisitors}, 2),'%')) as perday_visitor_count
        UNION
        SELECT 'Cumulative Unsubscribes' as description, COUNT(num.contact_id) as perday_visitor_count FROM
        ( SELECT 1 as contact_id FROM
