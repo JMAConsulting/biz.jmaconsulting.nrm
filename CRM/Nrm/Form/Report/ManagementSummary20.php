@@ -109,10 +109,15 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     // Create Temporary table for visits. This will be used to calculate daily as well as cumulative visits.
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_micro_visit");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_micro_log");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_survey_log");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_webform_visit");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_download_log");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_visitor_log");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_survey_count");
     $tempSql = "
       CREATE TEMPORARY TABLE civicrm_micro_visit AS SELECT p.purl_145 AS purl, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
       FROM {$this->_drupalDatabase}.watchdog_nrm w
-      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
+      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = w.purl_clean
       WHERE w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
       AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
     ";
@@ -121,7 +126,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     // Create Visit log temporary table.
     $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT p.purl_145 AS purl, p.entity_id as contact_id, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
       FROM {$this->_drupalDatabase}.nrm_visit_log n
-      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
+      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
       WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
       AND p.reporting_502 = 1";
     CRM_Core_DAO::executeQuery($visitSql);
@@ -130,7 +135,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $surveySql = "CREATE TEMPORARY TABLE civicrm_survey_log AS SELECT p.entity_id as contact_id, DATE(FROM_UNIXTIME(w.completed)) AS timestamp
        FROM {$this->_drupalDatabase}.webform_submissions w
        INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
+       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
        WHERE w.nid = 564 AND p.reporting_502 = 1
        AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
        GROUP BY n.hostname";
@@ -150,7 +155,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $downloadSql = "CREATE TEMPORARY TABLE civicrm_download_log AS SELECT p.entity_id as contact_id, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
        FROM {$this->_drupalDatabase}.watchdog_nrm wn
        LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.{$microsite}', '') = p.purl_145
+       ON wn.purl_clean = p.purl_145
        WHERE p.reporting_502 = 1 AND wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'";
     CRM_Core_DAO::executeQuery($downloadSql);
 
@@ -167,8 +172,8 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        SELECT contact_id, timestamp FROM civicrm_download_log
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-       WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
+       WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL AND purl LIKE '%{$microsite}')
        GROUP BY e.contact_id
        ) as ue";
     CRM_Core_DAO::executeQuery($visitorSql);
@@ -239,13 +244,16 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
             WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
+	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL
+	     AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
        ) AS num
        UNION
-       SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountDaily}) * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
+       SELECT 'Daily engagement rate' as description,
+       IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountDaily}) * 100/denom.visit, 2),'%')) as perday_visitor_count
+       FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountDaily}) AS visit
        FROM civicrm_micro_visit
        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
@@ -267,8 +275,9 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
             WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
+	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL
+	     AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
        ) AS num
@@ -281,7 +290,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountCumulative}) * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
        (SELECT (COUNT(DISTINCT(purl)) + {$visitCountCumulative}) AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-       WHERE purl <> '{$microsite}'  AND purl LIKE '%{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       WHERE purl_clean <> '' AND purl_clean IS NOT NULL AND purl LIKE '%{$microsite}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
        ) AS denom
        JOIN
        (SELECT COUNT(*) as ecount FROM
@@ -376,24 +385,21 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
   function getSurveyCount($from, $to, $isDaily) {
     if ($isDaily) {
-      $sql = "SELECT COUNT(sid) FROM civicrm_survey_count WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'";
+      return CRM_Core_DAO::singleValueQuery("SELECT COUNT(sid) FROM civicrm_survey_count WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'");
     }
     else {
       $dateClause = "DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'";
     }
-    $sql = CRM_Core_DAO::singleValueQuery("CREATE TEMPORARY TABLE civicrm_survey_count AS 
+    CRM_Core_DAO::singleValueQuery("CREATE TEMPORARY TABLE civicrm_survey_count AS 
      SELECT DISTINCT(w.sid) as sid, w.completed as timestamp FROM {$this->_drupalDatabase}.webform_submissions w
      WHERE w.nid = 564 AND {$dateClause} AND w.sid NOT IN (SELECT w.sid
      FROM {$this->_drupalDatabase}.webform_submissions w
      INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-     INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
+     INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
      WHERE w.nid = 564
      AND {$dateClause}
      GROUP BY n.hostname)");
-    if (empty($sql)) {
-      $sql = 0;
-    }
-    return $sql;
+    return CRM_Core_DAO::singleValueQuery("SELECT COUNT(sid) FROM civicrm_survey_count");
   }
 
   function getWhereCondition($fieldName, $alias = '') {
