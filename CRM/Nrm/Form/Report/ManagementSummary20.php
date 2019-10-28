@@ -176,8 +176,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT purl_clean AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL AND purl LIKE '%{$microsite}')
        GROUP BY e.contact_id
-       ) as ue
-       ) AS num";
+       ) as a";
     $cumulativeEngagement = CRM_Core_DAO::singleValueQuery($visitorSql);
 
     // Do each individual union operation here, since we cannot reopen MySQL temporary tables in the same query.
@@ -191,7 +190,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $newVisitors = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
        FROM civicrm_micro_visit
        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
-       AND purl NOT IN (SELECT DISTINCT(purl)
+       AND purl NOT IN (SELECT DISTINCT(purl_clean)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')");
 
     // Cumulative unique visitors to date.
@@ -225,7 +224,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        WHERE (1) {$engageWhere}
        AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as contact_id FROM civicrm_micro_log
+       SELECT contact_id FROM civicrm_micro_log
             WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        UNION
         SELECT contact_id FROM civicrm_survey_log
@@ -239,8 +238,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl_clean <> '' AND purl_clean IS NOT NULL
 	     AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
-       ) as ue
-       ) AS num");
+       ) as a");
 
     $this->_select = "
        SELECT '{$dateName}' as description, '' as perday_visitor_count
@@ -313,7 +311,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
     //CRM_Nrm_BAO_Nrm::filterIP();
 
-    //CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
+    CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
 
     $sql = $this->buildQuery(FALSE);
 
