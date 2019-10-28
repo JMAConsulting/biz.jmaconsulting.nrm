@@ -163,7 +163,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     $visitorSql = "CREATE TEMPORARY TABLE civicrm_visitor_log AS SELECT ue.contact_id, ue.timestamp FROM
        (SELECT e.contact_id, e.timestamp FROM
        (SELECT contact_id, timestamp FROM civicrm_webform_visit w
-       WHERE {$engageWhere}
+       WHERE (1) {$engageWhere}
        UNION
        SELECT contact_id, timestamp FROM civicrm_micro_log
        UNION
@@ -231,7 +231,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        (SELECT contact_id FROM
        (SELECT contact_id
        FROM civicrm_webform_visit w 
-       WHERE {$engageWhere}
+       WHERE (1) {$engageWhere}
        AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
        UNION
        SELECT p.entity_id as contact_id FROM civicrm_micro_log
@@ -262,7 +262,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        (SELECT COUNT(*) as ecount FROM
        (SELECT contact_id FROM
        (SELECT contact_id FROM civicrm_webform_visit w
-       WHERE {$engageWhere}
+       WHERE (1) {$engageWhere}
        AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
        UNION
        SELECT contact_id FROM civicrm_micro_log
