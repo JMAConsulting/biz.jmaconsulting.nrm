@@ -106,153 +106,168 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     }
     CRM_Core_Error::debug('af', $visitors);
     exit; */
+    // Create Temporary table for visits. This will be used to calculate daily as well as cumulative visits.
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_micro_visit");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_micro_log");
+    $tempSql = "
+      CREATE TEMPORARY TABLE civicrm_micro_visit AS SELECT p.purl AS purl, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
+      FROM {$this->_drupalDatabase}.watchdog_nrm w
+      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
+      WHERE w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
+      AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+    ";
+    CRM_Core_DAO::executeQuery($tempSql);
+
+    // Create Visit log temporary table.
+    $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT p.purl, p.entity_id as contact_id, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
+      FROM {$this->_drupalDatabase}.nrm_visit_log n
+      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
+      WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+      AND p.reporting_502 = 1";
+    CRM_Core_DAO::executeQuery($visitSql);
+
+    // Create extra survey table.
+    $surveySql = "CREATE TEMPORARY TABLE civicrm_survey_log AS SELECT p.entity_id as contact_id, DATE(FROM_UNIXTIME(w.completed)) AS timestamp
+       FROM {$this->_drupalDatabase}.webform_submissions w
+       INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
+       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
+       WHERE w.nid = 564 AND p.reporting_502 = 1
+       AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
+       GROUP BY n.hostname";
+    CRM_Core_DAO::executeQuery($surveySql);
+
+    // Create webform submission table.
+    $webformSql = "CREATE TEMPORARY TABLE civicrm_webform_visit AS SELECT w.data as contact_id, ws.completed as timestamp, w.nid as nid
+       FROM {$this->_drupalDatabase}.webform_submitted_data w
+       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
+       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
+       WHERE w.data IS NOT NULL and w.data <> ''
+       AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
+       GROUP BY w.sid";
+    CRM_Core_DAO::executeQuery($webformSql);
+
+    // Create downloads table.
+    $downloadSql = "CREATE TEMPORARY TABLE civicrm_download_log AS SELECT p.entity_id as contact_id, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
+       FROM {$this->_drupalDatabase}.watchdog_nrm wn
+       LEFT JOIN civicrm_value_nrmpurls_5 p
+       ON REPLACE(wn.purl, '.{$microsite}', '') = p.purl_145
+       WHERE p.reporting_502 = 1 AND wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'";
+    CRM_Core_DAO::executeQuery($downloadSql);
+
+    // Number of visitors in a day - TODO.
+    $visitorSql = "CREATE TEMPORARY TABLE civicrm_visitor_log AS SELECT ue.contact_id, ue.timestamp FROM
+       (SELECT e.contact_id, e.timestamp FROM
+       (SELECT contact_id, timestamp FROM civicrm_webform_visit w
+       WHERE {$engageWhere}
+       UNION
+       SELECT contact_id, timestamp FROM civicrm_micro_log
+       UNION
+       SELECT contact_id, timestamp FROM civicrm_survey_log
+       UNION
+       SELECT contact_id, timestamp FROM civicrm_download_log
+       ) as e
+       INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
+       WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
+       GROUP BY e.contact_id
+       ) as ue";
+    CRM_Core_DAO::executeQuery($visitorSql);
+
     $this->_select = "
        SELECT '{$dateName}' as description, '' as perday_visitor_count
        UNION
        SELECT 'Total unique visitors for the day' as description, (a.purl_perday_visitor + {$visitCountDaily}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(w.purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm w
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
-       WHERE DATE(FROM_UNIXTIME(w.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.timestamp)) <= '{$to}'
-       AND w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
+       (SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+        FROM civicrm_micro_visit
+        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) as a
        UNION
        SELECT 'Total unique new visitors for the day' as description, (c.purl_perday_visitor + {$visitCountUnique}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(w.purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm w
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
-       WHERE DATE(FROM_UNIXTIME(w.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.timestamp)) <= '{$to}'
-       AND w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
-       AND (w.purl) NOT IN (SELECT DISTINCT(purl)
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+       FROM civicrm_micro_visit
+       WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
+       AND purl NOT IN (SELECT DISTINCT(purl)
        FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')
        ) as c
        UNION
        SELECT 'Cumulative unique visitors to date' as description, (e.purl_perday_visitor + {$visitCountCumulative}) as perday_visitor_count FROM
-       ( SELECT COUNT(DISTINCT(w.purl)) as purl_perday_visitor
-       FROM {$this->_drupalDatabase}.watchdog_nrm w
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
-       WHERE w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
-       AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       ( SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor
+       FROM civicrm_micro_visit
        ) as e
        UNION
        SELECT 'Application page visits - yesterday' as description, COUNT(DISTINCT(g.purl)) as perday_visitor_count FROM
        (
-         SELECT purl FROM {$this->_drupalDatabase}.nrm_visit_log n
-         INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
-         WHERE n.purl LIKE '%.{$microsite}'
-         AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+         SELECT purl FROM civicrm_micro_log
+         WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
          AND location LIKE '%apply.upike.edu%'
-         AND p.reporting_502 = 1
        ) as g
        UNION
        SELECT 'Cumulative application page visits to date' as description, COUNT(DISTINCT(j.purl)) as perday_visitor_count FROM
        (
-        SELECT purl FROM {$this->_drupalDatabase}.nrm_visit_log n
-         INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
-         WHERE n.purl LIKE '%.{$microsite}'
-         AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-         AND location LIKE '%apply.upike.edu%'
-         AND p.reporting_502 = 1
+        SELECT purl FROM civicrm_micro_log
+         WHERE location LIKE '%apply.upike.edu%'
        ) as j
        UNION
        SELECT 'Total Schedule a Visit page visits - yesterday' as description, COUNT(DISTINCT(m.purl)) as perday_visitor_count FROM
        (
-         SELECT purl FROM {$this->_drupalDatabase}.nrm_visit_log n
-         INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
-         WHERE n.purl LIKE '%.{$microsite}'
-         AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+         SELECT purl FROM civicrm_micro_log
+         WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
          AND location LIKE '%upike-uga.edu%'
-         AND p.reporting_502 = 1
        ) as m
        UNION
        SELECT 'Cumulative Schedule a Visit page visits to date' as description, COUNT(DISTINCT(n.purl)) as perday_visitor_count FROM
        (
-         SELECT purl FROM {$this->_drupalDatabase}.nrm_visit_log n
-         INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '')
-         WHERE n.purl LIKE '%.{$microsite}'
-         AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-         AND location LIKE '%upike-uga.edu%'
-         AND p.reporting_502 = 1
+         SELECT purl FROM civicrm_micro_log
+         WHERE location LIKE '%upike-uga.edu%'
        ) as n
        UNION
        SELECT 'Unique visitors engaging for the day' as description, num.ecount + {$surveyCountDaily} as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM
        (SELECT contact_id FROM
-       (SELECT w.data as contact_id
-       FROM {$this->_drupalDatabase}.webform_submitted_data w
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
-       WHERE (1) {$engageWhere}
-       AND data IS NOT NULL and data <> ''
-       AND DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
-       GROUP BY w.sid
+       (SELECT contact_id
+       FROM civicrm_webform_visit w 
+       WHERE {$engageWhere}
+       AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as contact_id FROM {$this->_drupalDatabase}.nrm_visit_log n 
-            INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}','')
-            WHERE purl LIKE '%.{$microsite}%'
-            AND p.reporting_502 = 1
-            AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       SELECT p.entity_id as contact_id FROM civicrm_micro_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as survey
-       FROM {$this->_drupalDatabase}.webform_submissions w
-       INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci
-       WHERE w.nid = 564 AND p.reporting_502 = 1
-       AND DATE(FROM_UNIXTIME(w.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
-       GROUP BY n.hostname
+        SELECT contact_id FROM civicrm_survey_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as download
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(wn.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(wn.timestamp)) <= '{$to}'
+        SELECT contact_id FROM civicrm_download_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') COLLATE utf8_unicode_ci AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
        ) AS num
        UNION
        SELECT 'Daily engagement rate' as description, IF(denom.visit IS NULL OR denom.visit = 0, '0%', CONCAT(ROUND((num.ecount + {$surveyCountDaily}) * 100/denom.visit, 2),'%')) as perday_visitor_count FROM
-       (SELECT (COUNT(DISTINCT(w.purl)) + {$visitCountDaily}) AS visit
-       FROM {$this->_drupalDatabase}.watchdog_nrm w
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(w.purl, '.{$microsite}', '')
-       WHERE DATE(FROM_UNIXTIME(w.timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.timestamp)) <= '{$to}'
-       AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}' AND reporting_502 = 1
+       (SELECT (COUNT(DISTINCT(purl)) + {$visitCountDaily}) AS visit
+       FROM civicrm_micro_visit
+       WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) AS denom
        JOIN
        (SELECT COUNT(*) as ecount FROM
        (SELECT contact_id FROM
-       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
-       WHERE (1) {$engageWhere}
-       AND w.data IS NOT NULL and w.data <> ''
-       AND DATE(FROM_UNIXTIME(ws.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
-       GROUP BY w.sid
+       (SELECT contact_id FROM civicrm_webform_visit w
+       WHERE {$engageWhere}
+       AND w.timestamp >= '{$from}' AND w.timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as contact_id FROM {$this->_drupalDatabase}.nrm_visit_log n 
-            INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}','')
-            WHERE purl LIKE '%.{$microsite}%'
-            AND p.reporting_502 = 1
-            AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       SELECT contact_id FROM civicrm_micro_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as survey
-       FROM {$this->_drupalDatabase}.webform_submissions w
-       INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci
-       WHERE w.nid = 564
-       AND DATE(FROM_UNIXTIME(w.completed)) >= '{$from}' AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
-       AND p.reporting_502 = 1
-       GROUP BY n.hostname
+       SELECT contact_id FROM civicrm_survey_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        UNION
-       SELECT p.entity_id as download
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
+       SELECT contact_id FROM civicrm_download_log
+            WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        ) as e
        INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') COLLATE utf8_unicode_ci AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
+	     WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
 	     WHERE DATE(FROM_UNIXTIME(timestamp)) >= '{$from}' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
        GROUP BY contact_id
        ) as ue
@@ -260,38 +275,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        UNION
        SELECT 'Cumulative unique visitors that have engaged' as description, num.ecount + {$surveyCountCumulative} as perday_visitor_count FROM
        (SELECT COUNT(*) as ecount FROM
-       (SELECT contact_id FROM
-       (SELECT w.data as contact_id from {$this->_drupalDatabase}.webform_submitted_data w
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
-       WHERE (1) {$engageWhere}
-       AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
-       GROUP BY w.sid
-       UNION
-       SELECT p.entity_id as contact_id FROM {$this->_drupalDatabase}.nrm_visit_log n 
-            INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}','')
-            WHERE purl LIKE '%.{$microsite}%'
-            AND p.reporting_502 = 1
-            AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       UNION
-       SELECT p.entity_id as survey
-       FROM {$this->_drupalDatabase}.webform_submissions w
-       INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci
-       WHERE w.nid = 564
-       AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
-       AND p.reporting_502 = 1
-       GROUP BY n.hostname
-       UNION
-       SELECT p.entity_id as download
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn LEFT JOIN civicrm_value_nrmpurls_5 p
-       ON REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE wn.location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       ) as e
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-       WHERE p.reporting_502 = 1 AND p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') COLLATE utf8_unicode_ci AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
-       GROUP BY contact_id
+       (SELECT contact_id FROM civicrm_visitor_sql
        ) as ue
        ) AS num
        UNION
@@ -301,38 +285,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        ) AS denom
        JOIN
        (SELECT COUNT(*) as ecount FROM
-       (SELECT contact_id FROM
-       (SELECT w.data as contact_id FROM
-       {$this->_drupalDatabase}.webform_submitted_data w
-       INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
-       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
-       WHERE (1) {$engageWhere}
-       AND w.data IS NOT NULL and w.data <> '' AND DATE(FROM_UNIXTIME(ws.completed)) <= '{$to}'
-       GROUP BY w.sid
-       UNION
-       SELECT p.entity_id as contact_id FROM {$this->_drupalDatabase}.nrm_visit_log n 
-            INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}','')
-            WHERE purl LIKE '%.{$microsite}%'
-            AND p.reporting_502 = 1
-            AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       UNION
-       SELECT p.entity_id as survey
-       FROM {$this->_drupalDatabase}.webform_submissions w
-       INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = REPLACE(n.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci
-       WHERE w.nid = 564 AND p.reporting_502 = 1
-       AND DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'
-       GROUP BY n.hostname
-       UNION
-       SELECT p.entity_id as download
-       FROM {$this->_drupalDatabase}.watchdog_nrm wn
-       LEFT JOIN civicrm_value_nrmpurls_5 p on REPLACE(wn.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
-       WHERE location LIKE '%files/%' AND DATE(FROM_UNIXTIME(timestamp)) <= '{$to}'
-       ) as e
-       INNER JOIN civicrm_value_nrmpurls_5 p ON p.entity_id = e.contact_id
-	     WHERE p.purl_145 IN (SELECT REPLACE(purl,'.{$microsite}','') COLLATE utf8_unicode_ci AS visit FROM {$this->_drupalDatabase}.watchdog_nrm
-	     WHERE DATE(FROM_UNIXTIME(timestamp)) <= '{$to}' AND purl <> '{$microsite}' AND purl LIKE '%{$microsite}')
-       GROUP BY contact_id
+       (SELECT contact_id FROM civicrm_visitor_sql
        ) as ue
        ) AS num
        UNION
