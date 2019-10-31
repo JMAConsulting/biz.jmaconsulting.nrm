@@ -587,7 +587,8 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
+      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145
+      WHERE p.reporting_502 = 1";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
     CRM_Core_DAO::executeQuery($sql);
@@ -603,6 +604,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       LEFT JOIN civicrm_value_nrmpurls_5 p ON w.purl_clean = p.purl_145
       WHERE w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}'
+      AND p.reporting_502 = 1
       GROUP BY w.location ";
     CRM_Core_DAO::executeQuery($sql);
   }
@@ -916,9 +918,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
           $sql = "SELECT DISTINCT(location) FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-            AND location LIKE '%{$microsite}%' AND (location LIKE '%application-admission%' OR location LIKE '%update-information%' OR location LIKE '%request-information%'
-            OR location LIKE '%soar%' OR location LIKE '%scholarship-day%' OR location LIKE '%personal-visit%'
-            OR location LIKE '%cu-visit-day%' OR location LIKE '%survey%')
+            AND location LIKE '%{$microsite}%')
             ";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
@@ -935,7 +935,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       
       if (array_key_exists('civicrm_contact_survey_response', $row)) {
         //$validNids = array(308,425);
-        $validNids = array(304,305,307,373,374,375,400,475,476,490,491,501,503,504);
+        $validNids = array(304,305,307,373,374,375,400,475,476,490,491,501,503,504,564,571,734);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_survey_response'] = NULL;
@@ -975,7 +975,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_cuvd_registration', $row)) {
-        $validNids = array(680);
+        $validNids = array(428);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_cuvd_registration'] = NULL;
@@ -1001,14 +1001,14 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       }
       
       if (array_key_exists('civicrm_contact_update_information', $row)) {
-        $validNids = array(669);
+        $validNids = array(552);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
-          $rows[$rowNum]['civicrm_contact_pvd_registration'] = NULL;
+          $rows[$rowNum]['civicrm_contact_update_information'] = NULL;
         }
         else {
-          $rows[$rowNum]['civicrm_contact_pvd_registration'] = self::getCustomFieldDataLabels($row['civicrm_contact_pvd_registration']);
-          $rows[$rowNum]['civicrm_contact_pvd_registration'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_pvd_registration']);
+          $rows[$rowNum]['civicrm_contact_update_information'] = self::getCustomFieldDataLabels($row['civicrm_contact_update_information']);
+          $rows[$rowNum]['civicrm_contact_update_information'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_update_information']);
           $entryFound = TRUE;
         }
       }
@@ -1040,7 +1040,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
       }
 
       if (CRM_Utils_Array::value('civicrm_contact_info_request', $row)) {
-        $validNids = array(668);
+        $validNids = array(551);
         $dao = self::hideInvalidRows($row['civicrm_contact_contact_id'], $validNids);
         if (!$dao->N) {
           $rows[$rowNum]['civicrm_contact_info_request'] = NULL;
