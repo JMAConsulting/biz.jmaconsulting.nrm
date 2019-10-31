@@ -11,5 +11,6 @@
 function civicrm_api3_nrm_addvisit($params) {
   // Filter the table once since the report will be run multiple times.
   CRM_Nrm_BAO_Nrm::updateWatchdog_nrm();
+  CRM_Nrm_BAO_Nrm::filterIP();
 }
 
