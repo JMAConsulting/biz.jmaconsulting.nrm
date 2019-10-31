@@ -115,7 +115,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_visitor_log");
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_survey_count");
     $tempSql = "
-      CREATE TEMPORARY TABLE civicrm_micro_visit AS SELECT p.purl_145 AS purl, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
+      CREATE TEMPORARY TABLE civicrm_micro_visit AS SELECT w.purl_clean AS purl, DATE(FROM_UNIXTIME(timestamp)) AS timestamp
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = w.purl_clean
       WHERE w.purl LIKE '%{$microsite}' AND p.reporting_502 = 1
@@ -124,7 +124,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($tempSql);
 
     // Create Visit log temporary table.
-    $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT p.purl_145 AS purl, p.entity_id as contact_id, n.location as location,
+    $visitSql = "CREATE TEMPORARY TABLE civicrm_micro_log AS SELECT n.purl_clean AS purl, p.entity_id as contact_id, n.location as location,
       DATE(FROM_UNIXTIME(timestamp)) AS timestamp
       FROM {$this->_drupalDatabase}.nrm_visit_log n
       INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
@@ -143,7 +143,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($surveySql);
 
     // Create webform submission table.
-    $webformSql = "CREATE TEMPORARY TABLE civicrm_webform_visit AS SELECT w.data as contact_id, ws.completed as timestamp, w.nid as nid
+    $webformSql = "CREATE TEMPORARY TABLE civicrm_webform_visit AS SELECT w.data as contact_id, DATE(FROM_UNIXTIME(ws.completed)) as timestamp, w.nid as nid
        FROM {$this->_drupalDatabase}.webform_submitted_data w
        INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = w.cid AND c.name = 'Contact ID' AND w.nid = c.nid
        INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = w.nid AND w.sid = ws.sid
@@ -354,21 +354,21 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
 
   function getSurveyCount($from, $to, $isDaily) {
     if ($isDaily) {
-      return CRM_Core_DAO::singleValueQuery("SELECT COUNT(sid) FROM civicrm_survey_count WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'");
+      return CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(sid)) FROM civicrm_survey_count WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'");
     }
     else {
       $dateClause = "DATE(FROM_UNIXTIME(w.completed)) <= '{$to}'";
     }
     CRM_Core_DAO::singleValueQuery("CREATE TEMPORARY TABLE civicrm_survey_count AS 
-     SELECT DISTINCT(w.sid) as sid, w.completed as timestamp FROM {$this->_drupalDatabase}.webform_submissions w
+     SELECT DISTINCT(w.sid) as sid, DATE(FROM_UNIXTIME(w.completed)) as timestamp FROM {$this->_drupalDatabase}.webform_submissions w
      WHERE w.nid = 564 AND {$dateClause} AND w.sid NOT IN (SELECT w.sid
      FROM {$this->_drupalDatabase}.webform_submissions w
      INNER JOIN {$this->_drupalDatabase}.watchdog_nrm n ON n.hostname = w.remote_addr
      INNER JOIN civicrm_value_nrmpurls_5 p ON p.purl_145 = n.purl_clean
-     WHERE w.nid = 564
+     WHERE w.nid = 564 AND p.reporting_502 = 1
      AND {$dateClause}
      GROUP BY n.hostname)");
-    return CRM_Core_DAO::singleValueQuery("SELECT COUNT(sid) FROM civicrm_survey_count");
+    return CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(sid)) FROM civicrm_survey_count");
   }
 
   function getWhereCondition($fieldName, $alias = '') {
