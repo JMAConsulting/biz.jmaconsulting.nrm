@@ -384,7 +384,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
 
     $this->_from .= "
         LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd1 ON wsd1.data = contact_civireport.id
-        LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = wsd1.nid AND wc.cid = wsd1.cid AND wc.name = 'Contact ID'
+        LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = wsd1.nid AND wc.cid = wsd1.cid AND (wc.name = 'Contact ID' or wc.name = 'Existing Contact')
         LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd1.sid = wsd.sid";
 
     if ($this->_params['fields']['wsd2.data'] == 1) {
@@ -1078,7 +1078,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
   function hideInvalidRows($cid, $validNids) {
     $validNids = implode(',', $validNids);
     $sql = "SELECT ws.sid from {$this->_drupalDatabase}.webform_submissions ws
-      LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND wc.name = 'Contact ID'
+      LEFT JOIN {$this->_drupalDatabase}.webform_component wc ON wc.nid = ws.nid AND (wc.name = 'Contact ID' or wc.name = 'Existing Contact')
       LEFT JOIN {$this->_drupalDatabase}.webform_submitted_data wsd ON wsd.sid = ws.sid AND wsd.nid = ws.nid AND wsd.cid = wc.cid
       WHERE DATE(FROM_UNIXTIME(ws.completed)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
       AND wsd.data = {$cid} AND ws.nid IN ({$validNids})
