@@ -311,6 +311,9 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
               $this->customCSDField = "CONCAT(" . implode(', ', $csdFields) . ")";
               $csdField = "{$this->customCSDField} as civicrm_contact_csd_application,";
             }
+            elseif ($tableName == 'civicrm_contact' && $field['name'] == 'sort_name') {
+              $visitorField = "{$field['dbAlias']} as civicrm_contact_sort_name, ";
+            }
             else {
               $select[] = "{$field['dbAlias']}";
               $select[] = "'<br/>'";
@@ -321,6 +324,7 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
     }
 
     $this->_select = "SELECT {$this->_aliases['civicrm_contact']}.id as civicrm_contact_contact_id, CONCAT(" . implode(', ', $select) . ") as civicrm_contact_display_name,
+      {$visitorField}
       t.first_visit as civicrm_contact_first_visit,
       {$logSelect}
       {$visitedSelect}
@@ -915,17 +919,16 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
         if ($purl) {
           $string = '';
           // Visits. 
-          $sql = "SELECT DISTINCT(location) FROM {$this->_drupalDatabase}.watchdog_nrm
+          $sql = "SELECT COUNT(DISTINCT(location)) as location FROM {$this->_drupalDatabase}.watchdog_nrm
             WHERE location LIKE {$purl}
             AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)
-            AND location LIKE '%{$microsite}%')
-            ";
+            AND location LIKE '%{$microsite}%'";
           $dao = CRM_Core_DAO::executeQuery($sql);
           if ($dao->N) {
             $string = "<br/><hr><b>Visits:</b><br/>";
           }
           while ($dao->fetch()) {
-            $string .= urldecode(basename($dao->location)) . "<br/>";
+            $string .= $dao->location . "<br/>";
           }
           $rows[$rowNum]['civicrm_contact_sort_name'] = $rows[$rowNum]['civicrm_contact_sort_name'] . $string;
           $rows[$rowNum]['civicrm_contact_sort_name'] = str_replace("<br/>", "<br/>\n", $rows[$rowNum]['civicrm_contact_sort_name']);
