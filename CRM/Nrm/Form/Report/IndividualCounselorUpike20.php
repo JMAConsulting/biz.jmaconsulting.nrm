@@ -690,6 +690,7 @@ class CRM_Nrm_Form_Report_IndividualCounselorUpike20 extends CRM_Report_Form {
       FROM {$this->_drupalDatabase}.watchdog_nrm w
       LEFT JOIN civicrm_value_nrmpurls_5 p ON w.purl_clean = p.purl_145
       WHERE w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}'
+      AND p.reporting_502 = 1
       GROUP BY w.location ";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
