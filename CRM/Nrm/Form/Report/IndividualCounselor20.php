@@ -579,32 +579,32 @@ class CRM_Nrm_Form_Report_IndividualCounselor20 extends CRM_Report_Form {
               FROM {$this->_drupalDatabase}.watchdog_nrm WHERE location LIKE '%{$microsite}%'
               AND DATE(FROM_UNIXTIME(timestamp)) = DATE_SUB(DATE(NOW()), INTERVAL 1 day)) as wy 
             ON w.purl=wy.purl";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_a ADD INDEX idx_purl (purl(255)) USING HASH";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
     
     $sql = "CREATE TEMPORARY TABLE civicrm_watchdog_temp_b AS
       SELECT {$this->_aliases['civicrm_contact']}.id as contact_id, p.purl_145, first_visit
       FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       INNER JOIN civicrm_value_nrmpurls_5 p ON {$this->_aliases['civicrm_contact']}.id = p.entity_id
-      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145 COLLATE utf8_general_ci";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+      INNER JOIN civicrm_watchdog_temp_a w ON w.purl = p.purl_145";
+    CRM_Core_DAO::executeQuery($sql);
     $sql = "ALTER TABLE civicrm_watchdog_temp_b ADD INDEX idx_purl (purl_145(255)) USING HASH, ADD INDEX idx_c_id (contact_id) USING HASH";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
 
     $sql = "CREATE TEMPORARY TABLE civicrm_visit_times AS 
       SELECT wsd.data as contact_id, ws.completed as visit_time
       FROM {$this->_drupalDatabase}.webform_submitted_data wsd    
-      INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND c.name = 'Contact ID' and wsd.nid = c.nid
+      INNER JOIN {$this->_drupalDatabase}.webform_component c ON c.cid = wsd.cid AND (c.name = 'Contact ID' or c.name = 'Existing Contact') and wsd.nid = c.nid
       INNER JOIN {$this->_drupalDatabase}.webform_submissions ws ON ws.nid = wsd.nid AND wsd.sid = ws.sid
       GROUP BY wsd.sid
       UNION
       SELECT p.entity_id as contact_id, w.timestamp as visit_time
       FROM {$this->_drupalDatabase}.watchdog_nrm w
-      LEFT JOIN civicrm_value_nrmpurls_5 p ON REPLACE(w.purl, '.{$microsite}', '') COLLATE utf8_unicode_ci = p.purl_145
+      LEFT JOIN civicrm_value_nrmpurls_5 p ON w.purl_clean = p.purl_145
       WHERE w.purl <> '{$microsite}' AND w.purl LIKE '%{$microsite}'
       GROUP BY w.location ";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
   }
   
   function createSurveyResponse() {
