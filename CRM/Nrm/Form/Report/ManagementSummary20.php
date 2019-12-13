@@ -197,7 +197,7 @@ class CRM_Nrm_Form_Report_ManagementSummary20 extends CRM_Report_Form {
        FROM civicrm_micro_visit
        WHERE timestamp >= '{$from}' AND timestamp <= '{$to}'
        AND purl NOT IN (SELECT DISTINCT(purl_clean)
-       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}')");
+       FROM {$this->_drupalDatabase}.watchdog_nrm WHERE DATE(FROM_UNIXTIME(timestamp)) < '{$to}' AND purl_clean IS NOT NULL)");
 
     // Cumulative unique visitors to date.
     $cumulativeUniqueVisitors = CRM_Core_DAO::singleValueQuery("SELECT COUNT(DISTINCT(purl)) as purl_perday_visitor

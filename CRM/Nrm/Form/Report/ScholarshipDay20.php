@@ -169,15 +169,19 @@ class CRM_Nrm_Form_Report_ScholarshipDay20 extends CRM_Report_Form {
       if (in_array($formKey, array('civicrm_1_participant_1_participant_event_id'))) {
         $result = CRM_Core_DAO::singleValueQuery($sql);
         $result = unserialize($result);
-        $item = explode('|', $result['items']);
-        $flag = TRUE;
+        $indItems = explode("\n", $result['items']);
+        foreach ($indItems as $indItem) {
+          $val = explode('|', $indItem);
+          $item[$val[0]] = $val[1];
+        }
+      /*  $flag = TRUE;
         if ($formKey == 'civicrm_1_participant_1_participant_event_id') {
           $flag = FALSE;
           $date = TRUE;
           $temp = $item;
           $item = array();
           $item['dates'] = array_chunk($temp, 2);
-        }
+          } */
       }
       CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$formKey}");
       CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE IF NOT EXISTS {$formKey} (
