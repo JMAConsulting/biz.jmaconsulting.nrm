@@ -190,7 +190,7 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
   function createWebformTemp($formKeys) {
     foreach ($formKeys as $formKey) {
       $item = $vals = array();
-      $drupalDatabase = 'chowan2019_dru';
+      $drupalDatabase = 'chowan2020_dru';
       $sql = "SELECT extra
         FROM {$drupalDatabase}.webform_component
         WHERE form_key = '{$formKey}' AND nid = 428";
@@ -209,11 +209,8 @@ class CRM_Nrm_Form_Report_CuVisitDay20 extends CRM_Report_Form {
       }
       if ($formKey == 'anticipated_academic_enroll_year') {
         $item = array(
-          1 => 2015,
-          2 => 2016,
-          3 => 2017,
-          4 => 2018,
-          5 => 2019,
+          1 => 2020,
+          2 => 2021,
         );
         $flag = FALSE;
       }
